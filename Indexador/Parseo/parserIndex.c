@@ -1,4 +1,5 @@
 #include "parserIndex.h"
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -22,6 +23,7 @@ int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas){
 
 	return PARSERINDEX_OK;
 }
+
 
 
 int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* cant){
