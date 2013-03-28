@@ -9,7 +9,13 @@ En caso de haber mas, se devuelve error (cte PARSERINDEX_ERROR), sino, en 'caden
 quedara guardado en cada lugar (2) el valor de cada uno, siendo el primero el nombre
 del repositorio, y el segundo el directorio de archivos a indexar, y devolvera PARSERINDEX_OK.
 Precondicion: 'cadenas' tiene el lugar para (minimamente) de cadenas.*/
-int parserIndexObtenerParametros(int argc, char** argv,char** cadenas);
+int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas);
+
+
+/*A partir de la ruta del directorio que se quiere indexar, se obtienen la totalidad
+ * de archivos que se tienen en el directorio (aclaracion: por ahora solo de ese directorio,
+ * no de los sub-directorios)*/
+int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* cant);
 
 
 #endif
