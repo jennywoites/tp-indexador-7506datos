@@ -17,5 +17,7 @@ int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas);
  * no de los sub-directorios)*/
 int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* cant);
 
+//Va a haber que ver bien como se hace este. TODAVIA NO ESTA TERMINADO, SOLO EMPEZADO
+int parserIndex_parsearArchivo(const char* archivo);
 
 #endif

@@ -3,12 +3,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 //Para poder ver lo que haya en un directorio:
 #include <dirent.h>
 #define DT_DIR 4
 #define DT_FILE 8
 
+#define TAM 50
+const char* LECTURA = "r";
 
 int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas){
 	if (argc != 3){
@@ -54,4 +57,60 @@ int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* ca
 	free(directorios);
 	*rutas = r;
 	return PARSERINDEX_OK;
+}
+
+/* **************************************************************************** */
+
+//void eliminarCaracteresPrescindibles(char*);
+//void tratarPalabra(char*);
+bool caracterDeSeparacion(char c);
+bool lectura_anticipada(FILE*, char*);
+
+int parserIndex_parsearArchivo(const char* archivo){
+	FILE* arch = fopen(archivo, LECTURA);
+	if (!arch) return PARSERINDEX_ERROR;
+
+	unsigned int i;
+	unsigned int tam = TAM;
+
+	while (!feof(arch)){
+		char* buffer = malloc (sizeof(char) * TAM);
+		i = 0;
+		char c;
+		while (lectura_anticipada(arch, &c) && !caracterDeSeparacion(c)){
+			if (i == tam){
+				tam += TAM;
+				buffer = realloc (buffer, sizeof(char)*tam);
+			}
+			buffer[i] = c;
+			i++;
+		}
+		if (i == tam)
+			buffer = realloc (buffer, sizeof(char)*(tam+1));
+		buffer[i] = '\0';
+
+		//TODO: Ver como hacemos con las palabras que dupliquemos
+		//eliminarCaracteresPrescindibles(buffer);
+		//tratarPalabra(buffer);
+		free(buffer);
+	}
+
+	fclose(arch);
+	return PARSERINDEX_OK;
+}
+
+bool caracterDeSeparacion(char c){
+	static const char SEPARADORES[] ={' ', '-'};
+	unsigned int CANT_SEPARADORES = 2;
+
+	for (unsigned int i = 0; i < CANT_SEPARADORES; i++)
+		if (c == SEPARADORES[i]) return true;
+
+	return false;
+}
+
+bool lectura_anticipada(FILE* arch, char* c){
+	if (feof(arch)) return false;
+	(*c) = fgetc (arch);
+	return true;
 }
