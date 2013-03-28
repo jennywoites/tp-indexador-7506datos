@@ -24,13 +24,17 @@ int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas){
 	return PARSERINDEX_OK;
 }
 
+int filtro (struct dirent* d){
+	if (strcmp(d->d_name, ".") == 0 || strcmp(d->d_name, "..") == 0) return 0;
 
+	return 1;
+}
 
 int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* cant){
 	struct dirent** directorios = NULL;
 
 
-	(*cant) = scandir(directorio, &directorios, NULL, NULL);
+	(*cant) = scandir(directorio, &directorios, filtro, NULL);
 	//El tercer campo es una funcion de filtro que si devuelve 0, hara que se ignore
 	//el directorio/archivo leido. El cuarto campo es una funcion de ordenamiento
 	//(creo que se puede mandar una que se llama alphasort());
@@ -41,8 +45,9 @@ int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* ca
 	for (int i = 0; i < (*cant); i++){
 		r[i] = malloc (sizeof(char)*(strlen(directorios[i]->d_name)+1));
 		strcpy(r[i], directorios[i]->d_name);
+		free(directorios[i]);
 	}
-
+	free(directorios);
 	*rutas = r;
 	return PARSERINDEX_OK;
 }
