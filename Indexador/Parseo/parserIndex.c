@@ -35,7 +35,7 @@ int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* ca
 
 
 	(*cant) = scandir(directorio, &directorios, filtro, NULL);
-	//El tercer campo es una funcion de filtro que si devuelve 0, implica que se ignore
+	//El tercer campo es una funcion de filtro que si devuelve 0, hara que se ignore
 	//el directorio/archivo leido. El cuarto campo es una funcion de ordenamiento
 	//(creo que se puede mandar una que se llama alphasort());
 
@@ -43,8 +43,8 @@ int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* ca
 	if (!rutas) return PARSERINDEX_ERROR;
 
 	for (int i = 0; i < (*cant); i++){
-		r[i] = malloc (sizeof(char)*(strlen(directorios[i]->d_name)+1));
-		strcpy(r[i], directorios[i]->d_name);
+		r[i] = malloc (sizeof(char)*(strlen(directorios[i]->d_name) + strlen(directorio)+2));
+		sprintf(r[i], "%s/%s", directorio, directorios[i]->d_name);
 		free(directorios[i]);
 	}
 	free(directorios);
