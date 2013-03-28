@@ -11,7 +11,7 @@ int main (int argc, char** argv){
 		char** dirs = NULL;
 		int cant;
 		if (parserIndex_obtenerRutasDirectorios(cadenas[1], &dirs, &cant) == PARSERINDEX_OK){
-			printf("Se encontrar los siguientes archivos:\n");
+			printf("Se encontraron los siguientes archivos:\n");
 			for (int i = 0; i < cant; i++){
 				printf("%s\n",dirs[i]);
 			}
