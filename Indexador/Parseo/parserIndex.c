@@ -35,7 +35,7 @@ int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* ca
 
 
 	(*cant) = scandir(directorio, &directorios, filtro, NULL);
-	//El tercer campo es una funcion de filtro que si devuelve 0, hara que se ignore
+	//El tercer campo es una funcion de filtro que si devuelve 0, implica que se ignore
 	//el directorio/archivo leido. El cuarto campo es una funcion de ordenamiento
 	//(creo que se puede mandar una que se llama alphasort());
 
