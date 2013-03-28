@@ -4,9 +4,10 @@
 #include <stdlib.h>
 #include <stddef.h>
 
-
 //Para poder ver lo que haya en un directorio:
 #include <dirent.h>
+#define DT_DIR 4
+#define DT_FILE 8
 
 
 int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas){
@@ -27,6 +28,8 @@ int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas){
 int filtro (struct dirent* d){
 	if (strcmp(d->d_name, ".") == 0 || strcmp(d->d_name, "..") == 0) return 0;
 
+	//Por ahora, a los sub-directorios los descartamos (y cualquier cosa que no sea un archivo)
+	if (d->d_type != DT_FILE) return 0;
 	return 1;
 }
 
@@ -39,6 +42,7 @@ int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* ca
 	//el directorio/archivo leido. El cuarto campo es una funcion de ordenamiento
 	//(creo que se puede mandar una que se llama alphasort());
 
+	if ((*cant) <= 0) return PARSERINDEX_ERROR;
 	char** r = malloc (sizeof(char*) * (*cant));
 	if (!rutas) return PARSERINDEX_ERROR;
 
