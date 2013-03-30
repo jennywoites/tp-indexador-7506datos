@@ -11,7 +11,7 @@
 #define DT_FILE 8
 
 #define TAM 50
-//se abren los archivos en modo lectura
+//se abren los archivos en modo lectura simple
 const char* LECTURA = "r";
 
 int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas){
