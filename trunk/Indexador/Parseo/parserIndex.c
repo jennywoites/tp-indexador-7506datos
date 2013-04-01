@@ -13,6 +13,13 @@
 
 #define TAM 50
 
+const char SEPARADORES[] = {' ', '-'};
+unsigned int CANT_SEPARADORES = 2;
+const char PRESCINDIBLES[] = {',' , ';' , '.' , '?' , '!'};
+unsigned int CANT_PRESCINDIBLES = 5;
+const char DUPLICANTES[] = {'\"'};
+unsigned int CANT_DUPLICANTES = 1;
+
 int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas){
 	if (argc != 3){
 		//ver si se hace algo en caso de tener argumentos de mas o de menos
@@ -61,10 +68,10 @@ int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* ca
 
 /* **************************************************************************** */
 
-//void eliminarCaracteresPrescindibles(char*);
+char* eliminarCaracteresPrescindibles(char*, bool);
 //void tratarPalabra(char*);
 bool caracterDeSeparacion(char c);
-bool lectura_anticipada(FILE*, char*);
+bool esNecesarioDuplicar(char*);
 
 int parserIndex_parsearArchivo(const char* archivo){
 	FILE* arch = fopen(archivo, lectura_archivos());
@@ -72,7 +79,7 @@ int parserIndex_parsearArchivo(const char* archivo){
 
 	unsigned int i;
 	unsigned int tam = TAM;
-
+	unsigned int pos = 0;
 	while (!feof(arch)){
 		char* buffer = malloc (sizeof(char) * TAM);
 		i = 0;
@@ -89,10 +96,20 @@ int parserIndex_parsearArchivo(const char* archivo){
 			buffer = realloc (buffer, sizeof(char)*(tam+1));
 		buffer[i] = '\0';
 
-		//TODO: Ver como hacemos con las palabras que dupliquemos
-		//eliminarCaracteresPrescindibles(buffer);
-		//tratarPalabra(buffer);
+
+		char* bufferSinEliminables = eliminarCaracteresPrescindibles(buffer, false);
+
+		//tratarPalabra(bufferSinEliminables, archivo, pos);
+
+		if (esNecesarioDuplicar(buffer)){
+			char* bufferSinDuplicantes = eliminarCaracteresPrescindibles(buffer, true);
+			//tratarPalabra(bufferSinDuplicantes, archivo, pos);
+			free(bufferSinDuplicantes);
+		}
+
 		free(buffer);
+		free(bufferSinEliminables);
+		pos++;
 	}
 
 	fclose(arch);
@@ -100,11 +117,47 @@ int parserIndex_parsearArchivo(const char* archivo){
 }
 
 bool caracterDeSeparacion(char c){
-	static const char SEPARADORES[] ={' ', '-'};
-	unsigned int CANT_SEPARADORES = 2;
+
 
 	for (unsigned int i = 0; i < CANT_SEPARADORES; i++)
 		if (c == SEPARADORES[i]) return true;
 
+	return false;
+}
+
+bool caracterDuplicante(char c){
+	for (unsigned int i = 0; i < CANT_DUPLICANTES; i++){
+		if (c == DUPLICANTES[i]) return true;
+	}
+	return false;
+}
+
+char* eliminarCaracteresPrescindibles(char* cadena, bool duplicante){
+	char* nueva = malloc (sizeof(char)* (strlen(cadena)+1));
+	unsigned int cant = 0;
+	for (unsigned int i = 0; i < strlen(cadena); i++){
+		bool elim = false;
+		unsigned int j = 0;
+		while (!elim && j < CANT_PRESCINDIBLES){
+			elim = (cadena[i] == PRESCINDIBLES[j]);
+			j++;
+		}
+
+		if (!elim || !duplicante || !caracterDuplicante(cadena[i])){ //De Morgan FTW
+			nueva[cant] = cadena[i];
+			cant++;
+		}
+
+	}
+	nueva[cant] = "\0";
+	return nueva;
+}
+
+bool esNecesarioDuplicar(char* cadena){
+	//Por ahora la hago simple:
+	for (unsigned int i = 0 ; i < CANT_DUPLICANTES; i++){
+		if (cadena[0] == DUPLICANTES[i] || cadena[strlen(cadena)-1] == DUPLICANTES[i])
+			return true;
+	}
 	return false;
 }
