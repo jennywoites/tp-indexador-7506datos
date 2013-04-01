@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "../Manejo de Archivos/funcionesGeneralesArchivos.h"
 
 //Para poder ver lo que haya en un directorio:
 #include <dirent.h>
@@ -11,7 +12,6 @@
 #define DT_FILE 8
 
 #define TAM 50
-const char* LECTURA = "r"; //se abren los archivos en modo lectura simple
 
 int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas){
 	if (argc != 3){
@@ -67,7 +67,7 @@ bool caracterDeSeparacion(char c);
 bool lectura_anticipada(FILE*, char*);
 
 int parserIndex_parsearArchivo(const char* archivo){
-	FILE* arch = fopen(archivo, LECTURA);
+	FILE* arch = fopen(archivo, lectura_archivos());
 	if (!arch) return PARSERINDEX_ERROR;
 
 	unsigned int i;
@@ -107,10 +107,4 @@ bool caracterDeSeparacion(char c){
 		if (c == SEPARADORES[i]) return true;
 
 	return false;
-}
-
-bool lectura_anticipada(FILE* arch, char* c){
-	if (feof(arch)) return false;
-	(*c) = fgetc (arch);
-	return true;
 }
