@@ -1,5 +1,7 @@
 #include "funcionesGeneralesArchivos.h"
 
+const char* LECTURA = "r";
+const char* ESCRITURA = "w";
 bool lectura_anticipada(FILE* arch, char* c){
 	if (feof(arch)) return false;
 	(*c) = fgetc (arch);
@@ -8,8 +10,8 @@ bool lectura_anticipada(FILE* arch, char* c){
 
 
 const char* lectura_archivos(){
-	return "r";
+	return LECTURA;
 }
 const char* escritura_archivos(){
-	return "w";
+	return ESCRITURA;
 }
