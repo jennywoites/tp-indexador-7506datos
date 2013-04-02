@@ -9,6 +9,8 @@ const char* REPO_GRANDE = "--repository";
 const char* QUERY_CHICO = "-q";
 const char* QUERY_GRANDE = "--query";
 
+void __toLowerCase(char*);
+
 int parserFinder_obtenerParametros(int argc, char** argv,char** cadenas){
 	/*Tienen que venir 5 parametros:
 	 * 1) El que siempre viene (el nombre del programa)
@@ -49,5 +51,15 @@ int parserFinder_obtenerParametros(int argc, char** argv,char** cadenas){
 		free(cadenas[0]);
 		return PARSERFINDER_ERROR;
 	}
+	__toLowerCase(cadenas[1]);
 	return PARSERFINDER_OK;
+}
+
+void __toLowerCase(char* cadena){
+	for (unsigned int i = 0; i < strlen(cadena); i++){
+		char c = cadena[i];
+		if (c <= 'Z' && c >= 'A'){
+			cadena[i] = c - ('A' - 'a');
+		}
+	}
 }
