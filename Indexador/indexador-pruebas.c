@@ -19,6 +19,8 @@ int main (int argc, char** argv){
 			printf("Hubo algun error en la busqueda por directorios\n");
 		}
 
+		parserIndex_parsearArchivo(dirs[0]);
+
 		free(cadenas[0]);
 		free(cadenas[1]);
 
@@ -28,8 +30,6 @@ int main (int argc, char** argv){
 	}else{
 		printf("Hubo un error en el parseo\n");
 	}
-
-
 
 
 	return 0;

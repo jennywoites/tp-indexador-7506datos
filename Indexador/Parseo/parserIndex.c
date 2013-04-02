@@ -13,8 +13,8 @@
 
 #define TAM 50
 
-const char SEPARADORES[] = {' ', '-'};
-unsigned int CANT_SEPARADORES = 2;
+const char SEPARADORES[] = {' ', '-', '\n', '/'};
+unsigned int CANT_SEPARADORES = 4;
 const char PRESCINDIBLES[] = {',' , ';' , '.' , '?' , '!'};
 unsigned int CANT_PRESCINDIBLES = 5;
 const char DUPLICANTES[] = {'\"'};
@@ -69,12 +69,12 @@ int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* ca
 /* **************************************************************************** */
 
 char* eliminarCaracteresPrescindibles(char*, bool);
-//void tratarPalabra(char*);
+void tratarPalabra(char*, const char*, unsigned int);
 bool caracterDeSeparacion(char c);
 bool esNecesarioDuplicar(char*);
 
-int parserIndex_parsearArchivo(const char* archivo){
-	FILE* arch = fopen(archivo, lectura_archivos());
+int parserIndex_parsearArchivo(const char* ruta_archivo){
+	FILE* arch = fopen(ruta_archivo, lectura_archivos());
 	if (!arch) return PARSERINDEX_ERROR;
 
 	unsigned int i;
@@ -99,11 +99,11 @@ int parserIndex_parsearArchivo(const char* archivo){
 
 		char* bufferSinEliminables = eliminarCaracteresPrescindibles(buffer, false);
 
-		//tratarPalabra(bufferSinEliminables, archivo, pos);
+		tratarPalabra(bufferSinEliminables, ruta_archivo, pos);
 
-		if (esNecesarioDuplicar(buffer)){
+		if (esNecesarioDuplicar(bufferSinEliminables)){
 			char* bufferSinDuplicantes = eliminarCaracteresPrescindibles(buffer, true);
-			//tratarPalabra(bufferSinDuplicantes, archivo, pos);
+			tratarPalabra(bufferSinDuplicantes, ruta_archivo, pos);
 			free(bufferSinDuplicantes);
 		}
 
@@ -117,7 +117,6 @@ int parserIndex_parsearArchivo(const char* archivo){
 }
 
 bool caracterDeSeparacion(char c){
-
 
 	for (unsigned int i = 0; i < CANT_SEPARADORES; i++)
 		if (c == SEPARADORES[i]) return true;
@@ -143,13 +142,14 @@ char* eliminarCaracteresPrescindibles(char* cadena, bool duplicante){
 			j++;
 		}
 
-		if (!elim || !duplicante || !caracterDuplicante(cadena[i])){ //De Morgan FTW
-			nueva[cant] = cadena[i];
-			cant++;
+		if(!elim){
+			if (!duplicante || !caracterDuplicante(cadena[i])){
+				nueva[cant] = cadena[i];
+				cant++;
+			}
 		}
-
 	}
-	nueva[cant] = "\0";
+	nueva[cant] = '\0';
 	return nueva;
 }
 
@@ -160,4 +160,9 @@ bool esNecesarioDuplicar(char* cadena){
 			return true;
 	}
 	return false;
+}
+
+void tratarPalabra(char* palabra, const char* texto, unsigned int pos){
+	//Por ahora voy a imprimir simplemente:
+	printf("%s\t\t%s\t%u\n", palabra, texto, pos);
 }
