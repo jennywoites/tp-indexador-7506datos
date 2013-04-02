@@ -5,6 +5,7 @@ const char* ESCRITURA = "w";
 bool lectura_anticipada(FILE* arch, char* c){
 	if (feof(arch)) return false;
 	(*c) = fgetc (arch);
+	if ((*c)==EOF) return false;
 	return true;
 }
 
