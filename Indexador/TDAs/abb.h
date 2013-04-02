@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-//Declaracion del nombre de la estructura de arbol abb
+//Declaración del nombre de la estructura de arbol abb
 typedef struct abb abb_t;
 
-//Delclaracion del tipo de funcion comparar
+//Delclaración del tipo de funcion comparar
 typedef int (*abb_comparar_clave_t) (const char *, const char *);
 
 //Declaracion del tipo de funcion destruir dato
