@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include "Parseo/parserIndex.h"
 #include <stdlib.h>
+#include "Diccionarios/diccionarioMaestro.h"
+
+void print_test(char* name, bool result){
+    printf("%s: %s\n", name, result? "OK" : "ERROR");
+}
+
 
 int main (int argc, char** argv){
 
@@ -19,10 +25,10 @@ int main (int argc, char** argv){
 			printf("Hubo algun error en la busqueda por directorios\n");
 		}
 
-		parserIndex_parsearArchivo(dirs[0]);
-
 		free(cadenas[0]);
 		free(cadenas[1]);
+
+		parserIndex_parsearArchivo(dirs[0]);
 
 		for (int j = 0; j < cant; j++)
 			free(dirs[j]);
@@ -30,7 +36,6 @@ int main (int argc, char** argv){
 	}else{
 		printf("Hubo un error en el parseo\n");
 	}
-
 
 	return 0;
 }

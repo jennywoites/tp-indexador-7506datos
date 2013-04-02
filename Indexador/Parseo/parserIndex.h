@@ -19,7 +19,10 @@ int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas);
  * Memoria: en rutas se guarda memoria para cant elementos, asi tambien como memoria para*/
 int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* cant);
 
-//Va a haber que ver bien como se hace este. TODAVIA NO ESTA TERMINADO, SOLO EMPEZADO
+/* A partir de la ruta de un archivo, lo lee entero y realiza un tratado de cada palabra,
+ * teniendo en cuenta la posicion de tal, y el texto al que pertenece, asi como las distintas restricciones
+ * para las palabras.
+ * Aclaracion: el tratado que se realizara es sobre las palabras, previamente pasandolas a minusculas.*/
 int parserIndex_parsearArchivo(const char* archivo);
 
 #endif

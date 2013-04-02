@@ -72,6 +72,7 @@ char* eliminarCaracteresPrescindibles(char*, bool);
 void tratarPalabra(char*, const char*, unsigned int);
 bool caracterDeSeparacion(char c);
 bool esNecesarioDuplicar(char*);
+void __toLowerCase(char*);
 
 int parserIndex_parsearArchivo(const char* ruta_archivo){
 	FILE* arch = fopen(ruta_archivo, lectura_archivos());
@@ -96,6 +97,7 @@ int parserIndex_parsearArchivo(const char* ruta_archivo){
 			buffer = realloc (buffer, sizeof(char)*(tam+1));
 		buffer[i] = '\0';
 
+		__toLowerCase(buffer);
 
 		char* bufferSinEliminables = eliminarCaracteresPrescindibles(buffer, false);
 
@@ -165,4 +167,13 @@ bool esNecesarioDuplicar(char* cadena){
 void tratarPalabra(char* palabra, const char* texto, unsigned int pos){
 	//Por ahora voy a imprimir simplemente:
 	printf("%s\t\t%s\t%u\n", palabra, texto, pos);
+}
+
+void __toLowerCase(char* cadena){
+	for (unsigned int i = 0; i < strlen(cadena); i++){
+		char c = cadena[i];
+		if (c <= 'Z' && c >= 'A'){
+			cadena[i] = c - ('A' - 'a');
+		}
+	}
 }
