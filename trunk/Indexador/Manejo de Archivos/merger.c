@@ -1,29 +1,54 @@
 #include "merger.h"
 #include "funcionesGeneralesArchivos.h"
-#include "../TDAs/abb.h"
+#include "../TDAs/heap.h"
 #include <stddef.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 #define CANT_ARCHIVOS_SEGUIDOS 10
 #define CANT_REGISTROS_POR_ARCHIVO 10
 
-const char* SALIDA = "salida.txt"; 	//salida que se usara para el merge
+const char* SALIDA = "salida.txt"; 			//salida que se usara para el merge
+const char* SALIDA_TEMPORAL = "temp.txt";	//salida para archivos temporales
+
+/*Definicion del tipo de datos a guardar dentro del heap para hacer de auxiliar en el merge*/
+typedef struct{
+	//registro_t* registro;
+	unsigned int numArchivo;
+}dato_t;
 
 
 //ACLARACION: se hace un merge multi-etapa
 
 FILE** abrir_archivos(char**, int, unsigned int);
 void cerrar_archivos(FILE**, int);
-void agregar_elementos(abb_t*, FILE**, int);
-char* procesar_archivos(abb_t*, FILE**, int, unsigned int, FILE*);
+void verificarYAgregarElementos(heap_t*, unsigned int*,FILE**, int);
+void procesar_archivos(heap_t* heap,unsigned int* contadores ,FILE** archivos, int cant, FILE* salida);
+char* __crear_ruta(unsigned int, unsigned int);
 
+int funcionComparacion(const void* a, const void* b){
+	return 0; //por ahora no se como comparar
+	//registro_t* r1 = (registro_t*) a;
+	//registro_t* r2 = (registro_t*) b;
+	//return - strcmp(r1->clave, r2->clave);
+}
 
-char* merger(char** rutas, unsigned int i, int cant, FILE* salida){
+char* merger(char** rutas, unsigned int i, unsigned int max,int cant, FILE* salida){
 
 	FILE** archs = abrir_archivos(rutas, cant,i);
-	abb_t* arbol = abb_crear(NULL, NULL); 	//deberiamos pasarle funcion de comparacion, y cambiar que la clave tenga que
-											//si o si un char*
-	agregar_elementos(arbol, archs, cant);
+	heap_t* heap = heap_crear(funcionComparacion);
 
-	char* ruta_aux = procesar_archivos(arbol, archs, cant, i, salida);
+	unsigned int contadores[cant];
+	for (unsigned int j = 0; j < cant; j++) contadores[j] = 0;
+
+	FILE* outfile = salida;
+	char* ruta_aux = NULL;
+	if (!outfile){
+		ruta_aux = __crear_ruta(i,max);
+		outfile = fopen(ruta_aux, escritura_archivos());
+	}
+
+	procesar_archivos(heap, contadores, archs, cant, outfile);
 
 	cerrar_archivos(archs, cant);
 	return ruta_aux;
@@ -35,16 +60,19 @@ int merger_MergearArchivos(char** rutas, int cant){
 
 	FILE* archSalida = fopen (SALIDA, escritura_archivos());
 	if (!archSalida) return MERGER_ERROR;
-	int c = cant/CANT_ARCHIVOS_SEGUIDOS;
+	unsigned int c = cant/CANT_ARCHIVOS_SEGUIDOS;
+
 	//Primera etapa del merge. Subdivido por la constante CANT_ARCHIVOS_SEGUIDOS a tratar,
 	//abro cada archivo, creo el arbol con un elemento de cada archivo, y voy avanzando en cada uno.
 	char* rutas_aux[c];
 	for (unsigned int i = 0; i < c; i++){
-		rutas_aux[i] = merger(rutas, i, CANT_ARCHIVOS_SEGUIDOS, NULL);
+		rutas_aux[i] = merger(rutas, i,c ,CANT_ARCHIVOS_SEGUIDOS, NULL);
 	}
 
-	merger(rutas_aux, 0, c, archSalida);
-
+	merger(rutas_aux, 0, c,c, archSalida);
+	for (unsigned int j = 0; j < c; j++)
+		free(rutas_aux[j]);
+	fclose(archSalida);
 	return MERGER_OK;
 }
 
@@ -63,18 +91,69 @@ void cerrar_archivos(FILE** archivos, int cantidad){
 	free(archivos);
 }
 
-void agregar_elementos(abb_t* arbol, FILE** archivos, int cant){
-	for (unsigned int j = 0; j < cant; j++){
-		for (unsigned int k = 0; k < CANT_REGISTROS_POR_ARCHIVO;k++){
-			//registro_t* registro = leer_registro(archivos[i]);
-			char* clave = NULL;	// = registro_clave(registro);
-			void* dato = NULL;	// = registro_dato(registro) + j (?), necesito guardarlo aca para saber luego de cual sacar.
-			abb_guardar(arbol,clave , dato);
+void verificarYAgregarElementos(heap_t* heap, unsigned int* contadores,FILE** archivos, int cant){
+	for (unsigned int i = 0; i < cant; i++){
+		if (contadores[i] == 0){
+			for (unsigned j = 0; j < CANT_REGISTROS_POR_ARCHIVO; j++){
+				dato_t* dato = malloc (sizeof(dato_t));
+				dato->numArchivo = i;
+				//dato->registro = leer_registro(archivos[i])
+				heap_encolar(heap, dato);
+			}
+			contadores[i] = CANT_REGISTROS_POR_ARCHIVO;
 		}
 	}
 }
 
-char* procesar_archivos(abb_t* arbol, FILE** archivos, int cant, unsigned int i, FILE* useifnotNULL){
-	//esto es lo que no tengo idea de como hacer todavia u.u
-	return NULL;
+bool archivos_vacios(FILE** archivos, int cant){
+	for (unsigned int i = 0; i < cant; i++)
+		if (!feof(archivos[i])) return false;
+
+	return true;
+}
+
+void procesar_archivos(heap_t* heap,unsigned int* contadores ,FILE** archivos, int cant, FILE* salida){
+	while (!archivos_vacios(archivos, cant)){
+		verificarYAgregarElementos(heap,contadores,archivos, cant);
+		dato_t* dato = heap_desencolar(heap);
+		contadores[dato->numArchivo] = contadores[dato->numArchivo] - 1;
+		//escribir_registro(salida, dato->registro);
+
+		//registro_destruir(dato->registro);
+		free(dato);
+	}
+}
+
+
+/************************************************************************************/
+// FUNCIONES ESPECIALES AUXILIARES
+
+char* numeroToString(unsigned int num, unsigned int cantDigitos){
+	char* dev = malloc(sizeof(char) * (cantDigitos + 1));
+	dev[cantDigitos] = '\0';
+
+	for (unsigned int i = (cantDigitos - 1); i >= 0; i++){
+		dev[i] = num % 10;
+		num /= 10;
+	}
+	return dev;
+}
+
+char* __crear_ruta(unsigned int num, unsigned int maximo){
+	unsigned int cant = 1;
+	while (maximo % 10 != 0){
+		maximo /= 10;
+		cant++;
+	}
+	char* ruta = malloc (sizeof(char) * (strlen(SALIDA_TEMPORAL) + 1 + cant));
+
+	char* numeroCadena = numeroToString(num, cant);
+	strcpy(ruta, numeroCadena);
+
+
+	for (unsigned int i = strlen(numeroCadena); i < (strlen(numeroCadena)+strlen(SALIDA_TEMPORAL));i++){
+		ruta[i] = SALIDA_TEMPORAL[i - strlen(numeroCadena)];
+	}
+	free(numeroCadena);
+	return ruta;
 }
