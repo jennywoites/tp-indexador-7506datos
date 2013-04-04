@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "Parseo/parserIndex.h"
 #include <stdlib.h>
-#include "Diccionarios/diccionarioMaestro.h"
+#include <stdbool.h>
 
 void print_test(char* name, bool result){
     printf("%s: %s\n", name, result? "OK" : "ERROR");
