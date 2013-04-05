@@ -1,10 +1,11 @@
-#include "merger.h"
-#include "funcionesGeneralesArchivos.h"
-#include "../TDAs/heap.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include "merger.h"
+#include "funcionesGeneralesArchivos.h"
+#include "../TDAs/heap.h"
+#include "registro.h"
 #define CANT_ARCHIVOS_SEGUIDOS 10
 #define CANT_REGISTROS_POR_ARCHIVO 10
 
@@ -13,7 +14,7 @@ const char* SALIDA_TEMPORAL = "temp.txt";	//salida para archivos temporales
 
 /*Definicion del tipo de datos a guardar dentro del heap para hacer de auxiliar en el merge*/
 typedef struct{
-	//registro_t* registro;
+	registro_t* registro;
 	unsigned int numArchivo;
 }dato_t;
 
@@ -26,17 +27,11 @@ void verificarYAgregarElementos(heap_t*, unsigned int*,FILE**, int);
 void procesar_archivos(heap_t* heap,unsigned int* contadores ,FILE** archivos, int cant, FILE* salida);
 char* __crear_ruta(unsigned int, unsigned int);
 
-int funcionComparacion(const void* a, const void* b){
-	return 0; //por ahora no se como comparar
-	//registro_t* r1 = (registro_t*) a;
-	//registro_t* r2 = (registro_t*) b;
-	//return - strcmp(r1->clave, r2->clave);
-}
 
 char* merger(char** rutas, unsigned int i, unsigned int max,int cant, FILE* salida){
 
 	FILE** archs = abrir_archivos(rutas, cant,i);
-	heap_t* heap = heap_crear(funcionComparacion);
+	heap_t* heap = heap_crear(comparacionRegistros);
 
 	unsigned int contadores[cant];
 	for (unsigned int j = 0; j < cant; j++) contadores[j] = 0;
@@ -97,7 +92,7 @@ void verificarYAgregarElementos(heap_t* heap, unsigned int* contadores,FILE** ar
 			for (unsigned j = 0; j < CANT_REGISTROS_POR_ARCHIVO; j++){
 				dato_t* dato = malloc (sizeof(dato_t));
 				dato->numArchivo = i;
-				//dato->registro = leer_registro(archivos[i])
+				dato->registro = registro_leer(archivos[i]);
 				heap_encolar(heap, dato);
 			}
 			contadores[i] = CANT_REGISTROS_POR_ARCHIVO;
@@ -117,9 +112,9 @@ void procesar_archivos(heap_t* heap,unsigned int* contadores ,FILE** archivos, i
 		verificarYAgregarElementos(heap,contadores,archivos, cant);
 		dato_t* dato = heap_desencolar(heap);
 		contadores[dato->numArchivo] = contadores[dato->numArchivo] - 1;
-		//escribir_registro(salida, dato->registro);
+		registro_escribir(salida, dato->registro);
 
-		//registro_destruir(dato->registro);
+		registro_destruir(dato->registro);
 		free(dato);
 	}
 }
