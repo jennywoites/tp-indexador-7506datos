@@ -6,6 +6,7 @@
 #include "../Manejo de Archivos/funcionesGeneralesArchivos.h"
 
 hash_t* DICCIONARIO = NULL;
+const char* RUTA_DEFAULT = "Diccionarios/dicc.txt";
 
 void cargar_datos(hash_t* hash, const char* ruta){
 	FILE* arch = fopen(ruta, lectura_archivos());
@@ -25,7 +26,10 @@ void cargar_datos(hash_t* hash, const char* ruta){
 
 void diccionario_cargar(const char* ruta){
 	DICCIONARIO = hash_crear(NULL); //los datos a guardar seran NULL.
-	cargar_datos(DICCIONARIO, ruta);
+	if (!ruta)
+		cargar_datos (DICCIONARIO, RUTA_DEFAULT);
+	else
+		cargar_datos(DICCIONARIO, ruta);
 }
 
 void diccionario_liberar(){
