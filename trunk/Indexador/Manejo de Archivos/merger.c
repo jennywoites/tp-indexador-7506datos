@@ -64,8 +64,10 @@ int merger_MergearArchivos(char** rutas, int cant){
 	}
 
 	merger(rutas_aux, 0, c,c+1, archSalida);
-	for (unsigned int j = 0; j <= c; j++)
+	for (unsigned int j = 0; j <= c; j++){
+		remove(rutas_aux[j]);
 		free(rutas_aux[j]);
+	}
 	return MERGER_OK;
 }
 
