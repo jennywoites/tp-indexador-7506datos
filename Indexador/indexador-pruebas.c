@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "Parseo/parserIndex.h"
+#include "Manejo de Archivos/merger.h"
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -16,6 +17,9 @@ int main (int argc, char** argv){
 
 		char** dirs = NULL;
 		int cant;
+
+
+
 		if (parserIndex_obtenerRutasDirectorios(cadenas[1], &dirs, &cant) == PARSERINDEX_OK){
 			printf("Se encontraron los siguientes archivos:\n");
 			for (int i = 0; i < cant; i++){
@@ -23,12 +27,13 @@ int main (int argc, char** argv){
 			}
 		}else{
 			printf("Hubo algun error en la busqueda por directorios\n");
+			return 1;
 		}
 
 		free(cadenas[0]);
 		free(cadenas[1]);
+		if (merger_MergearArchivos(dirs, cant) == MERGER_ERROR) printf("Se cago la cosa\n");
 
-		parserIndex_parsearArchivo(dirs[0]);
 
 		for (int j = 0; j < cant; j++)
 			free(dirs[j]);

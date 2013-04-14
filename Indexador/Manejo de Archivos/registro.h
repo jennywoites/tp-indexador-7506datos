@@ -4,6 +4,11 @@
 
 typedef struct registro registro_t;
 
+typedef struct dato{
+	registro_t* registro;
+	unsigned int numArchivo;
+}dato_t;
+
 /* Funcion que permite liberar la memoria alocada para el registro */
 void registro_destruir(registro_t*);
 
