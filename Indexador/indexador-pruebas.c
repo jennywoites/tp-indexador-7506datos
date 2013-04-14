@@ -32,11 +32,13 @@ int main (int argc, char** argv){
 
 		free(cadenas[0]);
 		free(cadenas[1]);
-		if (merger_MergearArchivos(dirs, cant) == MERGER_ERROR) printf("Se cago la cosa\n");
+//		if (merger_MergearArchivos(dirs, cant) == MERGER_ERROR) printf("Se cago la cosa\n");
 
 
-		for (int j = 0; j < cant; j++)
+		for (int j = 0; j < cant; j++){
+			if (parserIndex_parsearArchivo(dirs[j]) == PARSERINDEX_OK) printf("Mira como te parseo \n");
 			free(dirs[j]);
+		}
 		free(dirs);
 	}else{
 		printf("Hubo un error en el parseo\n");

@@ -13,12 +13,12 @@
 
 #define TAM 50
 
-const char SEPARADORES[] = {' ', '-', '\n', '/'};
-unsigned int CANT_SEPARADORES = 4;
-const char PRESCINDIBLES[] = {',' , ';' , '.' , '?' , '!'};
-unsigned int CANT_PRESCINDIBLES = 5;
+const char SEPARADORES[] = {' ', '-', '\n', '/', '_'};
+unsigned int CANT_SEPARADORES = 5;
+const char PRESCINDIBLES[] = {',' , ';' , '.' , '?' , '!', '\"', '\'', '^', '[',};
+unsigned int CANT_PRESCINDIBLES = 7;
 const char DUPLICANTES[] = {'\"'};
-unsigned int CANT_DUPLICANTES = 1;
+unsigned int CANT_DUPLICANTES = 0;
 
 int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas){
 	if (argc != 3){
@@ -73,6 +73,7 @@ void tratarPalabra(char*, const char*, unsigned int);
 bool caracterDeSeparacion(char c);
 bool esNecesarioDuplicar(char*);
 void __toLowerCase(char*);
+char** separarSiSonNumeros(char*, unsigned int*);
 
 int parserIndex_parsearArchivo(const char* ruta_archivo){
 	FILE* arch = fopen(ruta_archivo, lectura_archivos());
@@ -101,17 +102,20 @@ int parserIndex_parsearArchivo(const char* ruta_archivo){
 
 		char* bufferSinEliminables = eliminarCaracteresPrescindibles(buffer, false);
 
-		tratarPalabra(bufferSinEliminables, ruta_archivo, pos);
+		unsigned int cantNum;
+		char** bufferSepNum = separarSiSonNumeros(bufferSinEliminables, &cantNum);
 
-		if (esNecesarioDuplicar(bufferSinEliminables)){
-			char* bufferSinDuplicantes = eliminarCaracteresPrescindibles(buffer, true);
-			tratarPalabra(bufferSinDuplicantes, ruta_archivo, pos);
-			free(bufferSinDuplicantes);
-		}
+		if (!bufferSepNum)
+			tratarPalabra(bufferSinEliminables, ruta_archivo, pos++);
+		else
+			for (unsigned int k = 0; k < cantNum;k++){
+				tratarPalabra(bufferSepNum[k], ruta_archivo, pos++);
+				free(bufferSepNum[k]);
+			}
 
 		free(buffer);
 		free(bufferSinEliminables);
-		pos++;
+		free(bufferSepNum);
 	}
 
 	fclose(arch);
@@ -133,16 +137,28 @@ bool caracterDuplicante(char c){
 	return false;
 }
 
+bool caracterPrescindible(char c){
+	/*
+	 for (unsigned int i = 0; i < CANT_PRESCINDIBLES)
+	  	  if (c == PRESCINIBLES[i]) return true;
+	 return false;
+	 */
+
+	if (c == '@') return false;
+	if (c == '&') return false;
+	if (c < '0') return true;
+	if (c > '9' && c < 'A') return true;
+	if (c > 'Z' && c < 'a') return true;
+	if (c > 'z') return true;
+	return false;
+}
+
 char* eliminarCaracteresPrescindibles(char* cadena, bool duplicante){
 	char* nueva = malloc (sizeof(char)* (strlen(cadena)+1));
 	unsigned int cant = 0;
 	for (unsigned int i = 0; i < strlen(cadena); i++){
 		bool elim = false;
-		unsigned int j = 0;
-		while (!elim && j < CANT_PRESCINDIBLES){
-			elim = (cadena[i] == PRESCINDIBLES[j]);
-			j++;
-		}
+		elim = caracterPrescindible(cadena[i]);
 
 		if(!elim){
 			if (!duplicante || !caracterDuplicante(cadena[i])){
@@ -166,7 +182,11 @@ bool esNecesarioDuplicar(char* cadena){
 
 void tratarPalabra(char* palabra, const char* texto, unsigned int pos){
 	//Por ahora voy a imprimir simplemente:
-	printf("%s\t\t%s\t%u\n", palabra, texto, pos);
+	FILE* aux = fopen("archivIndex.txt", "a");
+	fprintf(aux,"%s\t\t%s\t%u\n", palabra, texto, pos);
+	// Hay que cambiar el fprintf por crear un registro, y poder imprimirlo en el formato correcto
+	// esto implica el tema de codigos y bla bla bla
+	fclose(aux);
 }
 
 void __toLowerCase(char* cadena){
@@ -176,4 +196,25 @@ void __toLowerCase(char* cadena){
 			cadena[i] = c - ('A' - 'a');
 		}
 	}
+}
+
+bool sonTodosNumeros(char* cad){
+	for (unsigned int i = 0; i < strlen(cad); i++)
+		if (cad[i] < '0' || cad[i] > '9') return false;
+	return true;
+}
+
+char** separarSiSonNumeros(char* buffer, unsigned int* cant){
+	if (!sonTodosNumeros(buffer)) return NULL;
+
+	char** numeritos = malloc (sizeof(char*) * (strlen(buffer)));
+	*cant = strlen(buffer);
+
+	for (unsigned int i = 0; i < strlen(buffer); i++){
+		numeritos[i] = malloc (sizeof(char) * 2);
+		(numeritos[i])[0] = buffer[i];
+		(numeritos[i])[1] = '\0';
+	}
+
+	return numeritos;
 }
