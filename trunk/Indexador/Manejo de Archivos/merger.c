@@ -13,10 +13,6 @@ const char* SALIDA = "salida.txt"; 			//salida que se usara para el merge
 const char* SALIDA_TEMPORAL = "temp.txt";	//salida para archivos temporales
 
 /*Definicion del tipo de datos a guardar dentro del heap para hacer de auxiliar en el merge*/
-typedef struct{
-	registro_t* registro;
-	unsigned int numArchivo;
-}dato_t;
 
 
 //ACLARACION: se hace un merge multi-etapa
@@ -29,7 +25,6 @@ char* __crear_ruta(unsigned int, unsigned int);
 
 
 char* merger(char** rutas, unsigned int i, unsigned int max,int cant, FILE* salida){
-
 	FILE** archs = abrir_archivos(rutas, cant,i);
 	heap_t* heap = heap_crear(comparacionRegistros);
 
@@ -38,20 +33,24 @@ char* merger(char** rutas, unsigned int i, unsigned int max,int cant, FILE* sali
 
 	FILE* outfile = salida;
 	char* ruta_aux = NULL;
+
 	if (!outfile){
 		ruta_aux = __crear_ruta(i,max);
 		outfile = fopen(ruta_aux, escritura_archivos());
 	}
 
 	procesar_archivos(heap, contadores, archs, cant, outfile);
-
 	cerrar_archivos(archs, cant);
+	fclose(outfile);
+
+	heap_destruir(heap,NULL);
 	return ruta_aux;
 }
 
 
 int merger_MergearArchivos(char** rutas, int cant){
 	if (cant <= 0) return MERGER_ERROR;
+
 
 	FILE* archSalida = fopen (SALIDA, escritura_archivos());
 	if (!archSalida) return MERGER_ERROR;
@@ -60,14 +59,13 @@ int merger_MergearArchivos(char** rutas, int cant){
 	//Primera etapa del merge. Subdivido por la constante CANT_ARCHIVOS_SEGUIDOS a tratar,
 	//abro cada archivo, creo el arbol con un elemento de cada archivo, y voy avanzando en cada uno.
 	char* rutas_aux[c];
-	for (unsigned int i = 0; i < c; i++){
-		rutas_aux[i] = merger(rutas, i,c ,CANT_ARCHIVOS_SEGUIDOS, NULL);
+	for (unsigned int i = 0; i <= c; i++){
+		rutas_aux[i] = merger(rutas, i,c ,cant - i*c, NULL);
 	}
 
-	merger(rutas_aux, 0, c,c, archSalida);
-	for (unsigned int j = 0; j < c; j++)
+	merger(rutas_aux, 0, c,c+1, archSalida);
+	for (unsigned int j = 0; j <= c; j++)
 		free(rutas_aux[j]);
-	fclose(archSalida);
 	return MERGER_OK;
 }
 
@@ -87,13 +85,17 @@ void cerrar_archivos(FILE** archivos, int cantidad){
 }
 
 void verificarYAgregarElementos(heap_t* heap, unsigned int* contadores,FILE** archivos, int cant){
+
 	for (unsigned int i = 0; i < cant; i++){
 		if (contadores[i] == 0){
 			for (unsigned j = 0; j < CANT_REGISTROS_POR_ARCHIVO; j++){
 				dato_t* dato = malloc (sizeof(dato_t));
 				dato->numArchivo = i;
 				dato->registro = registro_leer(archivos[i]);
-				heap_encolar(heap, dato);
+				if (dato->registro != NULL)
+					heap_encolar(heap, dato);
+				else
+					free(dato);
 			}
 			contadores[i] = CANT_REGISTROS_POR_ARCHIVO;
 		}
@@ -108,15 +110,15 @@ bool archivos_vacios(FILE** archivos, int cant){
 }
 
 void procesar_archivos(heap_t* heap,unsigned int* contadores ,FILE** archivos, int cant, FILE* salida){
-	while (!archivos_vacios(archivos, cant)){
+	while (!archivos_vacios(archivos, cant) || !heap_esta_vacio(heap)){
 		verificarYAgregarElementos(heap,contadores,archivos, cant);
 		dato_t* dato = heap_desencolar(heap);
 		contadores[dato->numArchivo] = contadores[dato->numArchivo] - 1;
 		registro_escribir(salida, dato->registro);
-
 		registro_destruir(dato->registro);
 		free(dato);
 	}
+
 }
 
 
@@ -126,29 +128,30 @@ void procesar_archivos(heap_t* heap,unsigned int* contadores ,FILE** archivos, i
 char* numeroToString(unsigned int num, unsigned int cantDigitos){
 	char* dev = malloc(sizeof(char) * (cantDigitos + 1));
 	dev[cantDigitos] = '\0';
-
-	for (unsigned int i = (cantDigitos - 1); i >= 0; i++){
-		dev[i] = num % 10;
+	for (unsigned int i = (cantDigitos); i > 0; i--){
+		dev[i-1] = num % 10 + '0';
 		num /= 10;
 	}
+
 	return dev;
 }
 
 char* __crear_ruta(unsigned int num, unsigned int maximo){
-	unsigned int cant = 1;
-	while (maximo % 10 != 0){
+	unsigned int cant = 0;
+	while (maximo != 0){
 		maximo /= 10;
 		cant++;
 	}
-	char* ruta = malloc (sizeof(char) * (strlen(SALIDA_TEMPORAL) + 1 + cant));
+	if (cant == 0) cant = 1;
 
+	char* ruta = malloc (sizeof(char) * (strlen(SALIDA_TEMPORAL) + 1 + cant));
 	char* numeroCadena = numeroToString(num, cant);
 	strcpy(ruta, numeroCadena);
-
 
 	for (unsigned int i = strlen(numeroCadena); i < (strlen(numeroCadena)+strlen(SALIDA_TEMPORAL));i++){
 		ruta[i] = SALIDA_TEMPORAL[i - strlen(numeroCadena)];
 	}
 	free(numeroCadena);
+	ruta[strlen(SALIDA_TEMPORAL)+cant] = '\0';
 	return ruta;
 }

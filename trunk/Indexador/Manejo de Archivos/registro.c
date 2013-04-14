@@ -7,9 +7,9 @@ struct registro{
 };
 
 int comparacionRegistros(const void* a, const void* b){
-	registro_t* r1 = (registro_t*) a;
-	registro_t* r2 = (registro_t*) b;
-	return r1->c > r2->c;
+	dato_t* r1 = (dato_t*) a;
+	dato_t* r2 = (dato_t*) b;
+	return r2->registro->c - r1->registro->c;
 }
 
 
@@ -18,7 +18,7 @@ registro_t* registro_leer(FILE* entrada){
 	if (!reg) return NULL;
 
 	reg->c = fgetc(entrada);
-	if (reg->c == EOF){
+	if (reg->c == EOF || feof(entrada)){
 		free(reg);
 		return NULL;
 	}
@@ -28,7 +28,6 @@ registro_t* registro_leer(FILE* entrada){
 
 void registro_escribir(FILE* salida, registro_t* reg){
 	if (!reg) return;
-
 	fprintf(salida, "%c",reg->c);
 }
 
