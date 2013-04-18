@@ -4,7 +4,7 @@
 #include <string.h>
 #include "merger.h"
 #include "funcionesGeneralesArchivos.h"
-#include "../TDAs/heap.h"
+#include "../Carpetas Compartidas/TDAs/heap.h"
 #include "registro.h"
 #define CANT_ARCHIVOS_SEGUIDOS 10
 #define CANT_REGISTROS_POR_ARCHIVO 10
