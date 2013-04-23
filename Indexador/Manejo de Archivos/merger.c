@@ -20,13 +20,12 @@ const char* SALIDA_TEMPORAL = "temp.txt";	//salida para archivos temporales
 FILE** abrir_archivos(char**, int, unsigned int);
 void cerrar_archivos(FILE**, int);
 void verificarYAgregarElementos(heap_t*, unsigned int*,FILE**, int);
-void procesar_archivos(heap_t* heap,unsigned int* contadores ,FILE** archivos, int cant, FILE* salida);
+void procesar_archivos(unsigned int* contadores ,FILE** archivos, int cant, FILE* salida);
 char* __crear_ruta(unsigned int, unsigned int);
 
 
 char* merger(char** rutas, unsigned int i, unsigned int max,int cant, FILE* salida){
 	FILE** archs = abrir_archivos(rutas, cant,i);
-	heap_t* heap = heap_crear(comparacionRegistros);
 
 	unsigned int contadores[cant];
 	for (unsigned int j = 0; j < cant; j++) contadores[j] = 0;
@@ -39,11 +38,10 @@ char* merger(char** rutas, unsigned int i, unsigned int max,int cant, FILE* sali
 		outfile = fopen(ruta_aux, escritura_archivos());
 	}
 
-	procesar_archivos(heap, contadores, archs, cant, outfile);
+	procesar_archivos(contadores, archs, cant, outfile);
 	cerrar_archivos(archs, cant);
 	fclose(outfile);
 
-	heap_destruir(heap,NULL);
 	return ruta_aux;
 }
 
@@ -59,6 +57,7 @@ int merger_MergearArchivos(char** rutas, int cant){
 	//Primera etapa del merge. Subdivido por la constante CANT_ARCHIVOS_SEGUIDOS a tratar,
 	//abro cada archivo, creo el arbol con un elemento de cada archivo, y voy avanzando en cada uno.
 	char* rutas_aux[c];
+
 	for (unsigned int i = 0; i <= c; i++){
 		rutas_aux[i] = merger(rutas, i,c ,cant - i*c, NULL);
 	}
@@ -87,7 +86,6 @@ void cerrar_archivos(FILE** archivos, int cantidad){
 }
 
 void verificarYAgregarElementos(heap_t* heap, unsigned int* contadores,FILE** archivos, int cant){
-
 	for (unsigned int i = 0; i < cant; i++){
 		if (contadores[i] == 0){
 			for (unsigned j = 0; j < CANT_REGISTROS_POR_ARCHIVO; j++){
@@ -111,16 +109,18 @@ bool archivos_vacios(FILE** archivos, int cant){
 	return true;
 }
 
-void procesar_archivos(heap_t* heap,unsigned int* contadores ,FILE** archivos, int cant, FILE* salida){
+void procesar_archivos(unsigned int* contadores ,FILE** archivos, int cant, FILE* salida){
+	heap_t* heap = heap_crear(comparacionRegistros);
 	while (!archivos_vacios(archivos, cant) || !heap_esta_vacio(heap)){
 		verificarYAgregarElementos(heap,contadores,archivos, cant);
 		dato_t* dato = heap_desencolar(heap);
+		if (!dato) continue;
 		contadores[dato->numArchivo] = contadores[dato->numArchivo] - 1;
 		registro_escribir(salida, dato->registro);
 		registro_destruir(dato->registro);
 		free(dato);
 	}
-
+	heap_destruir(heap,NULL);
 }
 
 

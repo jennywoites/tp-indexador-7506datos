@@ -20,6 +20,8 @@ unsigned int CANT_PRESCINDIBLES = 7;
 const char DUPLICANTES[] = {'\"'};
 unsigned int CANT_DUPLICANTES = 0;
 
+const char* SALIDA_PARSER = "parser.txt";
+
 int parserIndex_obtenerParametros(int argc, char** argv,char** cadenas){
 	if (argc != 3){
 		//ver si se hace algo en caso de tener argumentos de mas o de menos
@@ -69,19 +71,19 @@ int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* ca
 /* **************************************************************************** */
 
 char* eliminarCaracteresPrescindibles(char*, bool);
-void tratarPalabra(char*, const char*, unsigned int);
+void tratarPalabra(char*, unsigned long, unsigned long);
 bool caracterDeSeparacion(char c);
 bool esNecesarioDuplicar(char*);
-void __toLowerCase(char*);
+void __toUPPERCase(char*);
 char** separarSiSonNumeros(char*, unsigned int*);
 
-int parserIndex_parsearArchivo(const char* ruta_archivo){
+int parserIndex_parsearArchivo(const char* ruta_archivo, unsigned long num){
 	FILE* arch = fopen(ruta_archivo, lectura_archivos());
 	if (!arch) return PARSERINDEX_ERROR;
 
 	unsigned int i;
 	unsigned int tam = TAM;
-	unsigned int pos = 0;
+	unsigned long pos = 0;
 	while (!feof(arch)){
 		char* buffer = malloc (sizeof(char) * TAM);
 		i = 0;
@@ -98,7 +100,7 @@ int parserIndex_parsearArchivo(const char* ruta_archivo){
 			buffer = realloc (buffer, sizeof(char)*(tam+1));
 		buffer[i] = '\0';
 
-		__toLowerCase(buffer);
+		__toUPPERCase(buffer);
 
 		char* bufferSinEliminables = eliminarCaracteresPrescindibles(buffer, false);
 
@@ -106,7 +108,7 @@ int parserIndex_parsearArchivo(const char* ruta_archivo){
 		char** bufferSepNum = separarSiSonNumeros(bufferSinEliminables, &cantNum);
 
 		if (!bufferSepNum)
-			tratarPalabra(bufferSinEliminables, ruta_archivo, pos++);
+			tratarPalabra(bufferSinEliminables, num, pos++);
 		else
 			for (unsigned int k = 0; k < cantNum;k++){
 				tratarPalabra(bufferSepNum[k], ruta_archivo, pos++);
@@ -180,20 +182,18 @@ bool esNecesarioDuplicar(char* cadena){
 	return false;
 }
 
-void tratarPalabra(char* palabra, const char* texto, unsigned int pos){
+void tratarPalabra(char* palabra, unsigned long doc, unsigned long pos){
 	//Por ahora voy a imprimir simplemente:
-	FILE* aux = fopen("archivIndex.txt", "a");
-	fprintf(aux,"%s\t\t%s\t%u\n", palabra, texto, pos);
-	// Hay que cambiar el fprintf por crear un registro, y poder imprimirlo en el formato correcto
-	// esto implica el tema de codigos y bla bla bla
+	FILE* aux = fopen(SALIDA_PARSER, "a");
+	fprintf(aux,"%s;%lu;%lu\n", palabra, doc, pos);
 	fclose(aux);
 }
 
-void __toLowerCase(char* cadena){
+void __toUPPERCase(char* cadena){
 	for (unsigned int i = 0; i < strlen(cadena); i++){
 		char c = cadena[i];
-		if (c <= 'Z' && c >= 'A'){
-			cadena[i] = c - ('A' - 'a');
+		if (c <= 'z' && c >= 'a'){
+			cadena[i] = c + ('A' - 'a');
 		}
 	}
 }

@@ -23,6 +23,6 @@ int parserIndex_obtenerRutasDirectorios(char* directorio, char*** rutas, int* ca
  * teniendo en cuenta la posicion de tal, y el texto al que pertenece, asi como las distintas restricciones
  * para las palabras.
  * Aclaracion: el tratado que se realizara es sobre las palabras, previamente pasandolas a minusculas.*/
-int parserIndex_parsearArchivo(const char* archivo);
+int parserIndex_parsearArchivo(const char* archivo, unsigned long num_arch);
 
 #endif

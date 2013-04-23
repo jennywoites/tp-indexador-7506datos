@@ -14,4 +14,8 @@ const char* escritura_archivos();
 //Memoria: se guarda memoria para lo que se devuelve, y para cada linea guardada (cant)
 char** obtenerLineas(FILE* archivo, unsigned int* cant);
 
+//Obtiene una línea del archivo. Si no quedan líneas, se devuelve NULL.
+//Memoria: se guarda memoria para la línea, si es que queda alguna.
+char* obtenerLinea(FILE* archivo);
+
 #endif /* FUNCIONESGENERALESARCHIVOS_H_ */
