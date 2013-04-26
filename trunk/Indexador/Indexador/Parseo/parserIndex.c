@@ -128,19 +128,6 @@ int parserIndex_parsearArchivo(const char* ruta_archivo, unsigned long num, FILE
 }
 
 
-int parserIndex_parsearArchivos(char** rutas_archivos, unsigned long num, const char* ruta_salida){
-	FILE* arch = fopen(ruta_salida, escritura_archivos());
-	if (!arch) return PARSERINDEX_ERROR;
-
-	bool ok = true;
-	for (unsigned long i = 0; i < num; i++){
-		ok = parserIndex_parsearArchivo(rutas_archivos[i], i, arch) == PARSERINDEX_OK;
-	}
-	fclose(arch);
-	if (ok) return PARSERINDEX_OK;
-	return PARSERINDEX_ERROR;
-}
-
 bool caracterDeSeparacion(char c){
 	for (unsigned int i = 0; i < CANT_SEPARADORES; i++)
 		if (c == SEPARADORES[i]) return true;
@@ -215,4 +202,41 @@ char** separarSiSonNumeros(char* buffer, unsigned int* cant){
 	}
 
 	return numeritos;
+}
+
+
+int comprimirNombres(char* directorio, char** rutas_archivos, unsigned long cant, const char* salida);
+
+int parserIndex_parsearArchivos(char* directorio, char** rutas_archivos, unsigned long num, const char* ruta_salida, const char* salida_nombres){
+	if (num == 0) return PARSERINDEX_OK;
+
+	FILE* arch = fopen(ruta_salida, escritura_archivos());
+	if (!arch) return PARSERINDEX_ERROR;
+
+	bool ok = true;
+	for (unsigned long i = 0; i < num; i++){
+		ok = parserIndex_parsearArchivo(rutas_archivos[i], i, arch) == PARSERINDEX_OK;
+	}
+	fclose(arch);
+
+	int aux = comprimirNombres(directorio, rutas_archivos, num, salida_nombres);
+
+	if (ok && (aux == PARSERINDEX_OK)) return PARSERINDEX_OK;
+	return PARSERINDEX_ERROR;
+}
+
+int comprimirNombres(char* directorio, char** rutas_archivos, unsigned long cant, const char* salida){
+	//Por ahora solo los imprimo de cabeza:
+	FILE* nombres = fopen(salida, escritura_archivos());
+	if (!nombres) return PARSERINDEX_ERROR;
+
+	unsigned int pos = strlen(directorio) + 1; //para evitar la primera barra
+	fprintf(nombres, "%s/\n", directorio);
+
+	for (unsigned long i = 0; i < cant; i++){
+		fprintf(nombres, "%s", (rutas_archivos[i] + sizeof(char) * pos));
+		if (i != (cant-1)) fprintf(nombres, "\n");
+	}
+	fclose(nombres);
+	return PARSERINDEX_OK;
 }
