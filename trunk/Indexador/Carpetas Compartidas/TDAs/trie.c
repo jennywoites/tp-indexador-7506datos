@@ -102,8 +102,8 @@ nodo_trie_t* trie_conseguir_nodo_rec(nodo_trie_t* nodo, const char* clave, size_
 char* concatenar_claves(const char*, size_t cant,const char*);
 int comparacionPosibilidadClaves(const char* clave,const char* cmp);
 void obtenerCadenaIgualesYDistintos(const char*, const char*, char**, char**, char**);
-bool trie_agregarNodo_rec(nodo_trie_t* padre, nodo_trie_t* hijo, size_t num_hijo, const char* clave, void* dato);
-
+bool trie_agregarNodo_rec(nodo_trie_t* padre, nodo_trie_t* hijo, size_t num_hijo, char* clave, void* dato);
+char* sacarDiferenciaClaves(char* exc, char* base);
 
 trie_t* trie_crear(trie_destruir_dato_t dest){
 	trie_t* trie = malloc (sizeof(trie_t));
@@ -155,7 +155,7 @@ bool trie_guardar(trie_t* trie, const char* clave, void* dato){
 	if (!trie) return false;
 	if (!clave) return false;
 
-	//Veo si hay que actualizar:
+	//Veo si hay que actualizar, en ese caso no debo sumar nada:
 	nodo_trie_t* nodo = trie_conseguir_nodo (trie, clave);
 	if (nodo != NULL){
 		if (trie->fdestruir)
@@ -167,12 +167,26 @@ bool trie_guardar(trie_t* trie, const char* clave, void* dato){
 
 	size_t num;
 	nodo_trie_t* siguiente = nodo_trie_siguiente(trie->raiz, clave, 0, &num);
+	//No hay siguiente -> no hay palabra que empiece con la misma letra:
 	if (!siguiente){
 		nodo_trie_t* nuevo = nodo_trie_crear(clave, dato);
-		return nodo_trie_agregar_hijo(trie->raiz, nuevo);
+		if( nodo_trie_agregar_hijo(trie->raiz, nuevo)){
+			trie->cant++;
+			return true;
+		}else{
+			return false;
+		}
 	}
 
-	return trie_agregarNodo_rec(trie->raiz, siguiente, num, clave, dato);
+	char* claveCpy = malloc (sizeof(char) * (strlen(clave)+1));
+	strcpy(claveCpy, clave);
+	if( trie_agregarNodo_rec(trie->raiz, siguiente, num, claveCpy, dato)){
+		trie->cant++;
+		return true;
+	}else{
+		return false;
+	}
+	
 }
 
 
@@ -186,7 +200,7 @@ nodo_trie_t* trie_conseguir_nodo(const trie_t* trie, const char* clave){
 
 	nodo_trie_t* hijo_correcto = nodo_trie_siguiente(trie->raiz, clave, 0,NULL);
 	if (!hijo_correcto) return NULL;
-
+	
 	return trie_conseguir_nodo_rec(hijo_correcto, clave, 0);
 }
 
@@ -206,7 +220,7 @@ nodo_trie_t* trie_conseguir_nodo_rec (nodo_trie_t* nodo, const char* clave, size
 
 	char* nueva = concatenar_claves(clave, actual, nodo->clave);
 
-	int posibilidad_nodo = comparacionPosibilidadClaves(nueva, clave);
+	int posibilidad_nodo = comparacionPosibilidadClaves(clave, nueva);
 	size_t pos_ac = strlen(nueva);
 	free(nueva);
 
@@ -254,7 +268,7 @@ int comparacionPosibilidadClaves(const char* clave,const char* cmp){
 
 int nodo_trie_relacion (const char* a, const char* b);
 
-bool trie_agregarNodo_rec(nodo_trie_t* padre, nodo_trie_t* hijo, size_t num_hijo, const char* clave, void* dato){
+bool trie_agregarNodo_rec(nodo_trie_t* padre, nodo_trie_t* hijo, size_t num_hijo, char* clave, void* dato){
 	if (!padre || !hijo || !clave) return false;
 
 	/* Tres posibilidades:
@@ -262,28 +276,36 @@ bool trie_agregarNodo_rec(nodo_trie_t* padre, nodo_trie_t* hijo, size_t num_hijo
 		2) la nueva clave esta incluida dentro del que estamos. Hay que crear un nuevo padre. Con dato = a guardar
 		3) la nueva clave esta incluida pero con diferencias. Hay que crear un nuevo padre sin dato, con dos hijos: uno con cada diferencia.
 	*/
-
+	
 	int relacion = nodo_trie_relacion (clave, hijo->clave);
 
 	//Caso 1:
 
 	if (relacion == TRIE_CONTENIDO){
 		size_t num;
-		nodo_trie_t* siguiente = nodo_trie_siguiente(hijo, clave, 0, &num);
+		char* sacado = sacarDiferenciaClaves(clave, hijo->clave);
+		nodo_trie_t* siguiente = nodo_trie_siguiente(hijo, sacado, 0, &num);
+		free(clave);
 		if (!siguiente){
-			nodo_trie_t* nuevo = nodo_trie_crear(clave, dato);
+			nodo_trie_t* nuevo = nodo_trie_crear(sacado, dato);
+			free(sacado);
 			if (!nuevo) return false;
 			return nodo_trie_agregar_hijo(hijo, nuevo);
 		}
-		return trie_agregarNodo_rec(hijo, siguiente, num, clave, dato);
+		return trie_agregarNodo_rec(hijo, siguiente, num, sacado, dato);
 	}
 
 	//Caso 2:
 	if (relacion == TRIE_PADRE){
+		char* sacado = sacarDiferenciaClaves(hijo->clave, clave);
 		nodo_trie_t* nuevo = nodo_trie_crear(clave, dato);
+		free(clave);
 		if (!nuevo) return false;
-		bool correcto = nodo_trie_agregar_hijo(nuevo, hijo);
+		bool correcto = nodo_trie_agregar_hijo(nuevo, hijo);		
 		if (!correcto) {nodo_trie_destruir(nuevo,NULL); return false;}
+		
+		free(hijo->clave);
+		hijo->clave = sacado;
 		padre->hijos[num_hijo] = nuevo;
 		return true;
 	}
@@ -293,35 +315,37 @@ bool trie_agregarNodo_rec(nodo_trie_t* padre, nodo_trie_t* hijo, size_t num_hijo
 		char* iguales;
 		char* distintos1, *distintos2;
 		obtenerCadenaIgualesYDistintos(clave, hijo->clave, &iguales, &distintos1, &distintos2);
+		free(clave);
 		nodo_trie_t* nuevo_padre = nodo_trie_crear(iguales, NULL);
+		free(iguales);
 
 		nuevo_padre->conDato = false;
 		nodo_trie_t* nuevo_hijo = nodo_trie_crear(distintos1, dato);
-
+		free(distintos1);
+		
 		nodo_trie_agregar_hijo (nuevo_padre, nuevo_hijo);
 		nodo_trie_agregar_hijo (nuevo_padre, hijo);
 		padre->hijos[num_hijo] = nuevo_padre;
 		free(hijo->clave);
 		hijo->clave = distintos2;
-		free(iguales);
-		free(distintos1);
 		return true;
 	}
-
 	return true;
 }
 
 int nodo_trie_relacion (const char* a, const char* b){
+	
 	bool ok = true;
 	size_t i;
 	for (i = 0; i < strlen(a) && i < strlen(b) && ok; i++){
 		ok = a[i] == b[i];
+		if (!ok)
+			i--;
 	}
-
 	if (i < strlen(a) && i < strlen(b)){
 		return TRIE_DIFERENCIA;
 	}
-
+	
 	if (i == strlen(a))
 		return TRIE_PADRE;
 
@@ -358,4 +382,16 @@ void obtenerCadenaIgualesYDistintos(const char* or1, const char* or2, char** igu
 
 	*dist1 = d1;
 	*dist2 = d2;
+}
+
+char* sacarDiferenciaClaves(char* exc, char* base){
+	if (strlen(exc) < strlen(base)) return NULL;
+	char* resul = malloc (sizeof(char) * (strlen(exc)+1));
+	size_t i = 0;
+	while (exc[i] == base[i]) i++;
+	
+	for (size_t j = i; j <= strlen(exc);j++)
+		resul[j-i] = exc[j];
+	
+	return resul;
 }
