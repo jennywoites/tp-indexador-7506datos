@@ -37,10 +37,9 @@ bool trie_guardar(trie_t* trie, const char* clave, void* dato);
 /* Elimina la clave del trie, y devuelve el dato asociado.
  * Pre: el trie fue creado, y la clave se encuentra dentro del trie.
  * Post: eliminada la clave y devuelto el dato. Si no se cumplen las precondiciones se devuelve NULL */
-
-/* NO SE IMPLEMENTA LA PRIMITIVA DE BORRADO*/
-
-//void* trie_borrar(trie_t* trie, const char* clave);
+void* trie_borrar(trie_t* trie, const char* clave);
+//ACLARACION: el objetivo de este trie no es permitir eliminar. Se le agrega la funcionalidad pero
+//el trie deja de ser optimo (pues no borrara los nodos, sino que se guardara el estado)
 
 
 
