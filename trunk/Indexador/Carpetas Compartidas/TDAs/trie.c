@@ -190,6 +190,19 @@ bool trie_guardar(trie_t* trie, const char* clave, void* dato){
 }
 
 
+void* trie_borrar(trie_t* trie, const char* clave){
+	//Solo pongo el nodo como que no tiene dato, es una solucion poco optima
+	//pero permite aunque sea agregarle la funcionalidad, teniendo enc cuenta
+	//que no es importante.
+	nodo_trie_t* nodo = trie_conseguir_nodo (trie, clave);
+	if (!nodo) return NULL;
+	if (!nodo->conDato) return NULL;
+	dato = nodo->dato;
+	nodo->dato = NULL;
+	nodo->conDato = false;
+	return dato;
+}
+
 /* *****************************************************************
  *                    FUNCIONES AUXILIARES DEL TREI
  * *****************************************************************/
