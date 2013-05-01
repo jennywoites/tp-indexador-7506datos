@@ -1,14 +1,16 @@
 #include "log.h"
 #include <stdio.h>
 
-FILE* LOG_SALIDA = stdout;
-
 const char* LOG_MSJ_INFORMATIVO = "INFORMATIVO";
 const char* LOG_MSJ_INFORMATIVO_IMP = "INFORMATIVO IMPORTANTE";
 const char* LOG_MSJ_ERROR = "ERROR";
 const char* LOG_MSJ_PROCESO = "PROCESO";
 
 void __realizar_impresion(const char* mensaje, unsigned int tipo){
+
+	FILE* LOG_SALIDA = stdout;
+	//Si quisieramos que fuera a otro archivo, lo abrimos con modo append y lo cerramos
+
 	if (tipo == LOG_ENTRADA_INFORMATIVA)
 		fprintf(LOG_SALIDA, "%s - ",LOG_MSJ_INFORMATIVO);
 	else if (tipo == LOG_ENTRADA_INFORMATIVA_IMPORTANTE)
