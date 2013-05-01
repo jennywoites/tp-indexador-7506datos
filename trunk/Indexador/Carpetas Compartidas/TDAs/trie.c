@@ -197,7 +197,7 @@ void* trie_borrar(trie_t* trie, const char* clave){
 	nodo_trie_t* nodo = trie_conseguir_nodo (trie, clave);
 	if (!nodo) return NULL;
 	if (!nodo->conDato) return NULL;
-	dato = nodo->dato;
+	void* dato = nodo->dato;
 	nodo->dato = NULL;
 	nodo->conDato = false;
 	return dato;

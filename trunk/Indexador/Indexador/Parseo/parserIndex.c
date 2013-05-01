@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "../../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
+#include "../../Carpetas Compartidas/Log/log.h"
 
 //Para poder ver lo que haya en un directorio:
 #include <dirent.h>
@@ -215,7 +216,9 @@ int parserIndex_parsearArchivos(char* directorio, char** rutas_archivos, unsigne
 
 	bool ok = true;
 	for (unsigned long i = 0; i < num; i++){
+		log_emitir("Inicia Parceo del archivo", LOG_ENTRADA_PROCESO);
 		ok = parserIndex_parsearArchivo(rutas_archivos[i], i, arch) == PARSERINDEX_OK;
+		log_emitir("Finalizado Parceo del archivo",LOG_ENTRADA_PROCESO);
 	}
 	fclose(arch);
 

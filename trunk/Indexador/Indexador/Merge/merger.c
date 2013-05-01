@@ -6,8 +6,10 @@
 #include "../../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
 #include "../../Carpetas Compartidas/TDAs/heap.h"
 #include "../../Carpetas Compartidas/Manejo de Archivos/registro.h"
-#define CANT_ARCHIVOS_SEGUIDOS 10
-#define CANT_REGISTROS_POR_ARCHIVO 10
+#include "../../Carpetas Compartidas/Log/log.h"
+
+#define CANT_ARCHIVOS_SEGUIDOS 20
+#define CANT_REGISTROS_POR_ARCHIVO 100
 
 const char* SALIDA = "salida.txt"; 			//salida que se usara para el merge
 const char* SALIDA_TEMPORAL = "temp.txt";	//salida para archivos temporales
@@ -49,7 +51,6 @@ char* merger(char** rutas, unsigned int i, unsigned int max,int cant, FILE* sali
 int merger_MergearArchivos(char** rutas, int cant){
 	if (cant <= 0) return MERGER_ERROR;
 
-
 	FILE* archSalida = fopen (SALIDA, escritura_archivos());
 	if (!archSalida) return MERGER_ERROR;
 	unsigned int c = cant/CANT_ARCHIVOS_SEGUIDOS;
@@ -58,11 +59,17 @@ int merger_MergearArchivos(char** rutas, int cant){
 	//abro cada archivo, creo el arbol con un elemento de cada archivo, y voy avanzando en cada uno.
 	char* rutas_aux[c];
 
+	log_emitir("Se inicia primera etapa del merge", LOG_ENTRADA_PROCESO);
 	for (unsigned int i = 0; i <= c; i++){
 		rutas_aux[i] = merger(rutas, i,c ,cant - i*c, NULL);
 	}
+	log_emitir("Finalizada primera etapa del merge", LOG_ENTRADA_PROCESO);
 
+	log_emitir("Se inicia segunda etapa del merge", LOG_ENTRADA_PROCESO);
 	merger(rutas_aux, 0, c,c+1, archSalida);
+	log_emitir("Finalizada primera etapa del merge", LOG_ENTRADA_PROCESO);
+
+	log_emitir("Se remueven los archivos temporales de la primera etapa del merge", LOG_ENTRADA_PROCESO);
 	for (unsigned int j = 0; j <= c; j++){
 		remove(rutas_aux[j]);
 		free(rutas_aux[j]);
