@@ -7,7 +7,7 @@
  *                DEFINICION DE LOS TIPOS DE DATOS
  * *****************************************************************/
 
-/* La Lista está planteada como una cola de punteros genéricos. */
+/* La Lista estï¿½ planteada como una cola de punteros genï¿½ricos. */
 
 typedef struct lista lista_t;
 typedef struct lista_iter lista_iter_t;
@@ -52,6 +52,12 @@ void *lista_borrar_primero(lista_t *lista);
 // Post: se devolvio el valor del primer elemento, cuando no esta vacia.
 void *lista_ver_primero(const lista_t *lista);
 
+// Obtiene el ultimo elemento de la lista. Si la lista tiene elementos,
+// se devuelve el valor del ultimo, si esta vacia, devuelve NULL.
+// Pre: la lista fue creada.
+// Post: se devolvio el valor del primer elemento, cuando no esta vacia.
+void* lista_ver_ultimo(const lista_t* lista);
+
 // Devuelve la cantidad de elementos que tiene la lista.
 // Pre: la lista fue creada.
 // Post: devuelve la cantidad. Si la lista esta vacia devuelve cero.
@@ -64,6 +70,7 @@ size_t lista_largo(const lista_t *lista);
 // destruir los datos de la lista; NULL en caso de que no se la utilice.
 // Post: se eliminaron todos los elementos de la lista.
 void lista_destruir(lista_t *lista, void destruir_dato(void *));
+
 
 /* *****************************************************************
  *                    PRIMITIVAS DEL ITERADOR

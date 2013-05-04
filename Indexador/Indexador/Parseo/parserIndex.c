@@ -236,10 +236,12 @@ int comprimirNombres(char* directorio, char** rutas_archivos, unsigned long cant
 	unsigned int pos = strlen(directorio) + 1; //para evitar la primera barra
 	fprintf(nombres, "%s/\n", directorio);
 
+	log_emitir("Inicia la compresion de rutas de archivos", LOG_ENTRADA_PROCESO);
 	for (unsigned long i = 0; i < cant; i++){
 		fprintf(nombres, "%s", (rutas_archivos[i] + sizeof(char) * pos));
 		if (i != (cant-1)) fprintf(nombres, "\n");
 	}
+	log_emitir("Finalizo la compresion de rutas de archivos", LOG_ENTRADA_PROCESO);
 	fclose(nombres);
 	return PARSERINDEX_OK;
 }

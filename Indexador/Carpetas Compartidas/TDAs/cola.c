@@ -27,6 +27,7 @@ nodo_t* crear_nodo_cola(void* valor){
 struct cola{
 	nodo_t* primero;
 	nodo_t* ultimo;
+	size_t cantidad;
 };
 
 /* ******************************************************************
@@ -34,11 +35,12 @@ struct cola{
  * *****************************************************************/
 
 cola_t* cola_crear(){
-	cola_t *nueva_cola=malloc(sizeof(cola_t));
+	cola_t *nueva_cola = malloc(sizeof(cola_t));
 	if (!nueva_cola)
 		return NULL;
-	nueva_cola->ultimo=NULL;
-	nueva_cola->primero=NULL;
+	nueva_cola->ultimo = NULL;
+	nueva_cola->primero = NULL;
+	nueva_cola->cantidad = 0;
 	return nueva_cola;
 }
 
@@ -70,6 +72,7 @@ bool cola_encolar(cola_t *cola, void* valor){
 		cola->primero=nuevo_nodo;
 		cola->ultimo=nuevo_nodo;
 	}
+	cola->cantidad++;
 	return true;
 }
 
@@ -91,5 +94,11 @@ void* cola_desencolar(cola_t *cola){
 	}
 	void* valor=aux->dato;
 	free(aux);
+	cola->cantidad--;
 	return valor;
+}
+
+size_t cola_largo(cola_t* cola){
+	if (!cola) return 0;
+	return cola->cantidad;
 }
