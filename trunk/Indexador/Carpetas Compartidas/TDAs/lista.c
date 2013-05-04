@@ -102,6 +102,15 @@ void* lista_ver_primero(const lista_t* lista){
 	return lista->primero->dato;	//devuelvo el dato
 }
 
+
+void* lista_ver_ultimo(const lista_t* lista){
+	if(!lista) return NULL;
+
+	if (lista_esta_vacia(lista)) return NULL;
+
+	return lista->ultimo->dato;
+}
+
 size_t lista_largo(const lista_t *lista){
 	if (!lista)
 		return 0;	//si no hay lista, como precondicion devuelve 0

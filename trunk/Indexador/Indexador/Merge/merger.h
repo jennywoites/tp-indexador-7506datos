@@ -8,10 +8,8 @@
  * (cada uno por separado).
  * Memoria: none
  * Post: Si salio bien, devuelve MERGER_OK, sino MERGER_ERROR. (Despues se ve si es
- * conveniente tener mas constantes).
- * TODAVIA NO ESTA TERMINADO, ESTA HECHO EN ABSTRACTO Y TENIENDO ALGUNAS FUNCIONES
- * A DEFINIR MAS ADELANTE*/
-int merger_MergearArchivos(char** rutas, int cant);
+ * conveniente tener mas constantes).*/
+int merger_MergearArchivos(char** rutas, int cant, const char* salida_final);
 
 
 #endif /* MERGER_H_ */

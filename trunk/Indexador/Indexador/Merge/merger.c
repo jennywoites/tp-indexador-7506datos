@@ -11,7 +11,6 @@
 #define CANT_ARCHIVOS_SEGUIDOS 20
 #define CANT_REGISTROS_POR_ARCHIVO 100
 
-const char* SALIDA = "salida.txt"; 			//salida que se usara para el merge
 const char* SALIDA_TEMPORAL = "temp.txt";	//salida para archivos temporales
 
 /*Definicion del tipo de datos a guardar dentro del heap para hacer de auxiliar en el merge*/
@@ -48,10 +47,10 @@ char* merger(char** rutas, unsigned int i, unsigned int max,int cant, FILE* sali
 }
 
 
-int merger_MergearArchivos(char** rutas, int cant){
+int merger_MergearArchivos(char** rutas, int cant, const char* salida_final){
 	if (cant <= 0) return MERGER_ERROR;
 
-	FILE* archSalida = fopen (SALIDA, escritura_archivos());
+	FILE* archSalida = fopen (salida_final, escritura_archivos());
 	if (!archSalida) return MERGER_ERROR;
 	unsigned int c = cant/CANT_ARCHIVOS_SEGUIDOS;
 
