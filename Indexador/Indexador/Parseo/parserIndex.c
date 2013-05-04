@@ -12,7 +12,7 @@
 #define DT_DIR 4
 #define DT_FILE 8
 
-#define TAM 50
+#define TAM 200
 
 const char SEPARADORES[] = {' ', '-', '\n', '/', '_'};
 unsigned int CANT_SEPARADORES = 5;
@@ -77,7 +77,6 @@ char** separarSiSonNumeros(char*, unsigned int*);
 int parserIndex_parsearArchivo(const char* ruta_archivo, unsigned long num, FILE* salida){
 	FILE* arch = fopen(ruta_archivo, lectura_archivos());
 	if (!arch) return PARSERINDEX_ERROR;
-
 	unsigned int i;
 	unsigned int tam = TAM;
 	unsigned long pos = 0;
