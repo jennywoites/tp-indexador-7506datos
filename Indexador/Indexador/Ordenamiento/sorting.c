@@ -27,6 +27,8 @@ int sorting_ordenarArchivo(const char* entrada, const char* salida){
 			d->numArchivo = 0;
 			if (reg != NULL)
 				heap_encolar(heap, d);
+			else
+				free(d);
 			i++;
 		}
 		i = 0;
@@ -50,8 +52,9 @@ int sorting_ordenarArchivo(const char* entrada, const char* salida){
 
 	for (unsigned int j = 0; j < num; j++){
 		remove(rutas[j]);
-		//free(rutas[i]);
+		free(rutas[j]);
 	}
-	//free(rutas);
+	free(rutas);
+	heap_destruir(heap,NULL);
 	return SORTING_OK;
 }
