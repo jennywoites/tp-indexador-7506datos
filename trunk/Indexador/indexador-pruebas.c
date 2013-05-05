@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "Indexador/Parseo/parserIndex.h"
-//#include "Indexador/Sort/sorting.h"
+#include "Indexador/Ordenamiento/sorting.h"
+#include "Indexador/Indexado/indexer.h"
+#include "Carpetas Compartidas/Log/log.h"
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -21,7 +23,7 @@ int main (int argc, char** argv){
 	char** rutas;
 	unsigned long cant;
 
-	const char* directorio = "ejs_parser";
+	const char* directorio = "Textos_ejemplo_parseo";
 
 	int aux = parserIndex_obtenerRutasDirectorios(directorio, &rutas, &cant);
 
@@ -33,14 +35,14 @@ int main (int argc, char** argv){
 	aux = parserIndex_parsearArchivos(directorio, rutas,cant,SALIDA_PARSER, NOMBRE_ARCHIVOS);
 
 	if (aux == PARSERINDEX_OK){
-		/* aux = sorting_ordenarArchivo(SALIDA_PARSER, SALIDA_SORT);
-		 * if (aux != SORTING_OK){ printf("hubo un error al ordenar los terminos\n");}
-		 * else{
-		 *		indexar(SALIDA_SORT, DATOS, LEXICO);
-		 * }
-		*/
+		log_emitir("Paseo Realizado Correctamente", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
+		aux = sorting_ordenarArchivo(SALIDA_PARSER, SALIDA_SORT);
+		indexer_indexar(SALIDA_SORT, INDICE, LEXICO);
+
 		remove(SALIDA_PARSER);
 		remove(SALIDA_SORT);
+	}else{
+		log_emitir("Parseo incorrecto", LOG_ENTRADA_ERROR);
 	}
 
 
@@ -48,5 +50,8 @@ int main (int argc, char** argv){
 		free(rutas[i]);
 	}
 	free(rutas);
+
+//	indexer_indexar(SALIDA_SORT, INDICE, LEXICO);
+
 	return 0;
 }

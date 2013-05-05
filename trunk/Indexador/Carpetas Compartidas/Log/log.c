@@ -26,8 +26,9 @@ void __realizar_impresion(const char* mensaje, unsigned int tipo){
 void log_emitir(const char* mensaje, unsigned int tipo){
 	switch(LOG_MODO){
 	case LOG_NADA: return;
-	case LOG_COMPLETO: 	__realizar_impresion(mensaje,tipo);
-						return;
+	case LOG_COMPLETO:
+		__realizar_impresion(mensaje,tipo);
+		return;
 	case LOG_RELEASE:
 		if (tipo == LOG_ENTRADA_INFORMATIVA_IMPORTANTE || tipo == LOG_ENTRADA_ERROR)
 			__realizar_impresion(mensaje, tipo);

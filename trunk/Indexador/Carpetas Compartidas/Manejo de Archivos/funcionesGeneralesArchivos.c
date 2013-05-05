@@ -1,8 +1,9 @@
 #include "funcionesGeneralesArchivos.h"
 #include <stdlib.h>
 #include <stddef.h>
+#include <string.h>
 #define MAXIMO_LINEAS 300
-#define MAX_LONG_LINEA 50
+#define MAX_LONG_LINEA 300
 
 const char* LECTURA = "r";
 const char* ESCRITURA = "w";
@@ -79,4 +80,36 @@ char* obtenerLinea(FILE* archivo){
 	verificarYAumentarTam(&buffer, &tam, i);
 	buffer[i] = '\0';
 	return buffer;
+}
+
+char* numeroToString(unsigned int num, unsigned int cantDigitos){
+	char* dev = malloc(sizeof(char) * (cantDigitos + 1));
+	dev[cantDigitos] = '\0';
+	for (unsigned int i = (cantDigitos); i > 0; i--){
+		dev[i-1] = num % 10 + '0';
+		num /= 10;
+	}
+
+	return dev;
+}
+
+char* __crear_ruta(unsigned int num, unsigned int maximo, const char* salida_temporal){
+	unsigned int cant = 0;
+	while (maximo != 0){
+		maximo /= 10;
+		cant++;
+	}
+
+	if (cant == 0) cant = 1;
+
+	char* ruta = malloc (sizeof(char) * (strlen(salida_temporal) + 1 + cant));
+	char* numeroCadena = numeroToString(num, cant);
+	strcpy(ruta, numeroCadena);
+
+	for (unsigned int i = strlen(numeroCadena); i < (strlen(numeroCadena)+strlen(salida_temporal));i++){
+		ruta[i] = salida_temporal[i - strlen(numeroCadena)];
+	}
+	free(numeroCadena);
+	ruta[strlen(salida_temporal)+cant] = '\0';
+	return ruta;
 }
