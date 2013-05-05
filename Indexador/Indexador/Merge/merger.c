@@ -11,7 +11,7 @@
 #define CANT_ARCHIVOS_SEGUIDOS 20
 #define CANT_REGISTROS_POR_ARCHIVO 100
 
-const char* SALIDA_TEMPORAL = "temp.txt";	//salida para archivos temporales
+const char* SALIDA_TEMPORAL = "temp.jem";	//salida para archivos temporales
 
 /*Definicion del tipo de datos a guardar dentro del heap para hacer de auxiliar en el merge*/
 
@@ -22,8 +22,6 @@ FILE** abrir_archivos(char**, int, unsigned int);
 void cerrar_archivos(FILE**, int);
 void verificarYAgregarElementos(heap_t*, unsigned int*,FILE**, int);
 void procesar_archivos(unsigned int* contadores ,FILE** archivos, int cant, FILE* salida);
-char* __crear_ruta(unsigned int, unsigned int);
-
 
 char* merger(char** rutas, unsigned int i, unsigned int max,int cant, FILE* salida){
 	FILE** archs = abrir_archivos(rutas, cant,i);
@@ -35,7 +33,7 @@ char* merger(char** rutas, unsigned int i, unsigned int max,int cant, FILE* sali
 	char* ruta_aux = NULL;
 
 	if (!outfile){
-		ruta_aux = __crear_ruta(i,max);
+		ruta_aux = __crear_ruta(i,max, SALIDA_TEMPORAL);
 		outfile = fopen(ruta_aux, escritura_archivos());
 	}
 
@@ -131,35 +129,5 @@ void procesar_archivos(unsigned int* contadores ,FILE** archivos, int cant, FILE
 
 
 /************************************************************************************/
-// FUNCIONES ESPECIALES AUXILIARES
 
-char* numeroToString(unsigned int num, unsigned int cantDigitos){
-	char* dev = malloc(sizeof(char) * (cantDigitos + 1));
-	dev[cantDigitos] = '\0';
-	for (unsigned int i = (cantDigitos); i > 0; i--){
-		dev[i-1] = num % 10 + '0';
-		num /= 10;
-	}
 
-	return dev;
-}
-
-char* __crear_ruta(unsigned int num, unsigned int maximo){
-	unsigned int cant = 0;
-	while (maximo != 0){
-		maximo /= 10;
-		cant++;
-	}
-	if (cant == 0) cant = 1;
-
-	char* ruta = malloc (sizeof(char) * (strlen(SALIDA_TEMPORAL) + 1 + cant));
-	char* numeroCadena = numeroToString(num, cant);
-	strcpy(ruta, numeroCadena);
-
-	for (unsigned int i = strlen(numeroCadena); i < (strlen(numeroCadena)+strlen(SALIDA_TEMPORAL));i++){
-		ruta[i] = SALIDA_TEMPORAL[i - strlen(numeroCadena)];
-	}
-	free(numeroCadena);
-	ruta[strlen(SALIDA_TEMPORAL)+cant] = '\0';
-	return ruta;
-}

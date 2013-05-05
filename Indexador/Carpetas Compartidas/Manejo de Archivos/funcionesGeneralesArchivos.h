@@ -18,4 +18,6 @@ char** obtenerLineas(FILE* archivo, unsigned int* cant);
 //Memoria: se guarda memoria para la línea, si es que queda alguna.
 char* obtenerLinea(FILE* archivo);
 
+char* __crear_ruta(unsigned int num, unsigned int maximo, const char* salida_temporal);
+
 #endif /* FUNCIONESGENERALESARCHIVOS_H_ */
