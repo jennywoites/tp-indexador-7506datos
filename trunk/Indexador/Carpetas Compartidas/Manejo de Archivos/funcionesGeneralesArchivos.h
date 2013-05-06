@@ -20,4 +20,7 @@ char* obtenerLinea(FILE* archivo);
 
 char* __crear_ruta(unsigned int num, unsigned int maximo, const char* salida_temporal);
 
+
+void emitir_impresion(const char* mensaje,unsigned long num, unsigned long freq);
+
 #endif /* FUNCIONESGENERALESARCHIVOS_H_ */

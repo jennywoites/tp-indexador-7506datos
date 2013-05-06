@@ -20,6 +20,7 @@ int sorting_ordenarArchivo(const char* entrada, const char* salida){
 	char** rutas = malloc (sizeof(char*) * 100);
 
 	while (!feof(archEnt)){
+		emitir_impresion("Ordenando Archivo Parseado", num, 4);
 		while ( i < 100000 && !feof(archEnt)){
 			registro_t* reg = registro_leer(archEnt);
 			dato_t* d = malloc(sizeof(dato_t));

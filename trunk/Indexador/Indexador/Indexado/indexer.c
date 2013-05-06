@@ -24,27 +24,29 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 
 	lista_t* posiciones = lista_crear();
 	lista_t* documentos = lista_crear();
-	unsigned long offset = 0;
 	registro_t* registro_anterior = NULL;
 
 	log_emitir("Inicia el Indexado de archivos", LOG_ENTRADA_PROCESO);
+	unsigned long i = 0;
 	while (!feof(archOrigen)){
+		emitir_impresion("Indexando Terminos y Punteros", i++, 12000);
 		registro_t* registro = registro_leer(archOrigen);
 		if (!registro && !feof(archOrigen)){
 			log_emitir("Lectura del archivo ordenado incorrecto", LOG_ENTRADA_ERROR);
 			continue;
 		}
 
-		registro_escribirEnIndice(registro, registro_anterior, archIndice, archLexico, documentos, posiciones, &offset);
+		registro_escribirEnIndice(registro, registro_anterior, archIndice, archLexico, documentos, posiciones);
 
 		if (registro_anterior)
 			registro_destruir(registro_anterior);
 		registro_anterior = registro;
+
 	}
 	if (registro_anterior)
 		registro_destruir(registro_anterior);
 
-	registro_escribirEnIndice(NULL, registro_anterior, archIndice, archLexico, documentos, posiciones, &offset);
+	registro_escribirEnIndice(NULL, registro_anterior, archIndice, archLexico, documentos, posiciones);
 
 	log_emitir("Finalizo el Indexado de archivos", LOG_ENTRADA_PROCESO);
 

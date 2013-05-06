@@ -214,11 +214,12 @@ int parserIndex_parsearArchivos(char* directorio, char** rutas_archivos, unsigne
 	if (!arch) return PARSERINDEX_ERROR;
 
 	bool ok = true;
+	log_emitir("Inicia Parceo de archivos", LOG_ENTRADA_PROCESO);
 	for (unsigned long i = 0; i < num; i++){
-		log_emitir("Inicia Parceo del archivo", LOG_ENTRADA_PROCESO);
+		emitir_impresion("Parceando Archivos",i,120);
 		ok = parserIndex_parsearArchivo(rutas_archivos[i], i, arch) == PARSERINDEX_OK;
-		log_emitir("Finalizado Parceo del archivo",LOG_ENTRADA_PROCESO);
 	}
+	log_emitir("Finalizado Parceo de archivos",LOG_ENTRADA_PROCESO);
 	fclose(arch);
 
 	int aux = comprimirNombres(directorio, rutas_archivos, num, salida_nombres);

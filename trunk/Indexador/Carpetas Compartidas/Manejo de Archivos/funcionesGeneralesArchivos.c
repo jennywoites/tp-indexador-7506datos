@@ -113,3 +113,38 @@ char* __crear_ruta(unsigned int num, unsigned int maximo, const char* salida_tem
 	ruta[strlen(salida_temporal)+cant] = '\0';
 	return ruta;
 }
+
+
+void emitir_impresion(const char* mensaje,unsigned long num, unsigned long freq){
+
+	unsigned long div0, div1, div2, div3;
+	div1 = freq / 4;
+	div2 = 2 * freq / 4;
+	div3 = 3 * freq / 4;
+	div0 = 0;
+
+	if (num % freq == div0){
+		system ("exec clear");
+		printf("%s\n",mensaje);
+		return;
+	}
+
+	if (num % freq == div1){
+		system ("exec clear");
+		printf("%s.\n",mensaje);
+		return;
+	}
+
+	if (num % freq == div2){
+		system ("exec clear");
+		printf("%s..\n",mensaje);
+		return;
+	}
+
+
+	if (num % freq == div3){
+		system ("exec clear");
+		printf("%s...\n",mensaje);
+		return;
+	}
+}
