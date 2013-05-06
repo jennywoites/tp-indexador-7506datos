@@ -91,7 +91,7 @@ void cerrar_termino(FILE* archLexico, unsigned long cant);
 
 void crear_termino(FILE* archLexico, registro_t* actual,registro_t* anterior, unsigned long offset);
 
-void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, FILE* archIndice, FILE* archLexico, lista_t* documentos, lista_t* posiciones_x_documento, unsigned long* offset){
+void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, FILE* archIndice, FILE* archLexico, lista_t* documentos, lista_t* posiciones_x_documento){
 	unsigned long offsetActual = 0;
 	bool agregarTermino = true;
 	if (anterior && actual)

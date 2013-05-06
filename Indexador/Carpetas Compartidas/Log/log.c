@@ -5,10 +5,11 @@ const char* LOG_MSJ_INFORMATIVO = "INFORMATIVO";
 const char* LOG_MSJ_INFORMATIVO_IMP = "INFORMATIVO IMPORTANTE";
 const char* LOG_MSJ_ERROR = "ERROR";
 const char* LOG_MSJ_PROCESO = "PROCESO";
+const char* LOG_ARCHIVO = "log.jem";
 
 void __realizar_impresion(const char* mensaje, unsigned int tipo){
 
-	FILE* LOG_SALIDA = stdout;
+	FILE* LOG_SALIDA = fopen(LOG_ARCHIVO, "a");
 	//Si quisieramos que fuera a otro archivo, lo abrimos con modo append y lo cerramos
 
 	if (tipo == LOG_ENTRADA_INFORMATIVA)
@@ -21,6 +22,7 @@ void __realizar_impresion(const char* mensaje, unsigned int tipo){
 		fprintf(LOG_SALIDA, "%s - ",LOG_MSJ_PROCESO);
 
 	fprintf(LOG_SALIDA, "%s\n",mensaje);
+	fclose(LOG_SALIDA);
 }
 
 void log_emitir(const char* mensaje, unsigned int tipo){

@@ -11,7 +11,7 @@
 #define CANT_ARCHIVOS_SEGUIDOS 20
 #define CANT_REGISTROS_POR_ARCHIVO 100
 
-const char* SALIDA_TEMPORAL = "temp.jem";	//salida para archivos temporales
+const char* SALIDA_TEMPORAL = "tempmerge.jem";	//salida para archivos temporales
 
 /*Definicion del tipo de datos a guardar dentro del heap para hacer de auxiliar en el merge*/
 
@@ -58,13 +58,15 @@ int merger_MergearArchivos(char** rutas, int cant, const char* salida_final){
 
 	log_emitir("Se inicia primera etapa del merge", LOG_ENTRADA_PROCESO);
 	for (unsigned int i = 0; i <= c; i++){
+		emitir_impresion("Mergeando Archivos Ordenados", i, 4);
 		rutas_aux[i] = merger(rutas, i,c ,cant - i*c, NULL);
 	}
 	log_emitir("Finalizada primera etapa del merge", LOG_ENTRADA_PROCESO);
 
+	emitir_impresion("Mergeando Archivos temporales", 0,4);
 	log_emitir("Se inicia segunda etapa del merge", LOG_ENTRADA_PROCESO);
 	merger(rutas_aux, 0, c,c+1, archSalida);
-	log_emitir("Finalizada primera etapa del merge", LOG_ENTRADA_PROCESO);
+	log_emitir("Finalizada segunda etapa del merge", LOG_ENTRADA_PROCESO);
 
 	log_emitir("Se remueven los archivos temporales de la primera etapa del merge", LOG_ENTRADA_PROCESO);
 	for (unsigned int j = 0; j <= c; j++){
