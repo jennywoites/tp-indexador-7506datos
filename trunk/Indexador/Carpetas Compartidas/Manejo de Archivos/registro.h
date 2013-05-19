@@ -1,6 +1,7 @@
 #ifndef REGISTRO_H_
 #define REGISTRO_H_
 #include <stdio.h>
+#include <stdbool.h>
 #include "../TDAs/lista.h"
 
 typedef struct registro registro_t;
@@ -9,6 +10,7 @@ typedef struct registro registro_t;
 typedef struct dato{
 	registro_t* registro;
 	unsigned int numArchivo;
+	bool freezado;
 }dato_t;
 
 /* Funcion que permite crear un registro a partir de un termino, documento y posicion */

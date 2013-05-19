@@ -14,6 +14,8 @@ int comparacionRegistros(const void* a, const void* b){
 	dato_t* d1 = (dato_t*) a;
 	dato_t* d2 = (dato_t*) b;
 
+	if (d1->freezado) return -1;
+	if (d2->freezado) return 1;
 	//Si son terminos distintos ordeno alfanumericamente
 	if (strcmp(d2->registro->termino, d1->registro->termino) != 0)
 		return strcmp(d2->registro->termino, d1->registro->termino);
