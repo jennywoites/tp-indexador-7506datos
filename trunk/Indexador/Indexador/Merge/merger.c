@@ -8,7 +8,7 @@
 #include "../../Carpetas Compartidas/Manejo de Archivos/registro.h"
 #include "../../Carpetas Compartidas/Log/log.h"
 
-#define CANT_ARCHIVOS_SEGUIDOS 4
+#define CANT_ARCHIVOS_SEGUIDOS 10
 #define CANT_REGISTROS_POR_ARCHIVO 100
 
 const char* SALIDA_TEMPORAL = "tempmerge.jem";	//salida para archivos temporales
@@ -49,6 +49,11 @@ int merger_MergearArchivos(char** rutas, int cant, const char* salida_final){
 	FILE* archSalida = fopen (salida_final, escritura_archivos());
 	if (!archSalida) return MERGER_ERROR;
 	unsigned int c = cant/CANT_ARCHIVOS_SEGUIDOS; //c es la cantidad de pasadas a hacer - 1
+
+	unsigned int corrector = 0;
+	if (cant % CANT_ARCHIVOS_SEGUIDOS == 0)
+		corrector = 1;
+	c -= corrector;
 
 	//Primera etapa del merge. Subdivido por la constante CANT_ARCHIVOS_SEGUIDOS a tratar,
 	//abro cada archivo, creo el arbol con un elemento de cada archivo, y voy avanzando en cada uno.
@@ -103,6 +108,7 @@ void verificarYAgregarElementos(heap_t* heap, unsigned int* contadores,FILE** ar
 				dato_t* dato = malloc (sizeof(dato_t));
 				dato->numArchivo = i;
 				dato->registro = registro_leer(archivos[i]);
+				dato->freezado = false;
 				if (dato->registro != NULL)
 					heap_encolar(heap, dato);
 				else
