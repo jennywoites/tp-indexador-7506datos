@@ -91,9 +91,9 @@ void cerrar_documento(FILE* archIndice,lista_t* documentos, lista_t* posiciones_
 
 void cerrar_termino(FILE* archLexico, unsigned long cant);
 
-void crear_termino(FILE* archLexico, registro_t* actual,registro_t* anterior, unsigned long offset);
+void crear_termino(FILE* archFrontCoding, FILE* archDiferentes, registro_t* actual,registro_t* anterior, unsigned long offset);
 
-void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, FILE* archIndice, FILE* archLexico, lista_t* documentos, lista_t* posiciones_x_documento){
+void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, FILE* archIndice, FILE* archFrontCoding, FILE* archDiferentes, lista_t* documentos, lista_t* posiciones_x_documento){
 	unsigned long offsetActual = 0;
 	bool agregarTermino = true;
 	if (anterior && actual)
@@ -103,11 +103,11 @@ void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, FILE* a
 		if (anterior){
 			unsigned long cantidad;
 			cerrar_documento(archIndice, documentos, posiciones_x_documento, &offsetActual, &cantidad);
-			cerrar_termino(archLexico, cantidad);
+			cerrar_termino(archFrontCoding, cantidad);
 		}
 		if (!actual) return;
 
-		crear_termino(archLexico, actual, anterior, offsetActual);
+		crear_termino(archFrontCoding, archDiferentes, actual, anterior, offsetActual);
 	}
 
 	if (!anterior || agregarTermino || actual->documento != anterior->documento){
@@ -136,12 +136,12 @@ void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, FILE* a
 //FUNCIONES QUE AGREGAN LOS TERMINOS, ETC.....
 //POR AHORA LAS HAGO A LO CABEZA
 
-void cerrar_termino(FILE* archLexico, unsigned long cant){
+void cerrar_termino(FILE* archFrontCoding, unsigned long cant){
 	//compresor_comprimirFrecuencia(archLexico, cant);
-	fprintf(archLexico,"%lu\n", cant);
+	fprintf(archFrontCoding,"%lu\n", cant);
 }
 
-void crear_termino(FILE* archLexico, registro_t* actual, registro_t* anterior, unsigned long offset){
+void crear_termino(FILE* archFrontCoding, FILE* archDiferentes, registro_t* actual, registro_t* anterior, unsigned long offset){
 	unsigned int repetidos = 0;
 	bool ok = true;
 	if (anterior){
@@ -153,15 +153,15 @@ void crear_termino(FILE* archLexico, registro_t* actual, registro_t* anterior, u
 	}
 
 	//compresor_comprimirRepetidosYDistinto(archLexico, repetidos, strlen(actual->termino) - repetidos);
-	fprintf(archLexico,"%u\t\t%u\t\t", repetidos, strlen(actual->termino) - repetidos);
+	fprintf(archFrontCoding,"%u\t\t%u", repetidos, strlen(actual->termino) - repetidos);
 
 	for (unsigned int i = repetidos; i < strlen(actual->termino);i++){
 		//compresor_comprimirCaracter(archLexico, actual->termino[i]); todo
-		fprintf(archLexico, "%c", actual->termino[i]);
+		fprintf(archDiferentes, "%c", actual->termino[i]);
 	}
 
 	//compresor_comprimirOffset(archLexico, offset); todo
-	fprintf(archLexico, "\t\t%lu\t\t", offset);
+	fprintf(archFrontCoding, "\t\t%lu\t\t", offset);
 }
 
 
