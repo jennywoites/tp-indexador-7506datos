@@ -68,7 +68,6 @@ char* obtenerLinea(FILE* archivo){
 	char* buffer = malloc (sizeof(char) * tam);
 	unsigned int i = 0;
 	char c = fgetc(archivo);
-
 	while (c != '\n' && c != EOF){
 		verificarYAumentarTam(&buffer, &tam, i);
 
@@ -76,7 +75,6 @@ char* obtenerLinea(FILE* archivo){
 		i++;
 		c = fgetc(archivo);
 	}
-
 	verificarYAumentarTam(&buffer, &tam, i);
 	buffer[i] = '\0';
 	return buffer;
