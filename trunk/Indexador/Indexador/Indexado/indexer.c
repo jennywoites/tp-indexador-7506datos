@@ -22,7 +22,7 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 		return INDEXER_ERROR;
 	}
 
-	fprintf(archFrontCoding,"REP\t\tDIST\t\t OFFSET\t\tFREC\n");
+	//fprintf(archFrontCoding,"REP\t\tDIST\t\t OFFSET\t\tFREC\n");
 
 	lista_t* posiciones = lista_crear();
 	lista_t* documentos = lista_crear();

@@ -18,9 +18,12 @@ char** obtenerLineas(FILE* archivo, unsigned int* cant);
 //Memoria: se guarda memoria para la línea, si es que queda alguna.
 char* obtenerLinea(FILE* archivo);
 
+
+/* Permite crear rutas auxiliares a partir de una salida temporal base, un numero de archivo temporal,
+ * y un numero maximo de archivos temporales a crear*/
 char* __crear_ruta(unsigned int num, unsigned int maximo, const char* salida_temporal);
 
-
+/* Realiza impresiones para mejorar la 'experiencia del usuario'*/
 void emitir_impresion(const char* mensaje,unsigned long num, unsigned long freq);
 
 #endif /* FUNCIONESGENERALESARCHIVOS_H_ */
