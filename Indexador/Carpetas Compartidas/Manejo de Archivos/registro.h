@@ -28,7 +28,7 @@ registro_t* registro_leer(FILE*);
 /* Escribe un registro dentro de un archivo*/
 void registro_escribir(FILE*, registro_t*);
 
-
+/* Escribe un termino en el indice, con un cierto formato. Lo hace con un cierto formato, y no necesariamente imprime cuando le dicen.*/
 void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, FILE* archIndice, FILE* archFrontCoding, FILE* archDiferentes, lista_t* documentos, lista_t* posiciones_x_documento);
 
 #endif /* REGISTRO_H_ */

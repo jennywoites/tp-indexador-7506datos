@@ -153,7 +153,7 @@ void crear_termino(FILE* archFrontCoding, FILE* archDiferentes, registro_t* actu
 	}
 
 	//compresor_comprimirRepetidosYDistinto(archLexico, repetidos, strlen(actual->termino) - repetidos);
-	fprintf(archFrontCoding,"%u\t\t%u", repetidos, strlen(actual->termino) - repetidos);
+	fprintf(archFrontCoding,"%u;%u", repetidos, strlen(actual->termino) - repetidos);
 
 	for (unsigned int i = repetidos; i < strlen(actual->termino);i++){
 		//compresor_comprimirCaracter(archLexico, actual->termino[i]); todo
@@ -161,7 +161,7 @@ void crear_termino(FILE* archFrontCoding, FILE* archDiferentes, registro_t* actu
 	}
 
 	//compresor_comprimirOffset(archLexico, offset); todo
-	fprintf(archFrontCoding, "\t\t%lu\t\t", offset);
+	fprintf(archFrontCoding, ";%lu;", offset);
 }
 
 

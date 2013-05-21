@@ -54,5 +54,6 @@ int main (int argc, char** argv){
 
 //	indexer_indexar(SALIDA_SORT, INDICE, LEXICO);
 
+
 	return 0;
 }
