@@ -10,6 +10,7 @@ const char* SALIDA_PARSER = "parser.jem";
 const char* SALIDA_SORT = "sort.jem";
 const char* INDICE = "indice.jem";
 const char* LEXICO = "lexico.jem";
+const char* DIFERENTES = "diferentes.jem";
 const char* NOMBRE_ARCHIVOS = "archs.jem";
 
 
@@ -37,7 +38,7 @@ int main (int argc, char** argv){
 	if (aux == PARSERINDEX_OK){
 		log_emitir("Paseo Realizado Correctamente", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
 		aux = sorting_ordenarArchivo(SALIDA_PARSER, SALIDA_SORT);
-		indexer_indexar(SALIDA_SORT, INDICE, LEXICO);
+		indexer_indexar(SALIDA_SORT, INDICE, LEXICO, DIFERENTES);
 
 		remove(SALIDA_PARSER);
 		remove(SALIDA_SORT);

@@ -29,6 +29,6 @@ registro_t* registro_leer(FILE*);
 void registro_escribir(FILE*, registro_t*);
 
 
-void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, FILE* archIndice, FILE* archLexico, lista_t* documentos, lista_t* posiciones_x_documento);
+void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, FILE* archIndice, FILE* archFrontCoding, FILE* archDiferentes, lista_t* documentos, lista_t* posiciones_x_documento);
 
 #endif /* REGISTRO_H_ */

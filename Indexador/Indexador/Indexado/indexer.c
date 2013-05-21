@@ -9,18 +9,20 @@
 
 //void indexarEntrada(registro_t* actual, registro_t* anterior, FILE* archIndex, FILE* archLexico, unsigned long *frecDoc, unsigned long *frecPos, unsigned long* offset);
 
-int indexer_indexar(const char* origen, const char* destino_index, const char* destino_lexico){
+int indexer_indexar(const char* origen, const char* destino_index, const char* destino_lexico_frontCoding, const char* destino_lexico_diferentes){
 	FILE* archOrigen = fopen(origen, lectura_archivos());
 	FILE* archIndice = fopen(destino_index, escritura_archivos());
-	FILE* archLexico = fopen(destino_lexico, escritura_archivos());
-	if (!archOrigen || !archIndice || !archLexico){
+	FILE* archFrontCoding = fopen(destino_lexico_frontCoding, escritura_archivos());
+	FILE* archDiferentes = fopen(destino_lexico_diferentes, escritura_archivos());
+	if (!archOrigen || !archIndice || !archFrontCoding || ! archDiferentes){
 		fclose(archOrigen);
 		fclose(archIndice);
-		fclose(archLexico);
+		fclose(archFrontCoding);
+		fclose(archDiferentes);
 		return INDEXER_ERROR;
 	}
 
-	fprintf(archLexico,"REP\t\tDIST\t\tCARAC\t\t OFFSET\t\tFREC\n");
+	fprintf(archFrontCoding,"REP\t\tDIST\t\t OFFSET\t\tFREC\n");
 
 	lista_t* posiciones = lista_crear();
 	lista_t* documentos = lista_crear();
@@ -36,7 +38,7 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 			continue;
 		}
 
-		registro_escribirEnIndice(registro, registro_anterior, archIndice, archLexico, documentos, posiciones);
+		registro_escribirEnIndice(registro, registro_anterior, archIndice, archFrontCoding, archDiferentes, documentos, posiciones);
 
 		if (registro_anterior)
 			registro_destruir(registro_anterior);
@@ -46,14 +48,15 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 	if (registro_anterior)
 		registro_destruir(registro_anterior);
 
-	registro_escribirEnIndice(NULL, registro_anterior, archIndice, archLexico, documentos, posiciones);
+	registro_escribirEnIndice(NULL, registro_anterior, archIndice, archFrontCoding,archDiferentes, documentos, posiciones);
 
 	log_emitir("Finalizo el Indexado de archivos", LOG_ENTRADA_PROCESO);
 
 	lista_destruir(documentos,NULL);
 	lista_destruir(posiciones, NULL);
 	fclose(archOrigen);
-	fclose(archLexico);
+	fclose(archFrontCoding);
+	fclose(archDiferentes);
 	fclose(archIndice);
 	return INDEXER_OK;
 }
