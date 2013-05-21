@@ -51,10 +51,16 @@ termino_t* termino_leer(termino_t* termino_anterior, FILE* archFrontCoding, FILE
 	char* offset = strtok(NULL, ";");
 	char* frecuencia = strtok(NULL, ";");
 
+	if (repetidos == NULL || distintos == NULL || offset == NULL || frecuencia == NULL){
+		free(linea);
+		return NULL;
+	}
+
 	size_t rep = atoi(repetidos);
 	size_t dist = atoi(distintos);
 	size_t off = atoi(offset);
 	size_t frec = atoi (frecuencia);
+
 	free(linea);
 
 	char* cad = malloc (sizeof(char) * (rep + dist + 1));
@@ -63,10 +69,16 @@ termino_t* termino_leer(termino_t* termino_anterior, FILE* archFrontCoding, FILE
 		cad[i] = termino_anterior->termino[i];
 
 	for (i = 0; i < dist; i++)
-		cad[i + rep] = fgetc(archFrontCoding);
+		cad[i + rep] = fgetc(archDiferentes);
 	cad[rep + dist] = '\0';
-	termino_t* t = termino_crear(cad, off, frec);
+
+	size_t off_ant = 0;
+	if (termino_anterior)
+		off_ant = termino_anterior->offset;
+
+	termino_t* t = termino_crear(cad, off + off_ant, frec);
 	free(cad);
+
 	return t;
 
 }

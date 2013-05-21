@@ -5,6 +5,8 @@
 #include "Carpetas Compartidas/Log/log.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include "Buscador/Levantador/levantador.h"
+#include "Carpetas Compartidas/TDAs/trie.h"
 
 const char* SALIDA_PARSER = "parser.jem";
 const char* SALIDA_SORT = "sort.jem";
@@ -51,9 +53,16 @@ int main (int argc, char** argv){
 		free(rutas[i]);
 	}
 	free(rutas);
+	log_emitir("Se termino de Indexar los documentos", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
 
-//	indexer_indexar(SALIDA_SORT, INDICE, LEXICO);
 
+	trie_t* trie = levantador_obtenerTrieLexico(LEXICO, DIFERENTES);
+
+	if (trie_pertenece(trie, "TOWER"))
+		printf("TOWER se encuentra :)\n");
+
+
+	trie_destruir(trie);
 
 	return 0;
 }

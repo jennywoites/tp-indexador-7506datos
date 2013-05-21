@@ -1,5 +1,6 @@
 #include "levantador.h"
 #include "../../Carpetas Compartidas/Manejo de Archivos/termino.h"
+#include "../../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
 #include "../../Carpetas Compartidas/Log/log.h"
 #include <stdlib.h>
 
@@ -25,14 +26,22 @@ void cargarTrie(trie_t* trie, FILE* archFrontCoding, FILE* archDiferentes){
 }
 
 
-trie_t* levantador_obtenerTrieLexico(FILE* archFrontCoding, FILE* archDiferentes){
-	if (!archFrontCoding || !archDiferentes)
+trie_t* levantador_obtenerTrieLexico(const char* rutaFrontCoding, const char* rutaDiferentes){
+	if (!rutaFrontCoding || !rutaDiferentes)
 		return NULL;
 
+	FILE* archFrontCoding = fopen(rutaFrontCoding, lectura_archivos());
+	FILE* archDiferentes = fopen(rutaDiferentes, lectura_archivos());
+	if (!archFrontCoding || !archDiferentes){
+		fclose(archFrontCoding);
+		fclose(archDiferentes);
+		return NULL;
+	}
+
 	trie_t* trie = trie_crear(destructor);
-
 	cargarTrie(trie, archFrontCoding, archDiferentes);
-
+	fclose(archFrontCoding);
+	fclose(archDiferentes);
 	return trie;
 }
 
