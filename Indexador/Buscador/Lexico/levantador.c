@@ -11,18 +11,18 @@
 
 
 void cargarEstructura(void* contenedor,contenedor_guardar_dato_t funcion , FILE* archFrontCoding, FILE* archDiferentes){
-	log_emitir("Inicia la carga de terminos al TRIE", LOG_ENTRADA_PROCESO);
+	log_emitir("Inicia la carga de terminos al CONTENDOR", LOG_ENTRADA_PROCESO);
 	termino_t* termino_anterior = NULL;
 	while (!feof(archFrontCoding) && !feof(archDiferentes)){
 		termino_t* termino = termino_leer(termino_anterior,archFrontCoding, archDiferentes);
 		if (!termino) continue;
 		char* cad = termino_obtenerPalabra(termino);
 		if(!funcion(contenedor, cad,termino))
-			log_emitir("No se pudo almacenar un termino en el TRIE", LOG_ENTRADA_ERROR);
+			log_emitir("No se pudo almacenar un termino en el CONTENEDOR", LOG_ENTRADA_ERROR);
 		free(cad);
 		termino_anterior = termino;
 	}
-	log_emitir("Finalizo la carga de terminos al TRIE", LOG_ENTRADA_PROCESO);
+	log_emitir("Finalizo la carga de terminos al CONTENEDOR", LOG_ENTRADA_PROCESO);
 }
 
 

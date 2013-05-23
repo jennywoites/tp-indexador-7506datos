@@ -23,4 +23,8 @@ termino_t* termino_leer(termino_t* termino_anterior, FILE* archFrontCoding, FILE
  * Memoria: guarda memoria para una copia de la palabra*/
 char* termino_obtenerPalabra(termino_t*);
 
+/* Permite comparar dos terminos.*/
+int terminos_comparar(void*,void*);
+
+
 #endif /* TERMINO_H_ */
