@@ -24,7 +24,9 @@ termino_t* termino_leer(termino_t* termino_anterior, FILE* archFrontCoding, FILE
 char* termino_obtenerPalabra(termino_t*);
 
 /* Permite comparar dos terminos.*/
-int terminos_comparar(void*,void*);
+int terminos_comparar(const void*,const void*);
 
+/* Funcion auxiliar que permite imprimir un termino por pantalla*/
+void termino_imprimir(termino_t*);
 
 #endif /* TERMINO_H_ */
