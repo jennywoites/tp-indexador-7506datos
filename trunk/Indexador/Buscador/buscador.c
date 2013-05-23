@@ -1,5 +1,6 @@
 #include "buscador.h"
 #include "../Carpetas Compartidas/TDAs/trie.h"
+#include "../Carpetas Compartidas/TDAs/heap.h"
 #include "../Carpetas Compartidas/Manejo de Archivos/termino.h"
 #include "Lexico/levantador.h"
 #include <stdbool.h>
@@ -39,21 +40,34 @@ void buscador_buscar(buscador_t* buscador, lista_t* terminos_buscados){
 		return;
 	}
 
+	termino_t** vector_terminos = malloc (sizeof(termino_t*) * lista_largo(terminos_buscados));
+	if (!vector_terminos) return;
+	size_t cont = 0;
+
 	lista_iter_t* iter = lista_iter_crear(terminos_buscados);
 
 	while (!lista_iter_al_final(iter)){
 		//Esto es lo que hay que cambiar:
 		char* termino = lista_iter_ver_actual(iter);
-		printf("%s: ", termino);
-		if (trie_pertenece(buscador->almacenador, termino))
-			printf("OK!\n");
-		else
-			printf("NO ESTA!\n");
 
+		if (trie_pertenece(buscador->almacenador, termino)){
+			termino_t* term =trie_obtener(buscador->almacenador, termino);
+			vector_terminos[cont] = term;
+		}else{
+			vector_terminos[cont] = NULL; 	//Aca podriamos decir que no hay ninguna solucion
+											//Posible, porque no se encontro uno de los terminos
+		}
+		cont++;
 		lista_iter_avanzar(iter);
 	}
-
 	lista_iter_destruir(iter);
+	heapsort((void*)vector_terminos, lista_largo(terminos_buscados), terminos_comparar);
+
+	printf("Se imprimen los resultados de menor frecuencia a mayor frecuencia!\n");
+	for (size_t i = 0; i < lista_largo(terminos_buscados); i++){
+		termino_imprimir(vector_terminos[i]);
+	}
+	free(vector_terminos);
 }
 
 

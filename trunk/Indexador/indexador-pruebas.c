@@ -22,7 +22,7 @@ void print_test(char* name, bool result){
 
 int main (int argc, char** argv){
 
-	char** rutas;
+/*	char** rutas;
 	unsigned long cant;
 
 	const char* directorio = "Textos_ejemplo_parseo";
@@ -53,7 +53,7 @@ int main (int argc, char** argv){
 	}
 	free(rutas);
 	log_emitir("Se termino de Indexar los documentos", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
-
+*/
 	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES);
 
 	lista_t* busquedas = lista_crear();
