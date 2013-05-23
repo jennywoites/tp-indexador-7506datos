@@ -5,8 +5,8 @@
 #include "Carpetas Compartidas/Log/log.h"
 #include <stdlib.h>
 #include <stdbool.h>
-#include "Buscador/Levantador/levantador.h"
-#include "Carpetas Compartidas/TDAs/trie.h"
+#include "Buscador/buscador.h"
+#include "Carpetas Compartidas/TDAs/lista.h"
 
 const char* SALIDA_PARSER = "parser.jem";
 const char* SALIDA_SORT = "sort.jem";
@@ -19,7 +19,6 @@ const char* NOMBRE_ARCHIVOS = "archs.jem";
 void print_test(char* name, bool result){
     printf("%s: %s\n", name, result? "OK" : "ERROR");
 }
-
 
 int main (int argc, char** argv){
 
@@ -55,14 +54,19 @@ int main (int argc, char** argv){
 	free(rutas);
 	log_emitir("Se termino de Indexar los documentos", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
 
+	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES);
 
-	trie_t* trie = levantador_obtenerTrieLexico(LEXICO, DIFERENTES);
+	lista_t* busquedas = lista_crear();
 
-	if (trie_pertenece(trie, "TOWER"))
-		printf("TOWER se encuentra :)\n");
+	lista_insertar_ultimo(busquedas, "HOLA");
+	lista_insertar_ultimo(busquedas, "TOWER");
+	lista_insertar_ultimo(busquedas, "ABAD");
+	lista_insertar_ultimo(busquedas, "ASDF");
+	lista_insertar_ultimo(busquedas, "ACTION");
 
-
-	trie_destruir(trie);
+	buscador_buscar(busq, busquedas);
+	lista_destruir(busquedas,NULL);
+	buscador_destruir(busq);
 
 	return 0;
 }
