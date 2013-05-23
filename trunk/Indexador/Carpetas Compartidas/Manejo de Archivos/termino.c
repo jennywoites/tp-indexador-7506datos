@@ -82,3 +82,10 @@ termino_t* termino_leer(termino_t* termino_anterior, FILE* archFrontCoding, FILE
 	return t;
 
 }
+
+int terminos_comparar(void* a,void* b){
+	termino_t* t1 = (termino_t*) a;
+	termino_t* t2 = (termino_t*) b;
+
+	return t1->frecuencia - t2->frecuencia;
+}
