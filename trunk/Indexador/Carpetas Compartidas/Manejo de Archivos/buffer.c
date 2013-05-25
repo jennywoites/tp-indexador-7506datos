@@ -34,7 +34,9 @@ void buffer_escribir_a_archivo(buffer_t* buff){
 	Byte_t byte_completo;
 	byte_completo = buffer_crear_byte(buff);
 
-	fprintf(buff->arch_salida, "%c", byte_completo );
+	if(buff->arch_salida)
+		fprintf(buff->arch_salida, "%c", byte_completo );
+
 	buff->cant_bits_almacenados=0;
 }
 
