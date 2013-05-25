@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int main (){
+int mainSIQUERESPROBAR (){
 	FILE* file1 = fopen("DEbuff.jem","r");
 	debuffer_t* debuff = debuffer_crear(file1);
 	
