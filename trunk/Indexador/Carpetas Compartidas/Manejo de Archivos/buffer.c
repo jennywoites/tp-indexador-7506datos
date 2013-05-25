@@ -45,11 +45,22 @@ void buffer_escribir_bytes(buffer_t* buff, Byte_t* num, size_t cant_bytes){
 
 void buffer_escribir_byte(buffer_t* buff, Byte_t num){
 	size_t longitud = 8;
-	buffer_escribir_bits(buff, num, longitud);
+	buffer_escribir_LS_bits(buff, num, longitud);
 }
 
-void buffer_escribir_bits(buffer_t* buff, Byte_t num, size_t longitud ){
+void buffer_escribir_LS_bits(buffer_t* buff, Byte_t num, size_t longitud ){
 	for (int i=longitud-1; i>=0 ;i--){
+		if ( num >= dosElevadoALa(i) ){
+			num = num - dosElevadoALa(i);
+			buffer_escribir_bit(buff, 1);
+		}else{
+			buffer_escribir_bit(buff, 0);
+		}
+	}
+}
+
+void buffer_escribir_MS_bits(buffer_t* buff, Byte_t num, size_t longitud ){
+	for (int i= 7; i>7-longitud ;i--){
 		if ( num >= dosElevadoALa(i) ){
 			num = num - dosElevadoALa(i);
 			buffer_escribir_bit(buff, 1);
