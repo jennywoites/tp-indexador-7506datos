@@ -1,0 +1,15 @@
+final: compilar construir
+	valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./pruebaDECOD -h
+	
+compilar: construir
+	gcc -Wall --pedantic --std=c99 decodificador.o debuffer.o matematicaEspecial.o -g pruebaDECOD.c -o pruebaDECOD
+construir:
+	gcc -Wall --pedantic -g --std=c99 -c ../../'Manejo de Archivos'/debuffer.c
+	gcc -Wall --pedantic -g --std=c99 -c ../decodificador.c
+	gcc -Wall --pedantic -g --std=c99 -c ../matematicaEspecial.c
+
+clean:
+	rm decodificador.o
+	rm debuffer.o
+	rm pruebaDECOD
+	rm matematicaEspecial.o

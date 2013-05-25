@@ -1,0 +1,15 @@
+final: compilar construir
+	valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./pruebaCOD -h
+	
+compilar: construir
+	gcc -Wall --pedantic --std=c99 buffer.o codificador.o matematicaEspecial.o -g pruebaCOD.c -o pruebaCOD
+construir:
+	gcc -Wall --pedantic -g --std=c99 -c ../../'Manejo de Archivos'/buffer.c
+	gcc -Wall --pedantic -g --std=c99 -c ../codificador.c
+	gcc -Wall --pedantic -g --std=c99 -c ../matematicaEspecial.c
+
+clean:
+	rm buffer.o
+	rm codificador.o
+	rm pruebaCOD
+	rm matematicaEspecial.o
