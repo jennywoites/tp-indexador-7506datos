@@ -33,12 +33,13 @@ void buffer_escribir_a_archivo(buffer_t* buff){
 		return ;
 	Byte_t byte_completo;
 	byte_completo = buffer_crear_byte(buff);
+
 	fprintf(buff->arch_salida, "%c", byte_completo );
 	buff->cant_bits_almacenados=0;
 }
 
 void buffer_escribir_bytes(buffer_t* buff, Byte_t* num, size_t cant_bytes){
-	for (size_t i=0; i<cant_bytes ;i--)
+	for (size_t i=0; i<cant_bytes ;i++)
 		buffer_escribir_byte(buff, num[i] );
 }
 
@@ -48,11 +49,13 @@ void buffer_escribir_byte(buffer_t* buff, Byte_t num){
 }
 
 void buffer_escribir_bits(buffer_t* buff, Byte_t num, size_t longitud ){
-	for (size_t i=longitud-1; i>=0 ;i--){
-		if ( num >= dosElevadoALa(i) )
+	for (int i=longitud-1; i>=0 ;i--){
+		if ( num >= dosElevadoALa(i) ){
 			num = num - dosElevadoALa(i);
 			buffer_escribir_bit(buff, 1);
-		buffer_escribir_bit(buff, 0);
+		}else{
+			buffer_escribir_bit(buff, 0);
+		}
 	}
 }
 
