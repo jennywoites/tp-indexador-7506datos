@@ -1,0 +1,12 @@
+final: compilar construir
+	valgrind --leak-check=full --show-reachable=yes ./pruebaBuff -h
+	
+compilar: construir
+	gcc -Wall --pedantic --std=c99 buffer.o matematicaEspecial.o -g pruebaBuff.c -o pruebaBuff
+construir:
+	gcc -Wall --pedantic -g --std=c99 -c ../buffer.c
+	gcc -Wall --pedantic -g --std=c99 -c ../../Codigos/matematicaEspecial.c
+
+clean:
+	rm buffer.o
+	rm pruebaBuff
