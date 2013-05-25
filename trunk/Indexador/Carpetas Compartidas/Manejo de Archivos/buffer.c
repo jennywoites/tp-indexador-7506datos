@@ -29,13 +29,11 @@ Byte_t buffer_crear_byte(buffer_t* buff){
 }
 
 void buffer_escribir_a_archivo(buffer_t* buff){
-	if (buff->cant_bits_almacenados!=8)
-		return ;
 	Byte_t byte_completo;
 	byte_completo = buffer_crear_byte(buff);
 
 	if(buff->arch_salida)
-		fprintf(buff->arch_salida, "%c", byte_completo );
+		fwrite(&byte_completo, 1, 1, buff->arch_salida);
 
 	buff->cant_bits_almacenados=0;
 }
@@ -77,7 +75,8 @@ void buffer_escribir_bit(buffer_t* buff, Byte_t num){
 
 	buff->cant_bits_almacenados++;
 
-	buffer_escribir_a_archivo(buff);
+	if (buff->cant_bits_almacenados==8)
+		buffer_escribir_a_archivo(buff);
 }
 
 void buffer_destruir(buffer_t* buff){
