@@ -20,10 +20,11 @@ codificador_t* codificador_crear(buffer_t* buffer){
 void codificador_codificarUnario(codificador_t* cod, unsigned int num){
 	if(num<=0)
 		return ;
-	while(num>1)
+	while(num>1){
 		num--;
-		buffer_escribir_bit(cod->buffer,0);
-	buffer_escribir_bit(cod->buffer,1);
+		buffer_escribir_bit(cod->buffer,1);
+	}
+	buffer_escribir_bit(cod->buffer,0);
 }
 
 void codificador_codificarBinario(codificador_t* cod, unsigned int num, size_t longitud){
