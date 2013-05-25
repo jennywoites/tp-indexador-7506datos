@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int main (){
+int mainSIPROBASDEBUFF (){
 	FILE* file = fopen("buff.jem","w");
 	buffer_t* buff = buffer_crear(file);
 	
