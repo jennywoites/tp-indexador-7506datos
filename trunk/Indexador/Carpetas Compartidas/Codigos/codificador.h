@@ -14,9 +14,9 @@ typedef struct codificador codificador_t;
 
 codificador_t* codificador_crear(buffer_t* buffer);
 
-void codificador_codificarUnario(codificador_t* cod, unsigned int num);
-
 void codificador_destruir(codificador_t* cod);
+
+void codificador_codificarUnario(codificador_t* cod, unsigned int num);
 
 void codificador_codificarBinario(codificador_t* cod, unsigned int num, size_t longitud);
 
