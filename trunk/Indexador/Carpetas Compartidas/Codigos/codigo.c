@@ -1,19 +1,21 @@
 #include "codigo.h"
 #include <stddef.h>
-#include <stdlib.h>
 #include "matematicaEspecial.h"
 #include <stdio.h>
 
+#define COMP_GAMMA 0
+#define COMP_DELTA 1
+
 struct codigo{
 	Byte_t* code;
-	size_t bits;
+	size_t cant_bits;
 };
 
 codigo_t* codigo_crearUnario(unsigned int);
 codigo_t* codigo_crearBinario(unsigned int, size_t);
-codigo_t* codigo_crearGamma(unsigned int a){return NULL;}
-codigo_t* codigo_crearDelta(unsigned int a){return NULL;}
-size_t cantidadDeBytes(size_t bits);
+codigo_t* codigo_crearGamma(unsigned int);
+codigo_t* codigo_crearDelta(unsigned int);
+size_t cantidadDeBytes(size_t cant_bits);
 
 codigo_t* codigo_crear(unsigned int num, unsigned int tipo){
 	switch(tipo){
@@ -33,15 +35,16 @@ void codigo_destruir(codigo_t* code){
 }
 
 
-size_t cantidadDeBytes(size_t bits){
+size_t cantidadDeBytes(size_t cant_bits){
 	//Devuelve la cantidad de bytes que ocupa una cierta cantidad de bits
+	
 	size_t sum = 0;
-	if (bits % BITS_X_BYTE != 0) sum = 1;
+	if (cant_bits % BITS_X_BYTE != 0) sum = 1;
 	//si el resto es 0, la division de mas abajo dara justo
 	//sino, debo sumarle uno para que entren todos los bits
 
 
-	size_t cant = bits / BITS_X_BYTE + sum;
+	size_t cant = cant_bits / BITS_X_BYTE + sum;
 	return cant;
 }
 
@@ -53,20 +56,25 @@ codigo_t* codigo_crearUnario(unsigned int num){
 	codigo_t* unario = malloc (sizeof(codigo_t));
 	if (!unario) return NULL;
 
-	unario->bits = num; //va a tener (num-1) 1's, y un 0
+	unario->cant_bits = num; //va a tener (num-1) 1's, y un 0
 
 	//Me fijo cuantos bytes voy a necesitar para guardar todos los bits
-	size_t cantBytes = cantidadDeBytes(unario->bits);
+	size_t cantBytes = cantidadDeBytes(unario->cant_bits);
+	
 	//Reservo la memoria suficiente
 	unario->code = malloc (sizeof(Byte_t) * cantBytes);
-	if (!unario->code){free (unario); return NULL;}
+	if (!unario->code){
+		free (unario);
+		return NULL;
+	}
+	
 	//Inicializo todos los bytes en 0
 	for (size_t i = 0; i < cantBytes; i++)
 		unario->code[i] = 0;
 
-	//Voy a poner los (n-1) 1's
+	//Voy a poner los (n-1) 1's cant_
 	size_t byteActual = 0;
-	unsigned int pot = 7;
+	unsigned int pot = 7; //Pos maxima en el byte
 	for (size_t j = 0; j < (num-1); j++){
 		unario->code[byteActual] += Byte_dosElevadoALa(pot);
 		if (pot == 0){
@@ -80,32 +88,108 @@ codigo_t* codigo_crearUnario(unsigned int num){
 }
 
 codigo_t* codigo_crearBinario(unsigned int num, size_t longitud ){
-	if (longitud == 0){
+	if (longitud == 0)
 		return NULL;
-	}
+	
 	unsigned max = maxPot2(num);
 	int diferencia = (longitud - 1) - max;
-	if (diferencia < 0) return NULL;
+	if (diferencia < 0)
+		return NULL;
 
 	codigo_t* binario = malloc (sizeof(codigo_t));
 	if (!binario) return NULL;
+	
 	size_t cantBytes = cantidadDeBytes(longitud);
 	binario->code = malloc(sizeof(Byte_t) * cantBytes);
-	if(!binario->code){free(binario); return NULL;}
+	if(!binario->code){
+		free(binario);
+		return NULL;
+	}
 
 	for (size_t i = 0; i < cantBytes; i++)
 		binario->code[i] = 0;
-	binario->bits = longitud;
+	binario->cant_bits = longitud;
 
 	/* FALTA PONER LO QUE HAGA QUE SE PONGO EL BINARIO*/
 
 	return binario;
 }
 
+void escribir_cod_en_compresor(codigo_t* cod_desde,codigo_t* cod_hacia , size_t bits_escritos){
+	//FALTA!!
+	return;
+}
+
+
+codigo_t* codigo_crearCompresor(unsigned int num, unsigned int tipo_codigo){
+	codigo_t* cod_compresor = malloc (sizeof(codigo_t));
+	if (!cod_compresor) return NULL;
+		
+	//Obtengo los numeros que tengo que escribir
+	unsigned int piso_log = maxPot2(num);
+	unsigned int num_primera_parte = 1 + piso_log;
+	unsigned int num_binario = num - dosElevadoALa(piso_log);
+	size_t cant_bits_binario = piso_log;
+		
+	//Creo los codigos de cada tipo
+	codigo_t* cod_primera_parte;
+	if (tipo_codigo == COMP_GAMMA){
+		cod_primera_parte = codigo_crearUnario(num_primera_parte);
+	}else{
+		cod_primera_parte = codigo_crearGamma(num_primera_parte);
+	}
+	
+	codigo_t* cod_binario = codigo_crearBinario(num_binario, cant_bits_binario);
+		
+	if(!cod_primera_parte || !cod_binario){
+		free(cod_compresor);
+		codigo_destruir(cod_primera_parte);
+		codigo_destruir(cod_binario);
+		return NULL;
+	}
+			
+	size_t cantidad_bits = (cod_primera_parte->cant_bits + cod_binario->cant_bits);
+	cod_compresor->cant_bits = cantidad_bits;
+		
+	size_t cantBytes = cantidadDeBytes(cantidad_bits);
+	cod_compresor->code = malloc(sizeof(Byte_t) * cantBytes);
+	
+	if(!cod_compresor->code){
+		codigo_destruir(cod_primera_parte);
+		codigo_destruir(cod_binario);
+		free(cod_compresor);
+		return NULL;
+	}
+		
+	//Inicializo los bytes con 0's
+	for (size_t i = 0; i < cantBytes; i++)
+		cod_compresor->code[i] = 0;
+	
+	//Paso cada codigo al cod_compresor
+	size_t bits_escritos = 0;
+	escribir_cod_en_compresor(cod_primera_parte, cod_compresor,bits_escritos);
+	bits_escritos = cod_primera_parte->cant_bits;
+	escribir_cod_en_compresor(cod_binario, cod_compresor,bits_escritos);
+		
+	//Destruyo los codigos que cree temporalmente
+	codigo_destruir(cod_primera_parte);
+	codigo_destruir(cod_binario);
+
+	return cod_compresor;
+}
+
+codigo_t* codigo_crearGamma(unsigned int num){
+	return codigo_crearCompresor(num, COMP_GAMMA);
+}
+
+codigo_t* codigo_crearDelta(unsigned int num){
+	return codigo_crearCompresor(num, COMP_DELTA);
+}
+
 
 void codigo_imprimir(codigo_t* c){
 	if (!c) return;
-	size_t cant_bytes = cantidadDeBytes(c->bits);
+	size_t cant_bytes = cantidadDeBytes(c->cant_bits);
 	printf("Codigo: ");
 	for (size_t i = 0; i < cant_bytes; i++)
 		printf("%d + ", c->code[i]);

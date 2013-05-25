@@ -15,11 +15,16 @@ Byte_t Byte_dosElevadoALa(unsigned int pot){
 }
 
 unsigned int dosElevadoALa(unsigned int pot){
-	if (pot > POTENCIA_MAX) return POTENCIAS_DE_2[POTENCIA_MAX]*dosElevadoALa(pot-POTENCIA_MAX);
+	if (pot > POTENCIA_MAX)
+		return POTENCIAS_DE_2[POTENCIA_MAX]*dosElevadoALa(pot-POTENCIA_MAX);
+	
 	return POTENCIAS_DE_2[pot];
 }
 
 unsigned int maxPot2(unsigned int num){
+	//Devuelve la potencia del numero en base dos mas cercano (por debajo)
+	// piso(log2(num))
+	
 	unsigned int pot = 0;
 	int resul;
 	while ( (resul =(num - dosElevadoALa(pot))) >= 0){

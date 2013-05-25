@@ -1,6 +1,8 @@
 #ifndef CODIGO_H_
 #define CODIGO_H_
 
+#include <stdlib.h>
+
 #define CODIGO_UNARIO 0
 #define CODIGO_BINARIO 1
 #define CODIGO_GAMMA 2
@@ -15,7 +17,7 @@ void codigo_destruir(codigo_t*);
 
 //Para pruebas:
 void codigo_imprimir(codigo_t*);
-codigo_t* codigo_crearBinario(unsigned int num, unsigned  longitud );
+codigo_t* codigo_crearBinario(unsigned int num , size_t longitud);
 
 
 #endif /* CODIGO_H_ */
