@@ -34,6 +34,8 @@ void buffer_escribir_a_archivo(buffer_t* buff){
 
 	if(buff->arch_salida)
 		fwrite(&byte_completo, 1, 1, buff->arch_salida);
+		//para pruebas:
+		//fprintf(buff->arch_salida, "%d", byte_completo);
 
 	buff->cant_bits_almacenados=0;
 }
