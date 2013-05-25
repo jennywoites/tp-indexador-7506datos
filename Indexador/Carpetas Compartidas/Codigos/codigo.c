@@ -2,9 +2,11 @@
 #include <stddef.h>
 #include "matematicaEspecial.h"
 #include <stdio.h>
+#include "../Manejo de Archivos/buffer.h"
 
 #define COMP_GAMMA 0
 #define COMP_DELTA 1
+#define TAM_BYTE 8
 
 struct codigo{
 	Byte_t* code;
@@ -115,12 +117,6 @@ codigo_t* codigo_crearBinario(unsigned int num, size_t longitud ){
 	return binario;
 }
 
-void escribir_cod_en_compresor(codigo_t* cod_desde,codigo_t* cod_hacia , size_t bits_escritos){
-	//FALTA!!
-	return;
-}
-
-
 codigo_t* codigo_crearCompresor(unsigned int num, unsigned int tipo_codigo){
 	codigo_t* cod_compresor = malloc (sizeof(codigo_t));
 	if (!cod_compresor) return NULL;
@@ -161,16 +157,19 @@ codigo_t* codigo_crearCompresor(unsigned int num, unsigned int tipo_codigo){
 		return NULL;
 	}
 		
-	//Inicializo los bytes con 0's
-	for (size_t i = 0; i < cantBytes; i++)
-		cod_compresor->code[i] = 0;
-	
 	//Paso cada codigo al cod_compresor
-	size_t bits_escritos = 0;
-	escribir_cod_en_compresor(cod_primera_parte, cod_compresor,bits_escritos);
-	bits_escritos = cod_primera_parte->cant_bits;
-	escribir_cod_en_compresor(cod_binario, cod_compresor,bits_escritos);
-		
+	buffer_t* buffer_bits = buffer_crear(NULL);
+	unsigned int cant_bits_restantes = cod_primera_parte->cant_bits;
+	unsigned int num_byte = cantidadDeBytes(cant_bits_restantes);
+	unsigned int byte_actual = cantBytes; 
+	while(cant_bits_restantes >= 8){
+		cod_compresor->code[byte_actual] = cod_primera_parte->code[num_byte];
+		cant_bits_restantes -= 8;
+		num_byte --;
+		byte_actual --;
+	}
+	
+	
 	//Destruyo los codigos que cree temporalmente
 	codigo_destruir(cod_primera_parte);
 	codigo_destruir(cod_binario);
