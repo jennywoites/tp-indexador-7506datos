@@ -58,11 +58,11 @@ int main (int argc, char** argv){
 
 	lista_t* busquedas = lista_crear();
 
-	lista_insertar_ultimo(busquedas, "HOLA");
-	lista_insertar_ultimo(busquedas, "TOWER");
-	lista_insertar_ultimo(busquedas, "ABAD");
-	lista_insertar_ultimo(busquedas, "ASDF");
-	lista_insertar_ultimo(busquedas, "ACTION");
+	lista_insertar_ultimo(busquedas, "PROJECT");
+	lista_insertar_ultimo(busquedas, "GUTENBERG");
+	lista_insertar_ultimo(busquedas, "GUTINBERGA");
+	lista_insertar_ultimo(busquedas, "VARIOUS");
+	lista_insertar_ultimo(busquedas, "TUVIEJENENTANGUEN");
 
 	buscador_buscar(busq, busquedas);
 	lista_destruir(busquedas,NULL);

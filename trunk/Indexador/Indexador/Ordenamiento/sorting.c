@@ -10,7 +10,7 @@
 const char* SALIDA_TEMPORAL_SORT = "tempsort.jem";
 
 #define SORT_CANT_REGISTROS 100000
-#define SORT_CANT_RUTAS_MAX 100
+#define SORT_CANT_RUTAS_MAX 999
 
 
 //El metodo a utilizar es el REPLACEMENT SELECTION
