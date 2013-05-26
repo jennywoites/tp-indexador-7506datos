@@ -12,7 +12,7 @@
 #define DT_DIR 4
 #define DT_FILE 8
 
-#define TAM 200
+#define TAM 400
 
 const char SEPARADORES[] = {' ', '-', '\n', '/', '_'};
 unsigned int CANT_SEPARADORES = 5;
