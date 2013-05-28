@@ -113,9 +113,9 @@ char* __crear_ruta(unsigned int num, unsigned int maximo, const char* salida_tem
 }
 
 
-void emitir_impresion(const char* mensaje,size_t num, size_t freq){
+void emitir_impresion(const char* mensaje,size_t num, size_t total){
 
-	unsigned long div0, div1, div2, div3;
+/*	unsigned long div0, div1, div2, div3;
 	div1 = freq / 4;
 	div2 = 2 * freq / 4;
 	div3 = 3 * freq / 4;
@@ -144,7 +144,9 @@ void emitir_impresion(const char* mensaje,size_t num, size_t freq){
 		system ("exec clear");
 		printf("%s...\n",mensaje);
 		return;
-	}
-	//system ("exec clear");
-	//printf("%s : %d%% \n", mensaje, /*(((float) num) *100) / total*/ 0);
+	}*/
+	system ("exec clear");
+	float porc = ((float) num )/ total;
+	porc *= 100;
+	printf("%s : %f%% Completado \n", mensaje, porc);
 }
