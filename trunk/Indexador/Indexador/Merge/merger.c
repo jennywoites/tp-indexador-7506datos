@@ -21,10 +21,10 @@ const char* SALIDA_TEMPORAL = "tempmerge.jem";	//salida para archivos temporales
 FILE** abrir_archivos(char**, int,int);
 void cerrar_archivos(FILE**, int);
 void verificarYAgregarElementos(heap_t*, unsigned int*,FILE**, int);
-void procesar_archivos(unsigned int* contadores ,FILE** archivos, int cant, FILE* salida);
+void procesar_archivos(unsigned int* contadores ,FILE** archivos, int cant, FILE* salida, size_t*);
 int copiarArchivo(const char* destino, const char* origen);
 
-char* merger(char** rutas, unsigned int i, unsigned int max,int inicial,int cant, FILE* salida){
+char* merger(char** rutas, unsigned int i, unsigned int max,int inicial,int cant, FILE* salida, size_t* ordenados){
 	FILE** archs = abrir_archivos(rutas,inicial, cant);
 
 	unsigned int contadores[cant];
@@ -37,7 +37,7 @@ char* merger(char** rutas, unsigned int i, unsigned int max,int inicial,int cant
 		ruta_aux = __crear_ruta(i,max, SALIDA_TEMPORAL);
 		outfile = fopen(ruta_aux, escritura_archivos());
 	}
-	procesar_archivos(contadores, archs, cant, outfile);
+	procesar_archivos(contadores, archs, cant, outfile, ordenados);
 	cerrar_archivos(archs, cant);
 	fclose(outfile);
 
@@ -62,27 +62,28 @@ int merger_MergearArchivos(char** rutas, int cant, const char* salida_final){
 		corrector = 1;
 	c -= corrector;
 
+	size_t ordenados = 0;
 	//Primera etapa del merge. Subdivido por la constante CANT_ARCHIVOS_SEGUIDOS a tratar,
 	//abro cada archivo, creo el arbol con un elemento de cada archivo, y voy avanzando en cada uno.
 	char* rutas_aux[c];
 	int cant_procesados = 0;
 	log_emitir("Se inicia primera etapa del merge", LOG_ENTRADA_PROCESO);
 	for (unsigned int i = 0; i <= c; i++){
-		emitir_impresion("Mergeando Archivos Ordenados", i, 4);
+		emitir_impresion("Mergeando Archivos Ordenados", ordenados, registro_totales());
 		int a_procesar;
 		if (cant_procesados + CANT_ARCHIVOS_SEGUIDOS <= cant){
 			a_procesar = CANT_ARCHIVOS_SEGUIDOS;
 		}else{
 			a_procesar = cant - cant_procesados - 1;
 		}
-		rutas_aux[i] = merger(rutas, i,c ,cant_procesados,a_procesar, NULL);
+		rutas_aux[i] = merger(rutas, i,c ,cant_procesados,a_procesar, NULL, &ordenados);
 		cant_procesados += a_procesar;
 	}
 	log_emitir("Finalizada primera etapa del merge", LOG_ENTRADA_PROCESO);
 
 	emitir_impresion("Mergeando Archivos temporales", 0,4);
 	log_emitir("Se inicia segunda etapa del merge", LOG_ENTRADA_PROCESO);
-	merger(rutas_aux, 0, c,0,c+1, archSalida);
+	merger(rutas_aux, 0, c,0,c+1, archSalida, &ordenados);
 	log_emitir("Finalizada segunda etapa del merge", LOG_ENTRADA_PROCESO);
 
 	log_emitir("Se remueven los archivos temporales de la primera etapa del merge", LOG_ENTRADA_PROCESO);
@@ -134,7 +135,7 @@ bool archivos_vacios(FILE** archivos, int cant){
 }
 
 
-void procesar_archivos(unsigned int* contadores ,FILE** archivos, int cant, FILE* salida){
+void procesar_archivos(unsigned int* contadores ,FILE** archivos, int cant, FILE* salida, size_t *ordenados){
 	heap_t* heap = heap_crear(comparacionRegistros);
 	while (!archivos_vacios(archivos, cant) || !heap_esta_vacio(heap)){
 		verificarYAgregarElementos(heap,contadores,archivos, cant);
@@ -143,6 +144,7 @@ void procesar_archivos(unsigned int* contadores ,FILE** archivos, int cant, FILE
 		if (dato){
 			contadores[dato->numArchivo] = contadores[dato->numArchivo] - 1;
 			registro_escribir(salida, dato->registro);
+			*ordenados = *ordenados + 1;
 			registro_destruir(dato->registro);
 			free(dato);
 		}

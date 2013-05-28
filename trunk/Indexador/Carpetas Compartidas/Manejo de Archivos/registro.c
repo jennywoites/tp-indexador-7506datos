@@ -39,7 +39,6 @@ registro_t* registro_crear(const char* termino, unsigned long doc, unsigned long
 
 	reg->documento = doc;
 	reg->posicion = pos;
-	cant_registros++;
 	return reg;
 }
 
@@ -219,4 +218,8 @@ void cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t* p
 
 size_t registro_totales(){
 	return cant_registros;
+}
+
+void registro_aumentarCantidad(){
+	cant_registros++;
 }

@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include "../../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
 #include "../../Carpetas Compartidas/Log/log.h"
+#include "../../Carpetas Compartidas/Manejo de Archivos/registro.h"
 
 //Para poder ver lo que haya en un directorio:
 #include <dirent.h>
@@ -172,6 +173,7 @@ char* eliminarCaracteresPrescindibles(char* cadena, bool duplicante){
 void tratarPalabra(char* palabra, unsigned long doc, unsigned long pos, FILE* salida){
 	//Por ahora voy a imprimir simplemente:
 	fprintf(salida,"%s;%lu;%lu\n", palabra, doc, pos);
+	registro_aumentarCantidad();
 }
 
 void __toUPPERCase(char* cadena){
@@ -214,12 +216,12 @@ int parserIndex_parsearArchivos(char* directorio, char** rutas_archivos, unsigne
 	if (!arch) return PARSERINDEX_ERROR;
 
 	bool ok = true;
-	log_emitir("Inicia Parceo de archivos", LOG_ENTRADA_PROCESO);
+	log_emitir("Inicia Parseo de archivos", LOG_ENTRADA_PROCESO);
 	for (unsigned long i = 0; i < num; i++){
-		emitir_impresion("Parceando Archivos",i,num);
-		ok = parserIndex_parsearArchivo(rutas_archivos[i], i, arch) == PARSERINDEX_OK;
+		emitir_impresion("Parseando Archivos",i,num);
+		ok = parserIndex_parsearArchivo(rutas_archivos[i], i+1, arch) == PARSERINDEX_OK;
 	}
-	log_emitir("Finalizado Parceo de archivos",LOG_ENTRADA_PROCESO);
+	log_emitir("Finalizado Parseo de archivos",LOG_ENTRADA_PROCESO);
 	fclose(arch);
 
 	int aux = comprimirNombres(directorio, rutas_archivos, num, salida_nombres);

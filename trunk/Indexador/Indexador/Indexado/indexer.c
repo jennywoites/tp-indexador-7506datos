@@ -6,6 +6,7 @@
 #include "../../Carpetas Compartidas/Log/log.h"
 #include "../../Carpetas Compartidas/TDAs/cola.h"
 #define TAM_TERMINO_IMPOSIBLE 200
+#define FRECUENCIA_DE_IMPRESION 1000
 
 
 //void indexarEntrada(registro_t* actual, registro_t* anterior, FILE* archIndex, FILE* archLexico, unsigned long *frecDoc, unsigned long *frecPos, unsigned long* offset);
@@ -31,9 +32,11 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 	registro_t* registro_anterior = NULL;
 
 	log_emitir("Inicia el Indexado de archivos", LOG_ENTRADA_PROCESO);
+	emitir_impresion("Indexando", 0, 1);
 	unsigned long i = 0;
 	while (!feof(archOrigen)){
-		emitir_impresion("Indexando Terminos y Punteros", i++, 12000);
+		if (i % FRECUENCIA_DE_IMPRESION == 0)
+			emitir_impresion("Indexando Terminos y Punteros", i, registro_totales());
 		registro_t* registro = registro_leer(archOrigen);
 		if (!registro && !feof(archOrigen)){
 			log_emitir("Lectura del archivo ordenado incorrecto", LOG_ENTRADA_ERROR);
@@ -45,7 +48,7 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 		if (registro_anterior)
 			registro_destruir(registro_anterior);
 		registro_anterior = registro;
-
+		i++;
 	}
 	if (registro_anterior)
 		registro_destruir(registro_anterior);

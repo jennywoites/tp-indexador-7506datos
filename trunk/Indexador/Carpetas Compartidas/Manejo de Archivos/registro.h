@@ -34,4 +34,6 @@ void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_
 
 /* Permite obteneer la cantidad total de registros creados*/
 size_t registro_totales();
+
+void registro_aumentarCantidad();
 #endif /* REGISTRO_H_ */

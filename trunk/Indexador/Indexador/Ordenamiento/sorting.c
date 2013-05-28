@@ -31,7 +31,7 @@ void sort_meterEnHeap(heap_t* heap, FILE* archEnt, unsigned long inicial){
 	}
 }
 
-void sort_guardarHastaFreezados(heap_t* heap, FILE* archEnt,FILE* archSal){
+void sort_guardarHastaFreezados(heap_t* heap, FILE* archEnt,FILE* archSal, size_t* ordenados){
 	dato_t* anterior = NULL;
 
 	while (!heap_esta_vacio(heap) && !((dato_t*)heap_ver_max(heap))->freezado){
@@ -48,6 +48,7 @@ void sort_guardarHastaFreezados(heap_t* heap, FILE* archEnt,FILE* archSal){
 
 		if (agregar){
 			registro_escribir(archSal, actual->registro);
+			*ordenados = *ordenados+1;
 			if (anterior){
 				registro_destruir(anterior->registro);
 				free(anterior);
@@ -92,17 +93,17 @@ int sorting_ordenarArchivo(const char* entrada, const char* salida){
 	FILE* archEnt = fopen(entrada, lectura_archivos());
 	unsigned int num = 0;
 	char** rutas = malloc (sizeof(char*) * SORT_CANT_RUTAS_MAX);
-
+	size_t ordenados = 0;
 	log_emitir("Se Comienza el proceso de Ordenamiento del archivo parcedo", LOG_ENTRADA_PROCESO);
 	while (!feof(archEnt) || !heap_esta_vacio(heap)){
 		log_emitir("Se genera particion ordenada", LOG_ENTRADA_PROCESO);
-		emitir_impresion("Ordenando Archivo Parseado", num, 4);
+		emitir_impresion("Ordenando Archivo Parseado", ordenados, registro_totales());
 		sort_meterEnHeap(heap, archEnt, heap_cantidad(heap));
 		char* ruta = __crear_ruta(num, SORT_CANT_RUTAS_MAX, SALIDA_TEMPORAL_SORT);
 		FILE* archSal = fopen(ruta, escritura_archivos());
 		rutas[num] = ruta;
 		num++;
-		sort_guardarHastaFreezados(heap, archEnt, archSal);
+		sort_guardarHastaFreezados(heap, archEnt, archSal,&ordenados);
 		fclose(archSal);
 		sort_desfreezar(&heap);
 	}
