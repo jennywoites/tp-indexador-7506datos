@@ -216,7 +216,7 @@ int parserIndex_parsearArchivos(char* directorio, char** rutas_archivos, unsigne
 	bool ok = true;
 	log_emitir("Inicia Parceo de archivos", LOG_ENTRADA_PROCESO);
 	for (unsigned long i = 0; i < num; i++){
-		emitir_impresion("Parceando Archivos",i,120);
+		emitir_impresion("Parceando Archivos",i,num);
 		ok = parserIndex_parsearArchivo(rutas_archivos[i], i, arch) == PARSERINDEX_OK;
 	}
 	log_emitir("Finalizado Parceo de archivos",LOG_ENTRADA_PROCESO);

@@ -3,10 +3,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/stat.h>
 
 int mainSIQUERESPROBAR (){
 	FILE* file1 = fopen("DEbuff.jem","r");
-	debuffer_t* debuff = debuffer_crear(file1);
+	struct stat st;
+	stat("DEbuff.jem", &st);
+	size_t cant_bytes = st.st_size;
+	debuffer_t* debuff = debuffer_crear(file1, cant_bytes);
 	
 	FILE* file2 = fopen("buff.jem","w");
 	buffer_t* buff = buffer_crear(file2);

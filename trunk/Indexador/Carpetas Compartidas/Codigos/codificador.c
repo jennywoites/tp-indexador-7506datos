@@ -17,17 +17,17 @@ codificador_t* codificador_crear(buffer_t* buffer){
 	return cod;
 }
 
-void codificador_codificarUnario(codificador_t* cod, unsigned int num){
+void codificador_codificarUnario(buffer_t* cod, unsigned int num){
 	if(num<=0)
 		return ;
 	while(num>1){
 		num--;
-		buffer_escribir_bit(cod->buffer,1);
+		buffer_escribir_bit(cod,1);
 	}
-	buffer_escribir_bit(cod->buffer,0);
+	buffer_escribir_bit(cod,0);
 }
 
-void codificador_codificarBinario(codificador_t* cod, unsigned int num, size_t longitud){
+void codificador_codificarBinario(buffer_t* cod, unsigned int num, size_t longitud){
 	if (longitud <= 0)
 		return ;
 	unsigned int pot2i;
@@ -35,14 +35,14 @@ void codificador_codificarBinario(codificador_t* cod, unsigned int num, size_t l
 		pot2i = dosElevadoALa(i);
 		if (num >= pot2i ){
 			num = num - pot2i;
-			buffer_escribir_bit(cod->buffer,1);
+			buffer_escribir_bit(cod,1);
 		}else
-			buffer_escribir_bit(cod->buffer,0);
+			buffer_escribir_bit(cod,0);
 	}
 }
 
 
-void codificador_codificarGamma(codificador_t* cod, unsigned int num){
+void codificador_codificarGamma(buffer_t* cod, unsigned int num){
 	if(num<=0)
 		return ;
 	//Obtengo los numeros que tengo que escribir
@@ -55,7 +55,7 @@ void codificador_codificarGamma(codificador_t* cod, unsigned int num){
 	codificador_codificarBinario(cod, num_binario, cant_bits_binario);
 }
 
-void codificador_codificarDelta(codificador_t* cod, unsigned int num){
+void codificador_codificarDelta(buffer_t* cod, unsigned int num){
 	if(num<=0)
 		return ;
 	//Obtengo los numeros que tengo que escribir

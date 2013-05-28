@@ -21,8 +21,8 @@ void print_test(char* name, bool result){
 }
 
 int main (int argc, char** argv){
-
-/*	char** rutas;
+/*
+	char** rutas;
 	unsigned long cant;
 
 	const char* directorio = "Textos_ejemplo_parseo";
@@ -65,7 +65,7 @@ int main (int argc, char** argv){
 	lista_insertar_ultimo(busquedas, "TUVIEJENENTANGUEN");
 
 	buscador_buscar(busq, busquedas);
-	lista_destruir(busquedas,NULL);
+	lista_destruir(busquedas,NULL);	
 	buscador_destruir(busq);
 
 	return 0;
