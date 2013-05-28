@@ -1,4 +1,5 @@
 #include "indexer.h"
+#include "../../Carpetas Compartidas/Manejo de Archivos/buffer.h"
 #include <stdio.h>
 #include "../../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
 #include "../../Carpetas Compartidas/Manejo de Archivos/registro.h"
@@ -22,7 +23,8 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 		return INDEXER_ERROR;
 	}
 
-	//fprintf(archFrontCoding,"REP\t\tDIST\t\t OFFSET\t\tFREC\n");
+	buffer_t* buff_indice = buffer_crear(archIndice);
+	buffer_t* buff_frontcoding =  buffer_crear(archFrontCoding);
 
 	lista_t* posiciones = lista_crear();
 	lista_t* documentos = lista_crear();
@@ -38,7 +40,7 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 			continue;
 		}
 
-		registro_escribirEnIndice(registro, registro_anterior, archIndice, archFrontCoding, archDiferentes, documentos, posiciones);
+		registro_escribirEnIndice(registro, registro_anterior, buff_indice, buff_frontcoding, archDiferentes, documentos, posiciones);
 
 		if (registro_anterior)
 			registro_destruir(registro_anterior);
@@ -48,10 +50,14 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 	if (registro_anterior)
 		registro_destruir(registro_anterior);
 
-	registro_escribirEnIndice(NULL, registro_anterior, archIndice, archFrontCoding,archDiferentes, documentos, posiciones);
+	registro_escribirEnIndice(NULL, registro_anterior, buff_indice, buff_frontcoding,archDiferentes, documentos, posiciones);
 
 	log_emitir("Finalizo el Indexado de archivos", LOG_ENTRADA_PROCESO);
 
+	buffer_rellenar(buff_indice);
+	buffer_rellenar(buff_frontcoding);
+	buffer_destruir(buff_indice);
+	buffer_destruir(buff_frontcoding);
 	lista_destruir(documentos,NULL);
 	lista_destruir(posiciones, NULL);
 	fclose(archOrigen);

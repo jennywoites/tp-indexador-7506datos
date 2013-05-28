@@ -17,23 +17,27 @@ decodificador_t* decodificador_crear(debuffer_t* debuffer){
 	return decod;
 }
 
-unsigned int decodificador_decodificarUnario(decodificador_t* decodificador){
+unsigned int decodificador_decodificarUnario(debuffer_t* decodificador){
 	if (!decodificador)
 		return NO_NUMERO;
 	
 	unsigned int cant_bits = 1;
-	Byte_t bit = debuffer_leer_bit(decodificador->debuffer);
+	Byte_t bit = debuffer_leer_bit(decodificador);
+	if (bit == DEBUFFER_ERROR)
+		return NO_NUMERO;
 	
 	while(bit != 0){
 		cant_bits ++;
-		bit = debuffer_leer_bit(decodificador->debuffer);
+		bit = debuffer_leer_bit(decodificador);
+		if (bit == DEBUFFER_ERROR)
+			return NO_NUMERO;
 	}
 	
 	unsigned int numero = cant_bits;
 	return numero;
 }
 
-unsigned int decodificador_decodificarBinario(decodificador_t* decodificador, size_t longitud){
+unsigned int decodificador_decodificarBinario(debuffer_t* decodificador, size_t longitud){
 	if (!decodificador || (longitud == 0))
 		return NO_NUMERO;
 
@@ -41,7 +45,9 @@ unsigned int decodificador_decodificarBinario(decodificador_t* decodificador, si
 	Byte_t bit;
 	
 	for(int i = longitud-1; i>=0; i--){
-		bit = debuffer_leer_bit(decodificador->debuffer);
+		bit = debuffer_leer_bit(decodificador);
+		if (bit == DEBUFFER_ERROR)
+			return NO_NUMERO;
 		
 		if (bit == 1)
 			numero = numero + dosElevadoALa(i);
@@ -50,13 +56,15 @@ unsigned int decodificador_decodificarBinario(decodificador_t* decodificador, si
 	return numero;
 }
 
-unsigned int decodificador_decodificarGamma(decodificador_t* decodificador){
+unsigned int decodificador_decodificarGamma(debuffer_t* decodificador){
 	if (!decodificador)
 		return NO_NUMERO;
 
 	unsigned int numero = 0;
 	unsigned int numero_unario = decodificador_decodificarUnario(decodificador);
 	size_t cant_bits = numero_unario - 1;
+	if (numero_unario == NO_NUMERO)
+			return NO_NUMERO;
 	unsigned int numero_binario = decodificador_decodificarBinario(decodificador, cant_bits);
 	
 	numero = numero_binario + dosElevadoALa(cant_bits);
@@ -64,12 +72,14 @@ unsigned int decodificador_decodificarGamma(decodificador_t* decodificador){
 	return numero;
 }
 
-unsigned int decodificador_decodificarDelta(decodificador_t* decodificador){
+unsigned int decodificador_decodificarDelta(debuffer_t* decodificador){
 	if (!decodificador)
 		return NO_NUMERO;
 
 	unsigned int numero = 0;
 	unsigned int numero_gamma = decodificador_decodificarGamma(decodificador);
+	if (numero_gamma == NO_NUMERO)
+		return NO_NUMERO;
 	size_t cant_bits = numero_gamma - 1;
 	unsigned int numero_binario = decodificador_decodificarBinario(decodificador, cant_bits);
 	

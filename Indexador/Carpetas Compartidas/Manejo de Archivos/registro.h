@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "../TDAs/lista.h"
+#include "buffer.h"
 
 typedef struct registro registro_t;
 
@@ -29,6 +30,8 @@ registro_t* registro_leer(FILE*);
 void registro_escribir(FILE*, registro_t*);
 
 /* Escribe un termino en el indice, con un cierto formato. Lo hace con un cierto formato, y no necesariamente imprime cuando le dicen.*/
-void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, FILE* archIndice, FILE* archFrontCoding, FILE* archDiferentes, lista_t* documentos, lista_t* posiciones_x_documento);
+void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_t* buffIndice, buffer_t* buffFrontCoding, FILE* archDiferentes, lista_t* documentos, lista_t* posiciones_x_documento);
 
+/* Permite obteneer la cantidad total de registros creados*/
+size_t registro_totales();
 #endif /* REGISTRO_H_ */

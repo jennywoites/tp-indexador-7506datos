@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "../../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
+#include "../../Carpetas Compartidas/Codigos/decodificador.h"
 
 struct termino{
 	char* termino;
@@ -44,8 +45,8 @@ char* termino_obtenerPalabra(termino_t* term){
 	return copy;
 }
 
-termino_t* termino_leer(termino_t* termino_anterior, FILE* archFrontCoding, FILE* archDiferentes){
-	char* linea = obtenerLinea(archFrontCoding);
+termino_t* termino_leer(termino_t* termino_anterior, debuffer_t* debuff_FrontCoding, FILE* archDiferentes){
+/*	char* linea = obtenerLinea(archFrontCoding);
 	char* repetidos = strtok(linea, ";");
 	char* distintos = strtok(NULL, ";");
 	char* offset = strtok(NULL, ";");
@@ -62,7 +63,17 @@ termino_t* termino_leer(termino_t* termino_anterior, FILE* archFrontCoding, FILE
 	size_t frec = atoi (frecuencia);
 
 	free(linea);
-
+*/
+	size_t rep = decodificador_decodificarGamma(debuff_FrontCoding);
+	size_t dist = decodificador_decodificarGamma(debuff_FrontCoding);
+	size_t off = decodificador_decodificarDelta(debuff_FrontCoding);
+	size_t frec = decodificador_decodificarDelta(debuff_FrontCoding);
+	if( rep == NO_NUMERO || dist == NO_NUMERO || off == NO_NUMERO || frec == NO_NUMERO )
+		return NULL;
+	rep--;
+	off--;
+	
+	
 	char* cad = malloc (sizeof(char) * (rep + dist + 1));
 	size_t i;
 	for (i = 0; i < rep && termino_anterior; i++)

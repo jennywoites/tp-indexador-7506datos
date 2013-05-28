@@ -1,6 +1,7 @@
 #ifndef TERMINO_H_
 #define TERMINO_H_
 #include <stdio.h>
+#include "../../Carpetas Compartidas/Manejo de Archivos/debuffer.h"
 
 // Definicion de la estructura de termino.
 typedef struct termino termino_t;
@@ -17,7 +18,7 @@ void termino_destruir(termino_t*);
 /* Permite obtener un término a partir de un archivo de front coding, y otro con
  * los caracteres diferentes. Ademas necesita conocer el termino anterior, para
  * utilizar el frontCoding*/
-termino_t* termino_leer(termino_t* termino_anterior, FILE* archFrontCoding, FILE* archDiferentes);
+termino_t* termino_leer(termino_t* termino_anterior, debuffer_t* debuff_FrontCoding, FILE* archDiferentes);
 
 /* Permite obtener la cadena perteneciente a un termino (la palabra)
  * Memoria: guarda memoria para una copia de la palabra*/
