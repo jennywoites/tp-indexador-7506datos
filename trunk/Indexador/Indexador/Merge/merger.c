@@ -22,6 +22,7 @@ FILE** abrir_archivos(char**, int,int);
 void cerrar_archivos(FILE**, int);
 void verificarYAgregarElementos(heap_t*, unsigned int*,FILE**, int);
 void procesar_archivos(unsigned int* contadores ,FILE** archivos, int cant, FILE* salida);
+int copiarArchivo(const char* destino, const char* origen);
 
 char* merger(char** rutas, unsigned int i, unsigned int max,int inicial,int cant, FILE* salida){
 	FILE** archs = abrir_archivos(rutas,inicial, cant);
@@ -46,6 +47,11 @@ char* merger(char** rutas, unsigned int i, unsigned int max,int inicial,int cant
 
 int merger_MergearArchivos(char** rutas, int cant, const char* salida_final){
 	if (cant <= 0) return MERGER_ERROR;
+
+	if (cant == 1){
+		 return copiarArchivo(salida_final, rutas[0]);
+	}
+
 	FILE* archSalida = fopen (salida_final, escritura_archivos());
 	if (!archSalida) return MERGER_ERROR;
 	unsigned int c = cant/CANT_ARCHIVOS_SEGUIDOS; //c es la cantidad de pasadas a hacer - 1
@@ -143,6 +149,24 @@ void procesar_archivos(unsigned int* contadores ,FILE** archivos, int cant, FILE
 	heap_destruir(heap,NULL);
 }
 
+int copiarArchivo(const char* destino, const char* origen){
+	FILE* org = fopen(origen, lectura_archivos());
+	FILE* dst = fopen(destino, escritura_archivos());
+	if (!org || !dst){
+		fclose(org);
+		fclose(dst);
+		return MERGER_ERROR;
+	}
+
+	while (!feof(org)){
+		char c = fgetc(org);
+		fprintf(dst, "%c", c);
+	}
+
+	fclose(org);
+	fclose(dst);
+	return MERGER_OK;
+}
 
 /************************************************************************************/
 
