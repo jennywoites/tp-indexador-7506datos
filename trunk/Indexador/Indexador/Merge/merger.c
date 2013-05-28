@@ -49,7 +49,8 @@ int merger_MergearArchivos(char** rutas, int cant, const char* salida_final){
 	if (cant <= 0) return MERGER_ERROR;
 
 	if (cant == 1){
-		 return copiarArchivo(salida_final, rutas[0]);
+		emitir_impresion("Mergeando Archivos temporales", 0,4);
+		return copiarArchivo(salida_final, rutas[0]);
 	}
 
 	FILE* archSalida = fopen (salida_final, escritura_archivos());
