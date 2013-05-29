@@ -34,8 +34,9 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 	log_emitir("Inicia el Indexado de archivos", LOG_ENTRADA_PROCESO);
 	emitir_impresion("Indexando", 0, 1);
 	unsigned long i = 0;
+	size_t freq = registro_totales() / FRECUENCIA_DE_IMPRESION;
 	while (!feof(archOrigen)){
-		if (i % FRECUENCIA_DE_IMPRESION == 0)
+		if (i %  freq == 0)
 			emitir_impresion("Indexando Terminos y Punteros", i, registro_totales());
 		registro_t* registro = registro_leer(archOrigen);
 		if (!registro && !feof(archOrigen)){
