@@ -30,4 +30,11 @@ int terminos_comparar(const void*,const void*);
 /* Funcion auxiliar que permite imprimir un termino por pantalla*/
 void termino_imprimir(termino_t*);
 
+/* Devuelve la frecuencia de un termino, es decir, la cantidad de documentos
+ * en los que aparece */
+size_t termino_obtener_frecuencia(termino_t*);
+
+/* Devuelve la posición en bits en la que comienzan los datos de un termino */
+size_t termino_obtener_offset(termino_t*);
+
 #endif /* TERMINO_H_ */
