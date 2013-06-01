@@ -8,8 +8,8 @@
 #include "../../Carpetas Compartidas/Manejo de Archivos/registro.h"
 #include "../../Carpetas Compartidas/Log/log.h"
 
-#define CANT_ARCHIVOS_SEGUIDOS 15
-#define CANT_REGISTROS_POR_ARCHIVO 200
+#define CANT_ARCHIVOS_SEGUIDOS 10
+#define CANT_REGISTROS_POR_ARCHIVO 20000
 
 const char* SALIDA_TEMPORAL = "tempmerge.jem";	//salida para archivos temporales
 
