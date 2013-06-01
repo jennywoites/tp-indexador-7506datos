@@ -9,7 +9,7 @@
 
 const char* SALIDA_TEMPORAL_SORT = "tempsort.jem";
 
-#define SORT_CANT_REGISTROS 1500000
+#define SORT_CANT_REGISTROS 3000000
 #define SORT_CANT_RUTAS_MAX 999
 
 
