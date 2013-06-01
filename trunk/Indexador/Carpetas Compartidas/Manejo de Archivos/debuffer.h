@@ -14,6 +14,8 @@ debuffer_t* debuffer_crear(FILE* fd, size_t cant_bytes);
 
 Byte_t debuffer_leer_bit(debuffer_t* debuff);
 
+void debuffer_descartar_bits(debuffer_t* debuff, size_t bits_a_desechar){
+
 void debuffer_destruir(debuffer_t* debuff);
 
 #endif /* DEBUFFER_H_ */
