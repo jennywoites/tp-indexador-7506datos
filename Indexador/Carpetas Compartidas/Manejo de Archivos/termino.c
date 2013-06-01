@@ -110,3 +110,17 @@ void termino_imprimir(termino_t* termino){
 
 	printf("El termino %s tiene frecuencia %u\n", termino->termino, termino->frecuencia);
 }
+
+size_t termino_obtener_frecuencia(termino_t* termino){
+	if (!termino)
+		return 0;
+
+	return termino->frecuencia;
+}
+
+size_t termino_obtener_offset(termino_t* termino){
+	if (!termino)
+		return 0;
+
+	return termino->offset;
+}
