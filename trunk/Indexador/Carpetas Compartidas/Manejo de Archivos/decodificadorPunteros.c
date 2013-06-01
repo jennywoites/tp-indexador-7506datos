@@ -73,4 +73,6 @@ lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos){
 		}
 		doc_actual ++;
 	}
+
+	return listado_datos;
 }
