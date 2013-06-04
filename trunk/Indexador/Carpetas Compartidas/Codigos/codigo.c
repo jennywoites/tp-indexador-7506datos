@@ -158,7 +158,7 @@ codigo_t* codigo_crearCompresor(unsigned int num, unsigned int tipo_codigo){
 	}
 		
 	//Paso cada codigo al cod_compresor
-	buffer_t* buffer_bits = buffer_crear(NULL);
+	//buffer_t* buffer_bits = buffer_crear(NULL);
 	unsigned int cant_bits_restantes = cod_primera_parte->cant_bits;
 	unsigned int num_byte = cantidadDeBytes(cant_bits_restantes);
 	unsigned int byte_actual = cantBytes; 

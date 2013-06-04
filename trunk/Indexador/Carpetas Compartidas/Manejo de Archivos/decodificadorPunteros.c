@@ -31,6 +31,7 @@ lista_t* decodificar_punteros(const char* ruta, termino_t* termino){
 	size_t cant_bytes = st.st_size;
 	debuffer_t* debuffer = debuffer_crear(arch, cant_bytes - offset_bytes);
 
+
 	//Posicionarse en el archivo a un lugar del debuffer
 	fseek(arch, offset_bytes,SEEK_SET); //SEEK_SET offset desde el inicio del archivo
 	debuffer_descartar_bits(debuffer,bits_a_desechar);
@@ -46,34 +47,43 @@ lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos){
 		return NULL;
 
 	lista_t* listado_datos = lista_crear();
+	lista_insertar_primero(listado_datos, lista_crear());
 
 	if(!listado_datos)
 		return NULL;
 
-	size_t doc_actual = 0;
+	size_t cant_doc_actual = 0;
 	unsigned int cant_posiciones;
 	unsigned int pos_actual;
+	size_t num_doc_actual = 0;
 	unsigned int numero;
 	unsigned int numero_anterior;
-	unsigned int* nueva_pos;
+	size_t* nueva_pos;
 
-	while(doc_actual < cant_documentos){
+	while(cant_doc_actual < cant_documentos){
+		num_doc_actual += decodificador_decodificarGamma(debuffer);
+		lista_t* listado_documentos = lista_ver_primero(listado_datos);
+		size_t* actual = malloc (sizeof(size_t));
+		*actual = num_doc_actual;
+		lista_insertar_ultimo(listado_documentos,actual );
 		cant_posiciones = decodificador_decodificarDelta(debuffer);
 		pos_actual = 0;
 		numero_anterior = 0;
+		lista_t* listado_posiciones = lista_crear();
+		lista_insertar_ultimo(listado_datos, listado_posiciones);
 		while(pos_actual < cant_posiciones){
 			numero = decodificador_decodificarDelta(debuffer);
-			nueva_pos = malloc(sizeof(unsigned int));
+			nueva_pos = malloc(sizeof(size_t));
 			if (!nueva_pos){
-				lista_destruir(listado_datos, free);
+				lista_destruir(listado_datos, NULL); //despues hay que ponerle el destructor
 				return NULL;
 			}
 			*nueva_pos = numero + numero_anterior;
-			numero_anterior = numero;
-			lista_insertar_ultimo(listado_datos, nueva_pos);
+			numero_anterior = *nueva_pos;
+			lista_insertar_ultimo(listado_posiciones, nueva_pos);
 			pos_actual ++;
 		}
-		doc_actual ++;
+		cant_doc_actual ++;
 	}
 
 	return listado_datos;
