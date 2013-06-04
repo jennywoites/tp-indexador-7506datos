@@ -80,7 +80,7 @@ int parserIndex_parsearArchivo(const char* ruta_archivo, unsigned long num, FILE
 	if (!arch) return PARSERINDEX_ERROR;
 	unsigned int i;
 	unsigned int tam = TAM;
-	unsigned long pos = 0;
+	unsigned long pos = 1;
 	while (!feof(arch)){
 		char* buffer = malloc (sizeof(char) * TAM);
 		i = 0;
