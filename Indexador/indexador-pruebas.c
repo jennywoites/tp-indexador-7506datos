@@ -21,7 +21,7 @@ void print_test(char* name, bool result){
 }
 
 int main (int argc, char** argv){
-
+/*
 	char** rutas;
 	unsigned long cant;
 
@@ -53,18 +53,19 @@ int main (int argc, char** argv){
 	}
 	free(rutas);
 	log_emitir("Se termino de Indexar los documentos", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
-
+*/
 	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES);
+	printf("Cargado el lexico\n");
 
 	lista_t* busquedas = lista_crear();
+	lista_insertar_ultimo(busquedas, "KNOWN");
+	lista_insertar_ultimo(busquedas, "INTERNATIONALLY");
+	lista_insertar_ultimo(busquedas, "AS");
+	lista_insertar_ultimo(busquedas, "ACTION");
+	lista_insertar_ultimo(busquedas, "CONTRE");
 
-	lista_insertar_ultimo(busquedas, "TOWER");
-	lista_insertar_ultimo(busquedas, "GUTENBERG");
-	lista_insertar_ultimo(busquedas, "FIRST");
-	lista_insertar_ultimo(busquedas, "VARIOUS");
-	lista_insertar_ultimo(busquedas, "TUVIEJENENTANGUEN");
-
-	buscador_buscar(busq, busquedas);
+	resultado_t* resul = buscador_buscar(busq, busquedas,INDICE);
+	resultado_destruir(resul);
 	lista_destruir(busquedas,NULL);	
 	buscador_destruir(busq);
 
