@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-//Declaración del nombre de la estructura de arbol abb
+//Declaraciï¿½n del nombre de la estructura de arbol abb
 typedef struct abb abb_t;
 
-//Delclaración del tipo de funcion comparar
+//Delclaraciï¿½n del tipo de funcion comparar
 typedef int (*abb_comparar_clave_t) (const char *, const char *);
 
 //Declaracion del tipo de funcion destruir dato
@@ -24,7 +24,7 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato);
 //Pre: hay arbol. La clave es distinta de NULL (no tiene sentido 
 //ordenarla)
 //Post: se inserto el el dato en el arbol con su clave y devuelve true.
-// Si no se oudo guardar devuelve false.
+// Si no se pudo guardar devuelve false.
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato);
 
 //Borra del arbol el nodo al que le corresponde la clave, y devuelve 
