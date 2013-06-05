@@ -20,4 +20,6 @@ resultado_t* buscador_buscar(buscador_t* buscador, lista_t* terminos_buscados, c
 
 void resultado_destruir(resultado_t* resul);
 
+void resultado_emitirListado(resultado_t* resultado, lista_t* query, const char* paths);
+
 #endif /* BUSCADOR_H_ */
