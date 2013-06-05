@@ -134,10 +134,11 @@ lista_t* __realizarIntersecciones(lista_t** posiciones, size_t cant){
 lista_t* solucion_determinarCorrecto(solucion_t* solucion, lista_t* terminos){
 	if (!solucion || !terminos) return NULL;
 	lista_t** posiciones = malloc (sizeof(lista_t*) * lista_largo(terminos));
-
+	printf("HOOOLA\n");
 	for (size_t i = 0; i < lista_largo(terminos); i++){
 		lista_t* list = lista_crear();
-		lista_insertar_ultimo(posiciones[i], list);
+		//lista_insertar_ultimo(posiciones[i], list);
+		posiciones[i] = list;
 	}
 
 	if (__crearListasPosiciones(solucion, posiciones, terminos) == -1){
@@ -149,6 +150,7 @@ lista_t* solucion_determinarCorrecto(solucion_t* solucion, lista_t* terminos){
 		lista_destruir(posiciones[i], free);
 	}
 	free(posiciones);
+	printf("CHAAAAU\n");
 	return interseccion;
 }
 
@@ -334,6 +336,28 @@ void sacarSolucionesNoVisitadas(resultado_t* resul){
 		}
 	}
 	lista_iter_destruir(iter);
+}
+
+void resultado_emitirListado(resultado_t* resultado, lista_t* query, const char* paths){
+	if (!resultado || !query) return;
+	lista_iter_t* iter_soluciones_posibles = lista_iter_crear(resultado->soluciones);
+	while (!lista_iter_al_final(iter_soluciones_posibles)){
+		solucion_t* actual = lista_iter_ver_actual(iter_soluciones_posibles);
+		lista_t* lista_de_solucion = solucion_determinarCorrecto(actual, query);
+		if (lista_largo(lista_de_solucion) > 0){
+			printf("El documento %u es solucion a la busqueda, en las siguientes posiciones:\n", actual->doc);
+			lista_iter_t* iter_sol = lista_iter_crear(lista_de_solucion);
+			while (!lista_iter_al_final(iter_sol)){
+				size_t* sol = lista_iter_ver_actual(iter_sol);
+				printf("Posicion: %u\n", *sol);
+				lista_iter_avanzar(iter_sol);
+			}
+			lista_iter_destruir(iter_sol);
+		}
+		lista_destruir(lista_de_solucion, free);
+		lista_iter_avanzar(iter_soluciones_posibles);
+	}
+	lista_iter_destruir(iter_soluciones_posibles);
 }
 
 
