@@ -84,12 +84,15 @@ int __crearListasPosiciones(solucion_t* solucion, lista_t** posiciones, lista_t*
 		do {
 //			printf("apreta enter %d\n", numTer); getchar();
 			size_t numPosFin = 0;
-			if (numPos >= numTer){
-				numPosFin = numPos - numTer;
-			}else{
-				abb_iter_in_avanzar(iter);
+//			if (numPos >= numTer){
+//				numPosFin = numPos - numTer;
+//			}else{
+//				abb_iter_in_avanzar(iter);
+//				break;
+//			}
+			if (numPos < numTer)
 				break;
-			}
+			numPosFin = numPos - numTer;
 			size_t* punteroPos = malloc (sizeof(size_t));
 			*punteroPos = numPosFin;
 //			if (numPos < 1000)
@@ -401,7 +404,7 @@ void resultado_emitirListado(resultado_t* resultado, lista_t* query, const char*
 			lista_iter_t* iter_sol = lista_iter_crear(lista_de_solucion);
 			while (!lista_iter_al_final(iter_sol)){
 				size_t* sol = lista_iter_ver_actual(iter_sol);
-				printf("Posicion: %lu\n", *sol);
+				printf("Posicion: %u\n", *sol);
 				lista_iter_avanzar(iter_sol);
 			}
 			lista_iter_destruir(iter_sol);
