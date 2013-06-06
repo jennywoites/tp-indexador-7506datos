@@ -4,7 +4,6 @@
 #include "../Carpetas Compartidas/TDAs/abb.h"
 #include "../Carpetas Compartidas/Manejo de Archivos/termino.h"
 #include "Lexico/levantador.h"
-#include "../Carpetas Compartidas/Manejo de Archivos/decodificadorPunteros.h"
 #include "../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -221,7 +220,7 @@ resultado_t* resultado_crear(termino_t** terminos, size_t cant, const char* dirO
 		//							termino. Posiciones siguientes (tantas como la cant
 		//							de elementos de la primera lista) son los numeros de posiciones.
 		//termino_obtenerInformacion(actual, dirOffsets);
-		lista_t* infoTermino = decodificar_punteros(dirOffsets, actual);
+		lista_t* infoTermino = termino_decodificarPunteros(actual, dirOffsets);
 		if (!infoTermino){
 			resultado_destruir(resul);
 			return NULL;

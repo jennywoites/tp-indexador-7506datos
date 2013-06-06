@@ -3,7 +3,7 @@
 #include "debuffer.h"
 
 #include <sys/stat.h>
-
+/*
 lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos);
 
 //Si no logro abrir el archivo o la frecuencia del termino es 0, devuelve NULL
@@ -88,3 +88,4 @@ lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos){
 
 	return listado_datos;
 }
+*/
