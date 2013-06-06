@@ -3,7 +3,7 @@
 #include "funcionesGeneralesArchivos.h"
 #include <string.h>
 #include "../TDAs/cola.h"
-#include "../Codigos/codificador.h"
+#include "../Codigos/trasbordoCodigo.h"
 
 struct registro{
 	char* termino;
@@ -141,7 +141,8 @@ void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_
 
 void cerrar_termino(buffer_t* buffFrontCoding, unsigned long cant){
 	//compresor_comprimirFrecuencia(archLexico, cant);
-	codificador_codificarDelta(buffFrontCoding,cant);
+	//codificador_codificarDelta(buffFrontCoding,cant);
+	comprimir_FrecuenciaDocumentos(buffFrontCoding,cant);
 	//fprintf(archFrontCoding,"%lu\n", cant);
 }
 
@@ -156,19 +157,20 @@ void crear_termino(buffer_t* buffFrontCoding, FILE* archDiferentes, registro_t* 
 			repetidos--;
 	}
 
-	//compresor_comprimirRepetidosYDistinto(archLexico, repetidos, strlen(actual->termino) - repetidos);
-	codificador_codificarGamma(buffFrontCoding,repetidos+1);
-	codificador_codificarGamma(buffFrontCoding,strlen(actual->termino) - repetidos);
-	//fprintf(archFrontCoding,"%u;%u", repetidos, strlen(actual->termino) - repetidos);
+	//codificador_codificarGamma(buffFrontCoding,repetidos+1);
+	comprimir_LexicoRepetidos(buffFrontCoding, repetidos+1);
+	//codificador_codificarGamma(buffFrontCoding,strlen(actual->termino) - repetidos);
+	comprimir_LexicoDiferentes(buffFrontCoding, strlen(actual->termino) - repetidos);
 	
 	for (unsigned int i = repetidos; i < strlen(actual->termino);i++){
-		//compresor_comprimirCaracter(archLexico, actual->termino[i]); todo
+		//compresor_comprimirCaracter(archLexico, actual->termino[i]);
 		fprintf(archDiferentes, "%c", actual->termino[i]);
 	}
 
-	//compresor_comprimirOffset(archLexico, offset); todo
+	//compresor_comprimirOffset(archLexico, offset);
 	//TODO: ver de no comprimir el primer offset, y sacar ese +1
-	codificador_codificarDelta(buffFrontCoding,offset+1);
+	//codificador_codificarDelta(buffFrontCoding,offset+1);
+	comprimir_LexicoOffset(buffFrontCoding, offset+1);
 	//fprintf(archFrontCoding, ";%lu;", offset);
 }
 
@@ -180,8 +182,9 @@ void cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t* p
 	while (!lista_esta_vacia(documentos)){
 		unsigned long* docActual = lista_borrar_primero(documentos);
 
-		//difOffset = compresor_comprimirDocumento(archIndice, *posActual - posAnterior); todo
-		codificador_codificarGamma(buffIndice,  *docActual - docAnterior);
+		//difOffset = compresor_comprimirDocumento(archIndice, *posActual - posAnterior);
+		//codificador_codificarGamma(buffIndice,  *docActual - docAnterior);
+		comprimir_IndiceDistanciaDocumentos(buffIndice, *docActual - docAnterior);
 		//fprintf(archIndice, "%lu ", *docActual - docAnterior);
 		
 //		int difOffset = buffer_obtener_contador(buffIndice);
@@ -193,16 +196,16 @@ void cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t* p
 		free(docActual);
 		cola_t* posiciones = lista_borrar_primero (posiciones_x_documentos);
 
-		//compresor_comprimirFrecuencia(archIndice, cola_cantidad(posiciones)); todo
-		codificador_codificarDelta(buffIndice,   (unsigned long)cola_largo(posiciones));
+		comprimir_FrecuenciaPosiciones(buffIndice,(unsigned long)cola_largo(posiciones));
+		//codificador_codificarDelta(buffIndice,   (unsigned long)cola_largo(posiciones));
 		//fprintf(archIndice,"%lu ", (unsigned long)cola_largo(posiciones));
 
 		unsigned long posAnterior = 0;
 		while (!cola_esta_vacia(posiciones)){
 			unsigned long* posActual = cola_desencolar(posiciones);
 
-			//compresor_comprimirPosicion(archIndice, *posActual - posAnterior); todo
-			codificador_codificarDelta(buffIndice,   *posActual - posAnterior);
+			comprimir_IndiceDistanciaPosiciones(buffIndice,   *posActual - posAnterior);
+			//codificador_codificarDelta(buffIndice,   *posActual - posAnterior);
 			//fprintf(archIndice, "%lu ", *posActual - posAnterior);
 
 			posAnterior = *posActual;

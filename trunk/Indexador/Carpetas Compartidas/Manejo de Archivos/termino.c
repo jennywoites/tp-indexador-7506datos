@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "../../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
-#include "../../Carpetas Compartidas/Codigos/decodificador.h"
+#include "../../Carpetas Compartidas/Codigos/trasbordoCodigo.h"
 #include <sys/stat.h>
 
 struct termino{
@@ -65,10 +65,15 @@ termino_t* termino_leer(termino_t* termino_anterior, debuffer_t* debuff_FrontCod
 
 	free(linea);
 */
-	size_t rep = decodificador_decodificarGamma(debuff_FrontCoding);
+	/*size_t rep = decodificador_decodificarGamma(debuff_FrontCoding);
 	size_t dist = decodificador_decodificarGamma(debuff_FrontCoding);
 	size_t off = decodificador_decodificarDelta(debuff_FrontCoding);
-	size_t frec = decodificador_decodificarDelta(debuff_FrontCoding);
+	size_t frec = decodificador_decodificarDelta(debuff_FrontCoding);*/
+	size_t rep = descomprimir_LexicoRepetidos(debuff_FrontCoding);
+	size_t dist = descomprimir_LexicoDiferentes(debuff_FrontCoding);
+	size_t off = descomprimir_LexicoOffset(debuff_FrontCoding);
+	size_t frec = descomprimir_FrecuenciaDocumentos(debuff_FrontCoding);
+
 	if( rep == NO_NUMERO || dist == NO_NUMERO || off == NO_NUMERO || frec == NO_NUMERO )
 		return NULL;
 	rep--;
@@ -169,18 +174,21 @@ lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos){
 	size_t* nueva_pos;
 
 	while(cant_doc_actual < cant_documentos){
-		num_doc_actual += decodificador_decodificarGamma(debuffer);
+		//num_doc_actual += decodificador_decodificarGamma(debuffer);
+		num_doc_actual += descomprimir_IndiceDistanciaDocumentos(debuffer);
 		lista_t* listado_documentos = lista_ver_primero(listado_datos);
 		size_t* actual = malloc (sizeof(size_t));
 		*actual = num_doc_actual;
 		lista_insertar_ultimo(listado_documentos,actual );
-		cant_posiciones = decodificador_decodificarDelta(debuffer);
+		//cant_posiciones = decodificador_decodificarDelta(debuffer);
+		cant_posiciones = descomprimir_FrecuenciaPosiciones(debuffer);
 		pos_actual = 0;
 		numero_anterior = 0;
 		lista_t* listado_posiciones = lista_crear();
 		lista_insertar_ultimo(listado_datos, listado_posiciones);
 		while(pos_actual < cant_posiciones){
-			numero = decodificador_decodificarDelta(debuffer);
+			//numero = decodificador_decodificarDelta(debuffer);
+			numero = descomprimir_IndiceDistanciaPosiciones(debuffer);
 			nueva_pos = malloc(sizeof(size_t));
 			if (!nueva_pos){
 				lista_destruir(listado_datos, NULL); //despues hay que ponerle el destructor
