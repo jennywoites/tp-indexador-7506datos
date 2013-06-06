@@ -10,10 +10,10 @@
 
 const char* SALIDA_PARSER = "parser.jem";
 const char* SALIDA_SORT = "sort.jem";
-const char* INDICE = "indice.jem";
-const char* LEXICO = "lexico.jem";
-const char* DIFERENTES = "diferentes.jem";
-const char* NOMBRE_ARCHIVOS = "archs.jem";
+const char* INDICE = "indice1.jem";
+const char* LEXICO = "lexico1.jem";
+const char* DIFERENTES = "diferentes1.jem";
+const char* NOMBRE_ARCHIVOS = "archs1.jem";
 
 
 void print_test(char* name, bool result){
@@ -71,7 +71,7 @@ int main (int argc, char** argv){
 	lista_insertar_ultimo(busquedas, "THE");
 	lista_insertar_ultimo(busquedas, "TABLE");
 	//lista_insertar_ultimo(busquedas, "IN");
-	//lista_insertar_ultimo(busquedas, "LALALA");
+	lista_insertar_ultimo(busquedas, "LALALA");
 	//lista_insertar_ultimo(busquedas, "LALALA");
 	//lista_insertar_ultimo(busquedas, "ARTHUR");
 	//lista_insertar_ultimo(busquedas, "THE");

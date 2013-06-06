@@ -1,11 +1,9 @@
 #ifndef BUSCADOR_H_
 #define BUSCADOR_H_
 #include "../Carpetas Compartidas/TDAs/lista.h"
-
+#include "resultado.h"
 
 typedef struct buscador buscador_t;
-
-typedef struct resultado resultado_t;
 
 /* Permite crear un buscador a partir de las rutas de los archivos de Front
  * Coding y otro con los caracteres diferentes.
