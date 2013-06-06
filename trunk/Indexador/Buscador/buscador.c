@@ -385,6 +385,7 @@ char* __obtenerNombreDoc(const char* paths, size_t num){
 	ruta[strlen(encabezado) + strlen(relativa)] = '\0';
 	free(encabezado);
 	free(relativa);
+	fclose(arch);
 	return ruta;
 }
 
