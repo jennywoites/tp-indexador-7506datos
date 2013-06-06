@@ -5,6 +5,7 @@
 #include "../Carpetas Compartidas/Manejo de Archivos/termino.h"
 #include "Lexico/levantador.h"
 #include "../Carpetas Compartidas/Manejo de Archivos/decodificadorPunteros.h"
+#include "../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -44,17 +45,19 @@ void solucion_destruir(solucion_t* solucion){
 	free(solucion);
 }
 
-int __obtenerNumTermino(lista_t* terminos, termino_t* term_actual){
+int __obtenerNumTermino(lista_t* terminos, termino_t* term_actual, int inicio){
 	char* buscado = termino_obtenerPalabra(term_actual);
 	lista_iter_t* iter = lista_iter_crear(terminos);
-	bool encontrado = false;
 	int num = -1;
+	bool encontrado = false;
+	for (int i = 0; i < inicio; i++){
+		lista_iter_avanzar(iter);
+		num++;
+	}
 	while (!lista_iter_al_final(iter) && !encontrado){
-		termino_t* term = lista_iter_ver_actual(iter);
-		char* comp = termino_obtenerPalabra(term);
+		char* comp = lista_iter_ver_actual(iter);
 		encontrado = (strcmp(comp, buscado) == 0);
 		num++;
-		free(comp);
 		lista_iter_avanzar(iter);
 	}
 	lista_iter_destruir(iter);
@@ -70,17 +73,31 @@ int __crearListasPosiciones(solucion_t* solucion, lista_t** posiciones, lista_t*
 		const char* strPos = abb_iter_in_ver_actual(iter);
 		size_t numPos = atoi(strPos);
 		termino_t* term_actual = abb_obtener(solucion->arbol_resul,strPos);
-		int numTer = __obtenerNumTermino(terminos, term_actual);
+		int numTer = __obtenerNumTermino(terminos, term_actual, 0);
 		if (numTer == -1){//? Por ahora devolvemos null o algo asi...
 			abb_iter_in_destruir(iter);
 			for (size_t i = 0; i < lista_largo(terminos); i++) lista_destruir(posiciones[i],free);
 			free(posiciones);
 			return -1;
 		}
-		numPos -= numTer;
-		size_t* punteroPos = malloc (sizeof(size_t));
-		*punteroPos = numPos;
-		lista_insertar_ultimo(posiciones[numTer],punteroPos);
+		//FIXME ??
+		do {
+//			printf("apreta enter %d\n", numTer); getchar();
+			size_t numPosFin = 0;
+			if (numPos >= numTer){
+				numPosFin = numPos - numTer;
+			}else{
+				abb_iter_in_avanzar(iter);
+				break;
+			}
+			size_t* punteroPos = malloc (sizeof(size_t));
+			*punteroPos = numPosFin;
+//			if (numPos < 1000)
+//				printf("Pos : %lu %d\n", numPosFin, numTer);
+			lista_insertar_ultimo(posiciones[numTer],punteroPos);
+			numTer = __obtenerNumTermino(terminos, term_actual, numTer+1);
+		}while (numTer != -1);
+
 		abb_iter_in_avanzar(iter);
 	}
 	abb_iter_in_destruir(iter);
@@ -106,14 +123,16 @@ lista_t* __realizarIntersecciones(lista_t** posiciones, size_t cant){
 	for (size_t i = 1; i < cant; i++ ){
 		if (lista_largo(interseccion) == 0) return interseccion;
 		lista_iter_t* iterInt = lista_iter_crear(interseccion);
-		lista_iter_t* iterSec = lista_iter_crear(posiciones[i]);
+		//lista_iter_t* iterSec = lista_iter_crear(posiciones[i]);
 		lista_t* aux = lista_crear();
 		while (!lista_iter_al_final(iterInt)){
+			lista_iter_t* iterSec = lista_iter_crear(posiciones[i]);
 			size_t* pos = lista_iter_ver_actual(iterInt);
 			bool pasado = false;
 			while(!lista_iter_al_final(iterSec) && !pasado){
 				size_t* posSec = lista_iter_ver_actual(iterSec);
 				pasado = (*posSec) > (*pos);
+				//printf("INTERSECO %lu con %lu \n", *pos, *posSec);
 				if (*posSec == *pos){
 					size_t* cpy = malloc (sizeof(size_t));
 					*cpy = *pos;
@@ -121,20 +140,26 @@ lista_t* __realizarIntersecciones(lista_t** posiciones, size_t cant){
 				}
 				lista_iter_avanzar(iterSec);
 			}
+			lista_iter_destruir(iterSec);
 			lista_iter_avanzar(iterInt);
 		}
 		lista_iter_destruir(iterInt);
-		lista_iter_destruir(iterSec);
+		//lista_iter_destruir(iterSec);
 		lista_destruir(interseccion, free);
 		interseccion = aux;
 	}
 	return interseccion;
 }
 
+int comparacionListas(const void* a, const void* b){
+	lista_t* l1 = (lista_t*)a;
+	lista_t* l2 = (lista_t*)b;
+	return (lista_largo(l1) - lista_largo(l2));
+}
+
 lista_t* solucion_determinarCorrecto(solucion_t* solucion, lista_t* terminos){
 	if (!solucion || !terminos) return NULL;
 	lista_t** posiciones = malloc (sizeof(lista_t*) * lista_largo(terminos));
-	printf("HOOOLA\n");
 	for (size_t i = 0; i < lista_largo(terminos); i++){
 		lista_t* list = lista_crear();
 		//lista_insertar_ultimo(posiciones[i], list);
@@ -145,12 +170,13 @@ lista_t* solucion_determinarCorrecto(solucion_t* solucion, lista_t* terminos){
 		return NULL;
 	}
 
+	heapsort((void*)posiciones,lista_largo(terminos),  comparacionListas );
+
 	lista_t* interseccion = __realizarIntersecciones(posiciones, lista_largo(terminos));
 	for (size_t i = 0; i < lista_largo(terminos);i++){
 		lista_destruir(posiciones[i], free);
 	}
 	free(posiciones);
-	printf("CHAAAAU\n");
 	return interseccion;
 }
 
@@ -207,7 +233,6 @@ resultado_t* resultado_crear(termino_t** terminos, size_t cant, const char* dirO
 		indicarSolucionesComoNoVisitadas(resul);
 
 	}
-	printf("Cant de soluciones Posibles: %u\n", lista_largo(resul->soluciones));
 	return resul;
 }
 
@@ -338,18 +363,45 @@ void sacarSolucionesNoVisitadas(resultado_t* resul){
 	lista_iter_destruir(iter);
 }
 
+char* __obtenerNombreDoc(const char* paths, size_t num){
+	FILE* arch = fopen(paths, lectura_archivos());
+	if (!arch) return NULL;
+
+	char* encabezado = obtenerLinea(arch);
+	for (size_t i = 1; num > i;i++){
+		free(obtenerLinea(arch));
+	}
+	char* relativa = obtenerLinea(arch);
+	char* ruta = malloc (sizeof(char) * (strlen(encabezado) + strlen(relativa) + 1));
+	for (size_t i = 0; strlen(encabezado)> i;i++){
+		ruta[i] = encabezado[i];
+	}
+	for (size_t i = strlen(encabezado); strlen(encabezado) + strlen(relativa)> i;i++){
+		ruta[i] = relativa[i - strlen(encabezado)];
+	}
+	ruta[strlen(encabezado) + strlen(relativa)] = '\0';
+	free(encabezado);
+	free(relativa);
+	return ruta;
+}
+
+
 void resultado_emitirListado(resultado_t* resultado, lista_t* query, const char* paths){
 	if (!resultado || !query) return;
+	bool hay_solucion = false;
 	lista_iter_t* iter_soluciones_posibles = lista_iter_crear(resultado->soluciones);
 	while (!lista_iter_al_final(iter_soluciones_posibles)){
 		solucion_t* actual = lista_iter_ver_actual(iter_soluciones_posibles);
 		lista_t* lista_de_solucion = solucion_determinarCorrecto(actual, query);
 		if (lista_largo(lista_de_solucion) > 0){
-			printf("El documento %u es solucion a la busqueda, en las siguientes posiciones:\n", actual->doc);
+			hay_solucion = true;
+			char* nombre_doc = __obtenerNombreDoc(paths, actual->doc);
+			printf("El documento %s es solucion a la busqueda, en las siguientes posiciones:\n", nombre_doc);
+			free(nombre_doc);
 			lista_iter_t* iter_sol = lista_iter_crear(lista_de_solucion);
 			while (!lista_iter_al_final(iter_sol)){
 				size_t* sol = lista_iter_ver_actual(iter_sol);
-				printf("Posicion: %u\n", *sol);
+				printf("Posicion: %lu\n", *sol);
 				lista_iter_avanzar(iter_sol);
 			}
 			lista_iter_destruir(iter_sol);
@@ -358,6 +410,8 @@ void resultado_emitirListado(resultado_t* resultado, lista_t* query, const char*
 		lista_iter_avanzar(iter_soluciones_posibles);
 	}
 	lista_iter_destruir(iter_soluciones_posibles);
+	if (!hay_solucion)
+		printf("No hay solucion a la consulta\n");
 }
 
 
@@ -419,7 +473,6 @@ resultado_t* buscador_buscar(buscador_t* buscador, lista_t* terminos_buscados, c
 	lista_iter_destruir(iter);
 	//heapsort((void*)vector_terminos, lista_largo(terminos_buscados), terminos_comparar);
 
-	//printf("Se imprimen los resultados de menor frecuencia a mayor frecuencia!\n");
 	for (size_t i = 0; i < lista_largo(terminos_buscados); i++){
 		termino_imprimir(vector_terminos[i]);
 	}

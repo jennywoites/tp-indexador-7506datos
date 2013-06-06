@@ -108,7 +108,7 @@ void termino_imprimir(termino_t* termino){
 		return;
 	}
 
-	printf("El termino %s tiene frecuencia %u\n", termino->termino, termino->frecuencia);
+	printf("El termino %s tiene frecuencia %lu\n", termino->termino, termino->frecuencia);
 }
 
 size_t termino_obtener_frecuencia(termino_t* termino){
