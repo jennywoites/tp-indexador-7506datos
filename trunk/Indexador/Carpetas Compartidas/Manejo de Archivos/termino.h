@@ -2,6 +2,7 @@
 #define TERMINO_H_
 #include <stdio.h>
 #include "../../Carpetas Compartidas/Manejo de Archivos/debuffer.h"
+#include "../../Carpetas Compartidas/TDAs/lista.h"
 
 // Definicion de la estructura de termino.
 typedef struct termino termino_t;
@@ -30,11 +31,10 @@ int terminos_comparar(const void*,const void*);
 /* Funcion auxiliar que permite imprimir un termino por pantalla*/
 void termino_imprimir(termino_t*);
 
-/* Devuelve la frecuencia de un termino, es decir, la cantidad de documentos
- * en los que aparece */
-size_t termino_obtener_frecuencia(termino_t*);
-
-/* Devuelve la posición en bits en la que comienzan los datos de un termino */
-size_t termino_obtener_offset(termino_t*);
+/* Devuelve una lista con los punteros del termino, con el siguiente formato:
+ * pos 0, documentos (num) en los que se encuentra el pos termino.
+ * Posiciones siguientes (tantas como la cant de elementos de la primera lista)
+ * son los numeros de posiciones.*/
+lista_t* termino_decodificarPunteros(termino_t* termino,const char* ruta);
 
 #endif /* TERMINO_H_ */
