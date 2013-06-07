@@ -6,14 +6,15 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "Buscador/buscador.h"
+#include "Buscador/Parseo/parserQuery.h"
 #include "Carpetas Compartidas/TDAs/lista.h"
 
 const char* SALIDA_PARSER = "parser.jem";
 const char* SALIDA_SORT = "sort.jem";
-const char* INDICE = "indice1.jem";
-const char* LEXICO = "lexico1.jem";
-const char* DIFERENTES = "diferentes1.jem";
-const char* NOMBRE_ARCHIVOS = "archs1.jem";
+const char* INDICE = "indice.jem";
+const char* LEXICO = "lexico.jem";
+const char* DIFERENTES = "diferentes.jem";
+const char* NOMBRE_ARCHIVOS = "archs.jem";
 
 
 void print_test(char* name, bool result){
@@ -57,33 +58,14 @@ int main (int argc, char** argv){
 	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES);
 	printf("Cargado el lexico\n");
 
-	lista_t* busquedas = lista_crear();
-//	lista_insertar_ultimo(busquedas, "KNOWN");
-//	lista_insertar_ultimo(busquedas, "INTERNATIONALLY");
-//	lista_insertar_ultimo(busquedas, "AS");
-	//lista_insertar_ultimo(busquedas, "BANGKOK");
-	//lista_insertar_ultimo(busquedas, "IS");
-	//lista_insertar_ultimo(busquedas, "ALTHOUGH");
-	lista_insertar_ultimo(busquedas, "THE");
-	lista_insertar_ultimo(busquedas, "CAT");
-	lista_insertar_ultimo(busquedas, "IS");
-	lista_insertar_ultimo(busquedas, "UNDER");
-	lista_insertar_ultimo(busquedas, "THE");
-	lista_insertar_ultimo(busquedas, "TABLE");
-	//lista_insertar_ultimo(busquedas, "IN");
-	lista_insertar_ultimo(busquedas, "LALALA");
-	//lista_insertar_ultimo(busquedas, "LALALA");
-	//lista_insertar_ultimo(busquedas, "ARTHUR");
-	//lista_insertar_ultimo(busquedas, "THE");
-	//lista_insertar_ultimo(busquedas, "ANTHROPIC");
-	//lista_insertar_ultimo(busquedas, "PRINCIPLE");
+	const char* query = "the cat is under the table";
+	lista_t* busquedas = parserQuery_parsearConsulta(query);
 
 	resultado_t* resul = buscador_buscar(busq, busquedas,INDICE);
 	resultado_emitirListado(resul,busquedas, NOMBRE_ARCHIVOS);
 
 	resultado_destruir(resul);
-	lista_destruir(busquedas,NULL);	
+	lista_destruir(busquedas,free);
 	buscador_destruir(busq);
-
 	return 0;
 }
