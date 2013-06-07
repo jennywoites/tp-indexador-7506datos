@@ -361,15 +361,35 @@ void sacarSolucionesNoVisitadas(resultado_t* resul){
 	lista_iter_destruir(iter);
 }
 
-char* __obtenerNombreDoc(const char* paths, size_t num){
+char* __obtenerNombreDoc(const char* paths, const char* offsets,  size_t num){
 	FILE* arch = fopen(paths, lectura_archivos());
-	if (!arch) return NULL;
+	FILE* off = fopen(offsets, lectura_archivos());
+	if (!arch || !off){
+		fclose(arch);
+		fclose(off);
+		return NULL;
+	}
 
 	char* encabezado = obtenerLinea(arch);
-	for (size_t i = 1; num > i;i++){
-		free(obtenerLinea(arch));
-	}
-	char* relativa = obtenerLinea(arch);
+
+	fseek(off,sizeof(size_t)*(num-1), SEEK_SET);
+	size_t pos;
+	size_t posSiguiente;
+	fread(&pos, sizeof(size_t),1,off);
+	fread(&posSiguiente, sizeof(size_t),1,off);
+
+	fseek(arch, sizeof(char) * pos, SEEK_SET);
+	char* relativa = malloc (sizeof(char) * (posSiguiente - pos + 1));
+
+	fgets(relativa,posSiguiente - pos + 1,arch);
+
+//	for (size_t i = 1; num > i;i++){
+//		free(obtenerLinea(arch));
+//	}
+//	char* relativa = obtenerLinea(arch);
+
+
+
 	char* ruta = malloc (sizeof(char) * (strlen(encabezado) + strlen(relativa) + 1));
 	for (size_t i = 0; strlen(encabezado)> i;i++){
 		ruta[i] = encabezado[i];
@@ -385,7 +405,7 @@ char* __obtenerNombreDoc(const char* paths, size_t num){
 }
 
 
-void resultado_emitirListado(resultado_t* resultado, lista_t* query, const char* paths){
+void resultado_emitirListado(resultado_t* resultado, lista_t* query, const char* paths, const char* offsets){
 	if (!resultado || !query) return;
 	bool hay_solucion = false;
 	lista_iter_t* iter_soluciones_posibles = lista_iter_crear(resultado->soluciones);
@@ -394,9 +414,11 @@ void resultado_emitirListado(resultado_t* resultado, lista_t* query, const char*
 		lista_t* lista_de_solucion = solucion_determinarCorrecto(actual, query);
 		if (lista_largo(lista_de_solucion) > 0){
 			hay_solucion = true;
-			char* nombre_doc = __obtenerNombreDoc(paths, actual->doc);
+
+			char* nombre_doc = __obtenerNombreDoc(paths, offsets,actual->doc);
 			printf("El documento %s es solucion a la busqueda, en las siguientes posiciones:\n", nombre_doc);
 			free(nombre_doc);
+
 			lista_iter_t* iter_sol = lista_iter_crear(lista_de_solucion);
 			while (!lista_iter_al_final(iter_sol)){
 				size_t* sol = lista_iter_ver_actual(iter_sol);

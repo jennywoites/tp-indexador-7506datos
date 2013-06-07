@@ -15,6 +15,7 @@ const char* INDICE = "indice.jem";
 const char* LEXICO = "lexico.jem";
 const char* DIFERENTES = "diferentes.jem";
 const char* NOMBRE_ARCHIVOS = "archs.jem";
+const char* OFFSET_ARCHIVOS = "offarchs.jem";
 
 
 void print_test(char* name, bool result){
@@ -22,8 +23,8 @@ void print_test(char* name, bool result){
 }
 
 int main (int argc, char** argv){
-
-/*	char** rutas;
+/*
+	char** rutas;
 	unsigned long cant;
 
 	const char* directorio = "Textos_ejemplo_parseo";
@@ -35,7 +36,7 @@ int main (int argc, char** argv){
 		return 0;
 	}
 
-	aux = parserIndex_parsearArchivos(directorio, rutas,cant,SALIDA_PARSER, NOMBRE_ARCHIVOS);
+	aux = parserIndex_parsearArchivos(directorio, rutas,cant,SALIDA_PARSER, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
 
 	if (aux == PARSERINDEX_OK){
 		log_emitir("Paseo Realizado Correctamente", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
@@ -48,7 +49,6 @@ int main (int argc, char** argv){
 		log_emitir("Parseo incorrecto", LOG_ENTRADA_ERROR);
 	}
 
-
 	for (unsigned long i = 0; i < cant; i++){
 		free(rutas[i]);
 	}
@@ -58,14 +58,15 @@ int main (int argc, char** argv){
 	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES);
 	printf("Cargado el lexico\n");
 
-	const char* query = "the cat is under the table";
+	const char* query = "kwnown internationally as";
 	lista_t* busquedas = parserQuery_parsearConsulta(query);
 
 	resultado_t* resul = buscador_buscar(busq, busquedas,INDICE);
-	resultado_emitirListado(resul,busquedas, NOMBRE_ARCHIVOS);
+	resultado_emitirListado(resul,busquedas, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
 
 	resultado_destruir(resul);
 	lista_destruir(busquedas,free);
 	buscador_destruir(busq);
+
 	return 0;
 }

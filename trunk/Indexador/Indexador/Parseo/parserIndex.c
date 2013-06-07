@@ -127,9 +127,9 @@ void tratarPalabra(char* palabra, unsigned long doc, unsigned long pos, FILE* sa
 }
 
 
-int comprimirNombres(char* directorio, char** rutas_archivos, unsigned long cant, const char* salida);
+int comprimirNombres(char* directorio, char** rutas_archivos, unsigned long cant, const char* salida, const char* offsets);
 
-int parserIndex_parsearArchivos(char* directorio, char** rutas_archivos, unsigned long num, const char* ruta_salida, const char* salida_nombres){
+int parserIndex_parsearArchivos(char* directorio, char** rutas_archivos, unsigned long num, const char* ruta_salida, const char* salida_nombres, const char* offset_archivos){
 	if (num == 0) return PARSERINDEX_OK;
 
 	FILE* arch = fopen(ruta_salida, escritura_archivos());
@@ -144,26 +144,38 @@ int parserIndex_parsearArchivos(char* directorio, char** rutas_archivos, unsigne
 	log_emitir("Finalizado Parseo de archivos",LOG_ENTRADA_PROCESO);
 	fclose(arch);
 
-	int aux = comprimirNombres(directorio, rutas_archivos, num, salida_nombres);
+	int aux = comprimirNombres(directorio, rutas_archivos, num, salida_nombres, offset_archivos);
 
 	if (ok && (aux == PARSERINDEX_OK)) return PARSERINDEX_OK;
 	return PARSERINDEX_ERROR;
 }
 
-int comprimirNombres(char* directorio, char** rutas_archivos, unsigned long cant, const char* salida){
+int comprimirNombres(char* directorio, char** rutas_archivos, unsigned long cant, const char* salida, const char* offset){
 	//Por ahora solo los imprimo de cabeza:
 	FILE* nombres = fopen(salida, escritura_archivos());
-	if (!nombres) return PARSERINDEX_ERROR;
+	FILE* offsets = fopen(offset, escritura_archivos());
+	if (!nombres || !offsets) {
+		fclose(nombres);
+		fclose(offsets);
+		return PARSERINDEX_ERROR;
+	}
 
 	unsigned int pos = strlen(directorio) + 1; //para evitar la primera barra
 	fprintf(nombres, "%s/\n", directorio);
 
+	size_t off = strlen(directorio) + 2;
+
 	log_emitir("Inicia la compresion de rutas de archivos", LOG_ENTRADA_PROCESO);
 	for (unsigned long i = 0; i < cant; i++){
 		fprintf(nombres, "%s", (rutas_archivos[i] + sizeof(char) * pos));
-		if (i != (cant-1)) fprintf(nombres, "\n");
+		//if (i != (cant-1)) fprintf(nombres, "\n");
+
+		fwrite(&off, sizeof(size_t) ,1,offsets);
+		//fprintf(offsets, "%u\n", off);
+		off += (strlen(rutas_archivos[i]) - sizeof(char)*pos);
 	}
 	log_emitir("Finalizo la compresion de rutas de archivos", LOG_ENTRADA_PROCESO);
 	fclose(nombres);
+	fclose(offsets);
 	return PARSERINDEX_OK;
 }
