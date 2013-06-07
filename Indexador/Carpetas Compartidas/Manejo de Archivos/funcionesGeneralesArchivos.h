@@ -26,4 +26,14 @@ char* __crear_ruta(unsigned int num, unsigned int maximo, const char* salida_tem
 /* Realiza impresiones para mejorar la 'experiencia del usuario'*/
 void emitir_impresion(const char* mensaje,size_t num, size_t total);
 
+bool caracterDeSeparacion(char c);
+
+bool caracterPrescindible(char c);
+
+char* eliminarCaracteresPrescindibles(char* cadena, bool duplicante);
+
+char** separarSiSonNumeros(char* buffer, unsigned int* cant);
+
+void __toUPPERCase(char* cadena);
+
 #endif /* FUNCIONESGENERALESARCHIVOS_H_ */

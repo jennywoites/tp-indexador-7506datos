@@ -7,6 +7,12 @@
 
 const char* LECTURA = "r";
 const char* ESCRITURA = "w";
+
+const char SEPARADORES[] = {' ', '-', '\n', '/', '_'};
+unsigned int CANT_SEPARADORES = 5;
+const char PRESCINDIBLES[] = {',' , ';' , '.' , '?' , '!', '\"', '\'', '^', '[',};
+unsigned int CANT_PRESCINDIBLES = 7;
+
 bool lectura_anticipada(FILE* arch, char* c){
 	if (feof(arch)) return false;
 	(*c) = fgetc (arch);
@@ -149,4 +155,75 @@ void emitir_impresion(const char* mensaje,size_t num, size_t total){
 	float porc = ((float) num )/ total;
 	porc *= 100;
 	printf("%s : %f%% Completado \n", mensaje, porc);
+}
+
+bool caracterDeSeparacion(char c){
+	for (unsigned int i = 0; i < CANT_SEPARADORES; i++)
+		if (c == SEPARADORES[i]) return true;
+
+	return false;
+}
+
+bool caracterPrescindible(char c){
+	/*
+	 for (unsigned int i = 0; i < CANT_PRESCINDIBLES)
+	  	  if (c == PRESCINIBLES[i]) return true;
+	 return false;
+	 */
+
+	if (c == '@') return false;
+	if (c == '&') return false;
+	if (c == '_') return false;
+	if (c < '0') return true;
+	if (c > '9' && c < 'A') return true;
+	if (c > 'Z' && c < 'a') return true;
+	if (c > 'z') return true;
+	return false;
+}
+
+char* eliminarCaracteresPrescindibles(char* cadena, bool duplicante){
+	char* nueva = malloc (sizeof(char)* (strlen(cadena)+1));
+	unsigned int cant = 0;
+	for (unsigned int i = 0; i < strlen(cadena); i++){
+		bool elim = false;
+		elim = caracterPrescindible(cadena[i]);
+
+		if(!elim){
+				nueva[cant] = cadena[i];
+				cant++;
+		}
+	}
+	nueva[cant] = '\0';
+	return nueva;
+}
+
+
+void __toUPPERCase(char* cadena){
+	for (unsigned int i = 0; i < strlen(cadena); i++){
+		char c = cadena[i];
+		if (c <= 'z' && c >= 'a'){
+			cadena[i] = c + ('A' - 'a');
+		}
+	}
+}
+
+bool sonTodosNumeros(char* cad){
+	for (unsigned int i = 0; i < strlen(cad); i++)
+		if (cad[i] < '0' || cad[i] > '9') return false;
+	return true;
+}
+
+char** separarSiSonNumeros(char* buffer, unsigned int* cant){
+	if (!sonTodosNumeros(buffer)) return NULL;
+
+	char** numeritos = malloc (sizeof(char*) * (strlen(buffer)));
+	*cant = strlen(buffer);
+
+	for (unsigned int i = 0; i < strlen(buffer); i++){
+		numeritos[i] = malloc (sizeof(char) * 2);
+		(numeritos[i])[0] = buffer[i];
+		(numeritos[i])[1] = '\0';
+	}
+
+	return numeritos;
 }
