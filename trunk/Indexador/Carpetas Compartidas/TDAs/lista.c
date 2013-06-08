@@ -139,6 +139,7 @@ void* lista_borrar_primero(lista_t *lista){
 
 
 void lista_destruir(lista_t *lista, void destruir_dato(void *)){
+	if (!lista) return;
 	void* aux;
 	while (!lista_esta_vacia(lista)){
 		aux=lista_borrar_primero(lista);

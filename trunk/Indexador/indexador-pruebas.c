@@ -27,39 +27,7 @@ void print_test(char* name, bool result){
     printf("%s: %s\n", name, result? "OK" : "ERROR");
 }
 
-int main (int argc, char** argv){
-
-/*	char** rutas;
-	unsigned long cant;
-
-	const char* directorio = "Textos_ejemplo_parseo";
-
-	int aux = parserIndex_obtenerRutasDirectorios(directorio, &rutas, &cant);
-
-	if (aux != PARSERINDEX_OK){
-		printf ("Error al obtener los archivos\n");
-		return 0;
-	}
-
-	aux = parserIndex_parsearArchivos(directorio, rutas,cant,SALIDA_PARSER, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
-
-	if (aux == PARSERINDEX_OK){
-		log_emitir("Paseo Realizado Correctamente", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
-		aux = sorting_ordenarArchivo(SALIDA_PARSER, SALIDA_SORT);
-		indexer_indexar(SALIDA_SORT, INDICE, LEXICO, DIFERENTES);
-
-		remove(SALIDA_PARSER);
-		remove(SALIDA_SORT);
-	}else{
-		log_emitir("Parseo incorrecto", LOG_ENTRADA_ERROR);
-	}
-
-	for (unsigned long i = 0; i < cant; i++){
-		free(rutas[i]);
-	}
-	free(rutas);
-	log_emitir("Se termino de Indexar los documentos", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
-*/
+void buscar(){
 	printf("Cargando el lexico en memoria, espere un instante\n");
 	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES);
 	printf("Cargado el lexico\n");
@@ -83,7 +51,7 @@ int main (int argc, char** argv){
 		}
 		clock_t tiempo = clock() - tiempo_ini;
 
-		double segsTot = (double) tiempo / CLOCKS_PER_SEC;
+		float segsTot = (float) tiempo / CLOCKS_PER_SEC;
 
 		printf("Tiempo de busqueda: %f segundos\n", segsTot);
 
@@ -91,5 +59,44 @@ int main (int argc, char** argv){
 		free(query);
 	}
 	buscador_destruir(busq);
+
+}
+
+void indexar(){
+	char** rutas;
+	unsigned long cant;
+
+	const char* directorio = "Textos_ejemplo_parseo";
+
+	int aux = parserIndex_obtenerRutasDirectorios(directorio, &rutas, &cant);
+
+	if (aux != PARSERINDEX_OK){
+		printf ("Error al obtener los archivos\n");
+		return;
+	}
+
+	aux = parserIndex_parsearArchivos(directorio, rutas,cant,SALIDA_PARSER, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
+
+	if (aux == PARSERINDEX_OK){
+		log_emitir("Paseo Realizado Correctamente", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
+		aux = sorting_ordenarArchivo(SALIDA_PARSER, SALIDA_SORT);
+		indexer_indexar(SALIDA_SORT, INDICE, LEXICO, DIFERENTES);
+
+		remove(SALIDA_PARSER);
+		remove(SALIDA_SORT);
+	}else{
+		log_emitir("Parseo incorrecto", LOG_ENTRADA_ERROR);
+	}
+
+	for (unsigned long i = 0; i < cant; i++){
+		free(rutas[i]);
+	}
+	free(rutas);
+	log_emitir("Se termino de Indexar los documentos", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
+}
+
+
+int main (int argc, char** argv){
+	buscar();
 	return 0;
 }

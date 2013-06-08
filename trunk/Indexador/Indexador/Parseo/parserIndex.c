@@ -176,6 +176,7 @@ int comprimirNombres(char* directorio, char** rutas_archivos, unsigned long cant
 	}
 	log_emitir("Finalizo la compresion de rutas de archivos", LOG_ENTRADA_PROCESO);
 	fclose(nombres);
+	fwrite(&off,sizeof(size_t),1,offsets );
 	fclose(offsets);
 	return PARSERINDEX_OK;
 }

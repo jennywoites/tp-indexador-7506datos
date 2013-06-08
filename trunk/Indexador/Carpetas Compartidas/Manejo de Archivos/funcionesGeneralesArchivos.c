@@ -239,9 +239,12 @@ char* __obtenerNombreDoc(const char* paths, const char* offsets,  size_t num){
 
 	char* encabezado = obtenerLinea(arch);
 
+
 	fseek(off,sizeof(size_t)*(num-1), SEEK_SET);
 	size_t pos;
 	size_t posSiguiente;
+
+
 	fread(&pos, sizeof(size_t),1,off);
 	fread(&posSiguiente, sizeof(size_t),1,off);
 
