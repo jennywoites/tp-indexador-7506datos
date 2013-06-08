@@ -227,3 +227,40 @@ char** separarSiSonNumeros(char* buffer, unsigned int* cant){
 
 	return numeritos;
 }
+
+char* __obtenerNombreDoc(const char* paths, const char* offsets,  size_t num){
+	FILE* arch = fopen(paths, lectura_archivos());
+	FILE* off = fopen(offsets, lectura_archivos());
+	if (!arch || !off){
+		fclose(arch);
+		fclose(off);
+		return NULL;
+	}
+
+	char* encabezado = obtenerLinea(arch);
+
+	fseek(off,sizeof(size_t)*(num-1), SEEK_SET);
+	size_t pos;
+	size_t posSiguiente;
+	fread(&pos, sizeof(size_t),1,off);
+	fread(&posSiguiente, sizeof(size_t),1,off);
+
+	fseek(arch, sizeof(char) * pos, SEEK_SET);
+	char* relativa = malloc (sizeof(char) * (posSiguiente - pos + 1));
+
+	fgets(relativa,posSiguiente - pos + 1,arch);
+
+	char* ruta = malloc (sizeof(char) * (strlen(encabezado) + strlen(relativa) + 1));
+	for (size_t i = 0; strlen(encabezado)> i;i++){
+		ruta[i] = encabezado[i];
+	}
+	for (size_t i = strlen(encabezado); strlen(encabezado) + strlen(relativa)> i;i++){
+		ruta[i] = relativa[i - strlen(encabezado)];
+	}
+	ruta[strlen(encabezado) + strlen(relativa)] = '\0';
+	free(encabezado);
+	free(relativa);
+	fclose(arch);
+	fclose(off);
+	return ruta;
+}

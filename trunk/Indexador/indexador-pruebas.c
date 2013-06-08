@@ -23,8 +23,8 @@ void print_test(char* name, bool result){
 }
 
 int main (int argc, char** argv){
-/*
-	char** rutas;
+
+/*	char** rutas;
 	unsigned long cant;
 
 	const char* directorio = "Textos_ejemplo_parseo";
@@ -58,13 +58,17 @@ int main (int argc, char** argv){
 	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES);
 	printf("Cargado el lexico\n");
 
-	const char* query = "kwnown internationally as";
+	const char* query = "Internationally";
 	lista_t* busquedas = parserQuery_parsearConsulta(query);
 
-	resultado_t* resul = buscador_buscar(busq, busquedas,INDICE);
-	resultado_emitirListado(resul,busquedas, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
+	if (lista_largo(busquedas) > 1){
+		resultado_t* resul = buscador_buscar(busq, busquedas,INDICE);
+		resultado_emitirListado(resul,busquedas, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
+		resultado_destruir(resul);
+	}else{
 
-	resultado_destruir(resul);
+		buscador_busquedaPuntual(busq, (char*)lista_ver_primero(busquedas),INDICE, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
+	}
 	lista_destruir(busquedas,free);
 	buscador_destruir(busq);
 

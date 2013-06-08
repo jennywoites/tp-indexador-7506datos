@@ -36,4 +36,6 @@ char** separarSiSonNumeros(char* buffer, unsigned int* cant);
 
 void __toUPPERCase(char* cadena);
 
+char* __obtenerNombreDoc(const char* paths, const char* offsets,  size_t num);
+
 #endif /* FUNCIONESGENERALESARCHIVOS_H_ */
