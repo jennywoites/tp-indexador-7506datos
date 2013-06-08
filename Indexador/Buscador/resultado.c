@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "../Carpetas Compartidas/TDAs/abb.h"
 #include "../Carpetas Compartidas/TDAs/heap.h"
+#include "../Carpetas Compartidas/TDAs/hash.h"
 #include "../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
 #include <string.h>
 
@@ -183,7 +184,7 @@ lista_t* solucion_determinarCorrecto(solucion_t* solucion, lista_t* terminos){
 /**************************************************************************************/
 
 struct resultado{
-	lista_t* soluciones;
+	hash_t* soluciones;
 };
 
 void destructor_soluciones(void* elem){
@@ -192,7 +193,7 @@ void destructor_soluciones(void* elem){
 
 void resultado_destruir(resultado_t* resultado){
 	if (!resultado) return;
-	lista_destruir(resultado->soluciones, destructor_soluciones);
+	hash_destruir(resultado->soluciones);
 	free(resultado);
 }
 
@@ -207,7 +208,7 @@ resultado_t* resultado_crear(termino_t** terminos, size_t cant, const char* dirO
 	//Por ahora descarto si un cierto termino no existe en los registros
 	if (!terminos[0]) return NULL;
 	resultado_t* resul = malloc (sizeof(resultado_t));
-	resul->soluciones = lista_crear();
+	resul->soluciones = hash_crear(destructor_soluciones);
 
 	bool primero = true;
 	for (size_t i = 0; i < cant; i++){
@@ -229,7 +230,6 @@ resultado_t* resultado_crear(termino_t** terminos, size_t cant, const char* dirO
 			agregarYeliminarSoluciones(resul, actual, infoTermino);
 		}
 		indicarSolucionesComoNoVisitadas(resul);
-
 	}
 	return resul;
 }
@@ -261,6 +261,7 @@ void agregarTodasLasSoluciones(resultado_t* resul, termino_t* termino, lista_t* 
 
 	while (!lista_iter_al_final(iter)){
 		size_t doc = *((size_t*) (lista_iter_ver_actual(iter)));
+		//printf("%s en documento %u\n", termino_obtenerPalabra(termino), doc);
 		solucion_t* sol = solucion_crear(doc);
 		lista_t* posiciones = lista_borrar_primero(infoTermino);
 		lista_iter_t* iterPos = lista_iter_crear(posiciones);
@@ -271,7 +272,9 @@ void agregarTodasLasSoluciones(resultado_t* resul, termino_t* termino, lista_t* 
 			free(clave);
 			lista_iter_avanzar(iterPos);
 		}
-		lista_insertar_ultimo(resul->soluciones, sol);
+		char* clave = __sizeToString(doc);
+		hash_guardar(resul->soluciones, clave,sol);
+		free(clave);
 		lista_iter_destruir(iterPos);
 		lista_destruir(posiciones, free);
 		lista_iter_avanzar(iter);
@@ -283,7 +286,7 @@ void agregarTodasLasSoluciones(resultado_t* resul, termino_t* termino, lista_t* 
 }
 
 solucion_t* documento_en_resolucion(resultado_t* resul, size_t num_doc){
-	if (!resul)
+	/*if (!resul)
 		return NULL;
 	lista_iter_t* iter = lista_iter_crear(resul->soluciones);
 	solucion_t* sol = NULL;
@@ -295,13 +298,17 @@ solucion_t* documento_en_resolucion(resultado_t* resul, size_t num_doc){
 	}
 	lista_iter_destruir(iter);
 	return sol;
+	*/
+	char* clave = __sizeToString(num_doc);
+	solucion_t* sol = hash_obtener(resul->soluciones, clave);
+	free(clave);
+	return sol;
 }
 
 void agregarYeliminarSoluciones(resultado_t* resul, termino_t* termino, lista_t* infoTermino){
 	if (!resul) return;
 	if (!termino) return;
 	if (!infoTermino) return;
-
 	lista_t* documentos = lista_borrar_primero(infoTermino);
 	lista_iter_t* iter = lista_iter_crear(documentos);
 	while (!lista_iter_al_final(iter)){
@@ -336,82 +343,39 @@ void agregarYeliminarSoluciones(resultado_t* resul, termino_t* termino, lista_t*
 
 void indicarSolucionesComoNoVisitadas(resultado_t* resul){
 	if (!resul) return;
-	lista_iter_t* iter = lista_iter_crear(resul->soluciones);
-	while (!lista_iter_al_final(iter)){
-		solucion_t* solucion = lista_iter_ver_actual(iter);
+	hash_iter_t* iter = hash_iter_crear(resul->soluciones);
+	while (!hash_iter_al_final(iter)){
+		solucion_t* solucion = hash_obtener(resul->soluciones, hash_iter_ver_actual(iter));
 		solucion->visitado = false;
-		lista_iter_avanzar(iter);
+		hash_iter_avanzar(iter);
 	}
-	lista_iter_destruir(iter);
+	hash_iter_destruir(iter);
 }
 
 void sacarSolucionesNoVisitadas(resultado_t* resul){
 	if (!resul) return;
-	lista_iter_t* iter = lista_iter_crear(resul->soluciones);
+	hash_iter_t* iter = hash_iter_crear(resul->soluciones);
 
-	while(!lista_iter_al_final(iter)){
-		solucion_t* solucion = lista_iter_ver_actual(iter);
+	while(!hash_iter_al_final(iter)){
+		const char* clave = hash_iter_ver_actual(iter);
+		hash_iter_avanzar(iter);
+		solucion_t* solucion = hash_obtener(resul->soluciones, clave);
 		if (!solucion->visitado){
-			lista_borrar(resul->soluciones, iter);
-			solucion_destruir(solucion);
-		}else{
-			lista_iter_avanzar(iter);
+			solucion_destruir((solucion_t*)hash_borrar(resul->soluciones, clave));
 		}
+			//solucion_destruir(solucion);
 	}
-	lista_iter_destruir(iter);
+	hash_iter_destruir(iter);
 }
 
-char* __obtenerNombreDoc(const char* paths, const char* offsets,  size_t num){
-	FILE* arch = fopen(paths, lectura_archivos());
-	FILE* off = fopen(offsets, lectura_archivos());
-	if (!arch || !off){
-		fclose(arch);
-		fclose(off);
-		return NULL;
-	}
-
-	char* encabezado = obtenerLinea(arch);
-
-	fseek(off,sizeof(size_t)*(num-1), SEEK_SET);
-	size_t pos;
-	size_t posSiguiente;
-	fread(&pos, sizeof(size_t),1,off);
-	fread(&posSiguiente, sizeof(size_t),1,off);
-
-	fseek(arch, sizeof(char) * pos, SEEK_SET);
-	char* relativa = malloc (sizeof(char) * (posSiguiente - pos + 1));
-
-	fgets(relativa,posSiguiente - pos + 1,arch);
-
-//	for (size_t i = 1; num > i;i++){
-//		free(obtenerLinea(arch));
-//	}
-//	char* relativa = obtenerLinea(arch);
-
-
-
-	char* ruta = malloc (sizeof(char) * (strlen(encabezado) + strlen(relativa) + 1));
-	for (size_t i = 0; strlen(encabezado)> i;i++){
-		ruta[i] = encabezado[i];
-	}
-	for (size_t i = strlen(encabezado); strlen(encabezado) + strlen(relativa)> i;i++){
-		ruta[i] = relativa[i - strlen(encabezado)];
-	}
-	ruta[strlen(encabezado) + strlen(relativa)] = '\0';
-	free(encabezado);
-	free(relativa);
-	fclose(arch);
-	fclose(off);
-	return ruta;
-}
 
 
 void resultado_emitirListado(resultado_t* resultado, lista_t* query, const char* paths, const char* offsets){
 	if (!resultado || !query) return;
 	bool hay_solucion = false;
-	lista_iter_t* iter_soluciones_posibles = lista_iter_crear(resultado->soluciones);
-	while (!lista_iter_al_final(iter_soluciones_posibles)){
-		solucion_t* actual = lista_iter_ver_actual(iter_soluciones_posibles);
+	hash_iter_t* iter_soluciones_posibles = hash_iter_crear(resultado->soluciones);
+	while (!hash_iter_al_final(iter_soluciones_posibles)){
+		solucion_t* actual = hash_obtener(resultado->soluciones, hash_iter_ver_actual(iter_soluciones_posibles));
 		lista_t* lista_de_solucion = solucion_determinarCorrecto(actual, query);
 		if (lista_largo(lista_de_solucion) > 0){
 			hay_solucion = true;
@@ -429,9 +393,9 @@ void resultado_emitirListado(resultado_t* resultado, lista_t* query, const char*
 			lista_iter_destruir(iter_sol);
 		}
 		lista_destruir(lista_de_solucion, free);
-		lista_iter_avanzar(iter_soluciones_posibles);
+		hash_iter_avanzar(iter_soluciones_posibles);
 	}
-	lista_iter_destruir(iter_soluciones_posibles);
+	hash_iter_destruir(iter_soluciones_posibles);
 	if (!hay_solucion)
 		printf("No hay solucion a la consulta\n");
 }

@@ -16,4 +16,6 @@ void buscador_destruir(buscador_t*);
 //FIXME: esto deberia devolver un solucion_t*, por ahora solo va a imprimir los OK :P
 resultado_t* buscador_buscar(buscador_t* buscador, lista_t* terminos_buscados, const char* dirOffsets);
 
+void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const char* index, const char* paths, const char* offsetPaths);
+
 #endif /* BUSCADOR_H_ */
