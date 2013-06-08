@@ -3,6 +3,7 @@
 #include "Indexador/Ordenamiento/sorting.h"
 #include "Indexador/Indexado/indexer.h"
 #include "Carpetas Compartidas/Log/log.h"
+#include "Carpetas Compartidas/interaccion.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include "Buscador/buscador.h"
@@ -59,34 +60,36 @@ int main (int argc, char** argv){
 	free(rutas);
 	log_emitir("Se termino de Indexar los documentos", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
 */
+	printf("Cargando el lexico en memoria, espere un instante\n");
 	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES);
 	printf("Cargado el lexico\n");
 
-	clock_t tiempo_ini = clock();
+	while (1){ //por ahora lo cortamos con ctrl+c, luego hago una funcion posta :P
+		printf("Ingrese busqueda\n");
+		char* query = leer_texto();
 
-	const char* query = "the cat is";
-	lista_t* busquedas = parserQuery_parsearConsulta(query);
+		clock_t tiempo_ini = clock();
 
-	if (lista_largo(busquedas) > 1){
-		resultado_t* resul = buscador_buscar(busq, busquedas,INDICE);
-		lista_t* soluciones = resultado_realizarIntersecciones(resul);
-		solucion_emitir(soluciones, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
-		lista_destruir(soluciones, destructor_solucion);
-		resultado_destruir(resul);
-	}else{
-		buscador_busquedaPuntual(busq, (char*)lista_ver_primero(busquedas),INDICE, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
+		lista_t* busquedas = parserQuery_parsearConsulta(query);
+
+		if (lista_largo(busquedas) > 1){
+			resultado_t* resul = buscador_buscar(busq, busquedas,INDICE);
+			lista_t* soluciones = resultado_realizarIntersecciones(resul);
+			solucion_emitir(soluciones, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
+			lista_destruir(soluciones, destructor_solucion);
+			resultado_destruir(resul);
+		}else{
+			buscador_busquedaPuntual(busq, (char*)lista_ver_primero(busquedas),INDICE, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
+		}
+		clock_t tiempo = clock() - tiempo_ini;
+
+		double segsTot = (double) tiempo / CLOCKS_PER_SEC;
+
+		printf("Tiempo de busqueda: %f segundos\n", segsTot);
+
+		lista_destruir(busquedas,free);
+		free(query);
 	}
-	clock_t tiempo = clock() - tiempo_ini;
-
-	unsigned long segsTot = tiempo / CLOCKS_PER_SEC;
-
-	unsigned long minutos = segsTot / 60;
-	unsigned long segundos = segsTot % 60;
-
-	printf("Tiempo de busqueda: %lu m %lu s\n", minutos, segundos);
-
-	lista_destruir(busquedas,free);
 	buscador_destruir(busq);
-
 	return 0;
 }

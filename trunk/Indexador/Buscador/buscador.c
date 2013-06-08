@@ -69,9 +69,6 @@ resultado_t* buscador_buscar(buscador_t* buscador, lista_t* terminos_buscados, c
 	}
 	lista_iter_destruir(iter);
 
-	for (size_t i = 0; i < cont; i++){
-		termino_imprimir(vector_terminos[i]);
-	}
 	abb_destruir(arbol_buscados);
 	resultado_t* resul = resultado_crear(vector_terminos, cont, dirOffsets);
 	free(vector_terminos);
@@ -103,16 +100,12 @@ void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const c
 	while (!lista_iter_al_final(iter)){
 		size_t doc = *((size_t*) (lista_iter_ver_actual(iter)));
 		char* nomDoc = __obtenerNombreDoc(paths, offsetPaths, doc);
-		printf("%s en las posiciones:\n", nomDoc);
+		printf("%s ", nomDoc);
 		free(nomDoc);
 		lista_t* posiciones = lista_borrar_primero(infoTermino);
-		lista_iter_t* iterPos = lista_iter_crear(posiciones);
-		while (!lista_iter_al_final(iterPos)){
-			size_t numPos = *((size_t*)(lista_iter_ver_actual(iterPos)));
-			printf("\t%u\n", numPos);
-			lista_iter_avanzar(iterPos);
-		}
-		lista_iter_destruir(iterPos);
+
+		printf("%u veces\n",lista_largo(posiciones));
+
 		lista_destruir(posiciones, free);
 		lista_iter_avanzar(iter);
 	}
