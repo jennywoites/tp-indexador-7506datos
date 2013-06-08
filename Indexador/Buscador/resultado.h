@@ -4,11 +4,14 @@
 
 typedef struct resultado resultado_t;
 
-resultado_t* resultado_crear(termino_t** terminos, size_t cant, const char* dirOffsets);
+resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* dirOffsets);
 
-void resultado_emitirListado(resultado_t* resultado, lista_t* query, const char* paths, const char* offsets);
+lista_t* resultado_realizarIntersecciones(resultado_t* resul);
+
+void solucion_emitir(lista_t* soluciones, const char* paths, const char* offsets);
 
 void resultado_destruir(resultado_t* resul);
 
+void destructor_solucion(void* a);
 
 #endif /* RESULTADO_H_ */

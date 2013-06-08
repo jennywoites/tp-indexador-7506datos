@@ -6,8 +6,12 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "Buscador/buscador.h"
+#include "Buscador/resultado.h"
 #include "Buscador/Parseo/parserQuery.h"
 #include "Carpetas Compartidas/TDAs/lista.h"
+
+#include <time.h>
+#include <bits/time.h>
 
 const char* SALIDA_PARSER = "parser.jem";
 const char* SALIDA_SORT = "sort.jem";
@@ -58,17 +62,29 @@ int main (int argc, char** argv){
 	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES);
 	printf("Cargado el lexico\n");
 
-	const char* query = "Internationally";
+	clock_t tiempo_ini = clock();
+
+	const char* query = "the cat is";
 	lista_t* busquedas = parserQuery_parsearConsulta(query);
 
 	if (lista_largo(busquedas) > 1){
 		resultado_t* resul = buscador_buscar(busq, busquedas,INDICE);
-		resultado_emitirListado(resul,busquedas, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
+		lista_t* soluciones = resultado_realizarIntersecciones(resul);
+		solucion_emitir(soluciones, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
+		lista_destruir(soluciones, destructor_solucion);
 		resultado_destruir(resul);
 	}else{
-
 		buscador_busquedaPuntual(busq, (char*)lista_ver_primero(busquedas),INDICE, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
 	}
+	clock_t tiempo = clock() - tiempo_ini;
+
+	unsigned long segsTot = tiempo / CLOCKS_PER_SEC;
+
+	unsigned long minutos = segsTot / 60;
+	unsigned long segundos = segsTot % 60;
+
+	printf("Tiempo de busqueda: %lu m %lu s\n", minutos, segundos);
+
 	lista_destruir(busquedas,free);
 	buscador_destruir(busq);
 
