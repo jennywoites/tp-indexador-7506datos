@@ -29,7 +29,7 @@ int pot_interaccion(int x, int y){
 	if (y==0) return 1;
 	if (y==1) return x;
 	
-	int h=pot(x, y/2);
+	int h=pot_interaccion(x, y/2);
 	int w;
 	if (y%2==0) w=1;
 	else w=x;
@@ -75,6 +75,6 @@ int leer_numero(){
         numero+=(buffer[j]-'0')*pot_interaccion(10,i-j-1);
          
     free(buffer);
-    return numero;     // la funcion tiene un pequeño error con numeros muy grandes, pero como estos no nos importan
+    return numero;     // la funcion tiene un pequeï¿½o error con numeros muy grandes, pero como estos no nos importan
                        // ni nos vamos a fijar
 }
