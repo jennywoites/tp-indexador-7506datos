@@ -79,12 +79,13 @@ resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* 
 		while (!lista_iter_al_final(iter)){
 			size_t numDoc = *((size_t*)lista_iter_ver_actual(iter));
 			char* clave = __sizeToString(numDoc);
-
 			hash_guardar(resul->hashes_terminos[i]->hash, clave, lista_borrar_primero(infoTerminos));
 			free(clave);
 			lista_iter_avanzar(iter);
 		}
 		lista_iter_destruir(iter);
+		lista_destruir(documentos, free);
+		lista_destruir(infoTerminos, NULL);
 	}
 
 	heapsort((void*)resul->hashes_terminos, cantidad, compararFrecuencias);
@@ -202,6 +203,7 @@ lista_t* resultado_realizarIntersecciones(resultado_t* resul){
 		lista_iter_avanzar(iter);
 	}
 	lista_iter_destruir(iter);
+	lista_destruir(documentos, free);
 	return soluciones;
 }
 
@@ -235,5 +237,6 @@ void resultado_destruir(resultado_t* resul){
 		hash_destruir(resul->hashes_terminos[i]->hash);
 		free(resul->hashes_terminos[i]);
 	}
+	free(resul->hashes_terminos);
 	free(resul);
 }
