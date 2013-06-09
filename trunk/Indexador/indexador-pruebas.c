@@ -35,10 +35,16 @@ void buscar(){
 	while (1){ //por ahora lo cortamos con ctrl+c, luego hago una funcion posta :P
 		printf("Ingrese busqueda\n");
 		char* query = leer_texto();
+		if (strlen(query) == 0){free(query); continue;}
 
 		clock_t tiempo_ini = clock();
 
 		lista_t* busquedas = parserQuery_parsearConsulta(query);
+		lista_iter_t* iter = lista_iter_crear(busquedas);
+		while (!lista_iter_al_final(iter)){
+			printf("%s\n", (char*)lista_iter_ver_actual(iter));
+			lista_iter_avanzar(iter);}
+		lista_iter_destruir(iter);
 
 		if (lista_largo(busquedas) > 1){
 			resultado_t* resul = buscador_buscar(busq, busquedas,INDICE);
