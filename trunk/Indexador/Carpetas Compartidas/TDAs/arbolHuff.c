@@ -182,7 +182,7 @@ lista_t* arbol_huff_obtener_lista_bits(arbol_huff_t* arbol,unsigned int num){
 
 unsigned int arbol_huff_obtener_numero(arbol_huff_t* arbol,debuffer_t* debuffer){
 	if(!arbol || !debuffer){
-		return NULL;
+		return 0;
 	}
 
 	unsigned int numero;

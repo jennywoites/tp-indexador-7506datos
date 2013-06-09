@@ -11,7 +11,7 @@
 
 //void indexarEntrada(registro_t* actual, registro_t* anterior, FILE* archIndex, FILE* archLexico, unsigned long *frecDoc, unsigned long *frecPos, unsigned long* offset);
 
-int indexer_indexar(const char* origen, const char* destino_index, const char* destino_lexico_frontCoding, const char* destino_lexico_diferentes){
+int indexer_indexar(size_t cant_documentos, const char* origen, const char* destino_index, const char* destino_lexico_frontCoding, const char* destino_lexico_diferentes){
 	FILE* archOrigen = fopen(origen, lectura_archivos());
 	FILE* archIndice = fopen(destino_index, escritura_archivos());
 	FILE* archFrontCoding = fopen(destino_lexico_frontCoding, escritura_archivos());
@@ -44,7 +44,7 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 			continue;
 		}
 
-		registro_escribirEnIndice(registro, registro_anterior, buff_indice, buff_frontcoding, archDiferentes, documentos, posiciones);
+		registro_escribirEnIndice(registro, registro_anterior, buff_indice, buff_frontcoding, archDiferentes, documentos, posiciones, cant_documentos);
 
 		if (registro_anterior)
 			registro_destruir(registro_anterior);
@@ -54,7 +54,7 @@ int indexer_indexar(const char* origen, const char* destino_index, const char* d
 	if (registro_anterior)
 		registro_destruir(registro_anterior);
 
-	registro_escribirEnIndice(NULL, registro_anterior, buff_indice, buff_frontcoding,archDiferentes, documentos, posiciones);
+	registro_escribirEnIndice(NULL, registro_anterior, buff_indice, buff_frontcoding,archDiferentes, documentos, posiciones, cant_documentos);
 
 	log_emitir("Finalizo el Indexado de archivos", LOG_ENTRADA_PROCESO);
 

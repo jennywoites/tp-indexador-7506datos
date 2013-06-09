@@ -37,6 +37,8 @@ void buscar(){
 		char* query = leer_texto();
 		if (strlen(query) == 0){free(query); continue;}
 
+		if (strcmp(query, "salir") == 0){free(query); break;}
+
 		clock_t tiempo_ini = clock();
 
 		lista_t* busquedas = parserQuery_parsearConsulta(query);
@@ -86,7 +88,7 @@ void indexar(){
 	if (aux == PARSERINDEX_OK){
 		log_emitir("Paseo Realizado Correctamente", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
 		aux = sorting_ordenarArchivo(SALIDA_PARSER, SALIDA_SORT);
-		indexer_indexar(SALIDA_SORT, INDICE, LEXICO, DIFERENTES);
+		indexer_indexar(cant,SALIDA_SORT, INDICE, LEXICO, DIFERENTES);
 
 		remove(SALIDA_PARSER);
 		remove(SALIDA_SORT);
@@ -103,6 +105,6 @@ void indexar(){
 
 
 int main (int argc, char** argv){
-	buscar();
+	indexar();
 	return 0;
 }
