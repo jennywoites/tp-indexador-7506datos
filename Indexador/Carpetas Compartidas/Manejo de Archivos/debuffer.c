@@ -52,7 +52,6 @@ size_t debuffer_leer_de_archivo(debuffer_t* debuff){
 }
 
 void debuffer_descartar_bits(debuffer_t* debuff, size_t bits_a_desechar){
-	//FIXME: Eze: No recuerdo bien si el de leer bit solo avanza en el debuffer o no. Hay que probarlo
 	for(int i =0; i<bits_a_desechar; i++){
 		debuffer_leer_bit(debuff);
 	}
