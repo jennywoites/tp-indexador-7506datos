@@ -2,6 +2,7 @@
 #include "arbolHuff.h"
 #include <stdbool.h>
 #include <string.h>
+#include "heap.h"
 
 typedef struct nodo_huff{
 	char* clave;
@@ -12,7 +13,6 @@ typedef struct nodo_huff{
 
 struct arbol_huff{
 	nodo_arbol_huff_t* raiz;
-	cmp_func_t fcmp;
 };
 
 void crear_con_base_de_arbol(arbol_huff_t* arbol, size_t b);
@@ -22,14 +22,10 @@ nodo_arbol_huff_t* nodo_arbol_huff_crear(const char* clave, unsigned int dato);
 
 //Crea el arbol, asignando las funciones de comparacion y de destruccion
 // de dato
-arbol_huff_t* arbol_huff_crear(cmp_func_t cmp, size_t b){
-	//Si no hay funcion de comparacion, no podemos hacer nada
-	if (!cmp)	return NULL;
-
+arbol_huff_t* arbol_huff_crear(size_t b){
 	arbol_huff_t* arbol = malloc(sizeof(arbol_huff_t));
 	if (!arbol) return NULL;
 
-	arbol->fcmp=cmp;
 	arbol->raiz=NULL;
 
 	crear_con_base_de_arbol(arbol,b);
@@ -38,11 +34,19 @@ arbol_huff_t* arbol_huff_crear(cmp_func_t cmp, size_t b){
 
 }
 
+int comparacion_prefijo(const void* a, const void* b){
+	nodo_arbol_huff_t* nodoIzq = (nodo_arbol_huff_t*)a;
+	nodo_arbol_huff_t* nodoDer = (nodo_arbol_huff_t*)b;
+	char* claveIzq =  nodoIzq->clave;
+	char* claveDer =  nodoDer->clave;
+	return atoi(claveDer)- atoi(claveIzq);
+}
+
 void crear_con_base_de_arbol(arbol_huff_t* arbol, size_t b){
 	if(b== 0 || !arbol)
 		return;
 
-	heap_t* heap = heap_crear(arbol->fcmp);
+	heap_t* heap = heap_crear((cmp_func_t)comparacion_prefijo);
 	if(!heap)
 		return;
 

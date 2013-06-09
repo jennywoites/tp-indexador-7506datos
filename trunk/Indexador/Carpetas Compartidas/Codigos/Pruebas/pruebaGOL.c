@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int mainGOL (){
+int main (){
 	//para pruebas, hay que pasarse al fprintf en el buffer.c
 	FILE* file = fopen("gol.jem","w");
 	buffer_t* cod = buffer_crear(file);
@@ -51,6 +51,7 @@ int mainGOL (){
 	codificador_codificarBinarioPrefijo(cod, 18, 20);
 	printf("el 19\n");
 	codificador_codificarBinarioPrefijo(cod, 19, 20);
+
 	
 	buffer_rellenar(cod);
 
