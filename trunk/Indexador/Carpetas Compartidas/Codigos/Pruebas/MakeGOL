@@ -2,9 +2,10 @@ final: compilar construir
 	valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./pruebaGOL -h
 	
 compilar: construir
-	gcc -Wall --pedantic --std=c99 buffer.o heap.o codificador.o lista.o arbolHuff.o matematicaEspecial.o -g pruebaGOL.c -o pruebaGOL
+	gcc -Wall --pedantic --std=c99 buffer.o debuffer.o heap.o codificador.o lista.o arbolHuff.o matematicaEspecial.o -g pruebaGOL.c -o pruebaGOL
 construir:
 	gcc -Wall --pedantic -g --std=c99 -c ../../'Manejo de Archivos'/buffer.c
+	gcc -Wall --pedantic -g --std=c99 -c ../../'Manejo de Archivos'/debuffer.c
 	gcc -Wall --pedantic -g --std=c99 -c ../../TDAs/heap.c
 	gcc -Wall --pedantic -g --std=c99 -c ../../Codigos/codificador.c
 	gcc -Wall --pedantic -g --std=c99 -c ../../Codigos/matematicaEspecial.c
@@ -13,8 +14,9 @@ construir:
 
 clean:
 	rm buffer.o
+	rm debuffer.o
 	rm codificador.o
-	rm pruebaCOD
+	rm pruebaGOL
 	rm matematicaEspecial.o
 	rm heap.o
 	rm lista.o

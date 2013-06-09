@@ -78,7 +78,6 @@ void crear_con_base_de_arbol(arbol_huff_t* arbol, size_t b){
 	}
 
 	arbol->raiz = heap_desencolar(heap);
-	printf("raiz: %s \n",arbol->raiz->clave);
 
 	free(clave);
 	heap_destruir(heap, NULL);
