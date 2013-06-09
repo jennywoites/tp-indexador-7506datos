@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int main (){
+int mainPruebasGol (){
 	//para pruebas, hay que pasarse al fprintf en el buffer.c
 	FILE* file = fopen("gol.jem","w");
 	buffer_t* cod = buffer_crear(file);

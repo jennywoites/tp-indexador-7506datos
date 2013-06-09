@@ -96,7 +96,7 @@ void cerrar_termino(buffer_t* buffFrontCoding, unsigned long cant);
 
 void crear_termino(buffer_t* buffFrontCoding, FILE* archDiferentes, registro_t* actual,registro_t* anterior, unsigned long offset);
 
-void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_t* buffIndice, buffer_t* buffFrontCoding, FILE* archDiferentes, lista_t* documentos, lista_t* posiciones_x_documento){
+void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_t* buffIndice, buffer_t* buffFrontCoding, FILE* archDiferentes, lista_t* documentos, lista_t* posiciones_x_documento, size_t cant_documentos){
 	unsigned long offsetActual = 0;
 	bool agregarTermino = true;
 	if (anterior && actual)
