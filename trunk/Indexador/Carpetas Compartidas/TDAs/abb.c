@@ -27,14 +27,16 @@ struct abb{
 //Crea el arbol, asignando las funciones de comparacion y de destruccion
 // de dato
 abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
+	//Si no hay funcion de comparacion, no podemos hacer nada
+	if (!cmp)	return NULL;
+
 	//Pido memoria para la estructura de arbol
 	abb_t* arbol=malloc(sizeof(abb_t));
 	if (!arbol) return NULL;
 
 	//No apunta a ninguna raiz
 	arbol->raiz=NULL;
-	//Si no hay funcion de comparacion, no podemos hacer nada
-	if (!cmp)	return NULL;
+
 	//Se guardan las funciones
 	arbol->fcmp=cmp;
 	arbol->fdestruir=destruir_dato;
