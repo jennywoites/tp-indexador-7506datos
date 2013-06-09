@@ -21,7 +21,6 @@ void generarTermino(lista_t* terminos, char* buffer){
 	}else{
 		for (unsigned int k = 0; k < cantNum;k++){
 			lista_insertar_ultimo(terminos, bufferSepNum[k]);
-			free(bufferSepNum[k]);
 		}
 		free(bufferSepNum);
 		free(bufferSinEliminables);
