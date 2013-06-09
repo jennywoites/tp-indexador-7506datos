@@ -32,8 +32,8 @@ void generarTermino(lista_t* terminos, char* buffer){
 
 
 lista_t* parserQuery_parsearConsulta(const char* query){
-	if (strlen(query) == 0) return NULL;
 	lista_t* terminos = lista_crear();
+	if (strlen(query) == 0) return terminos;
 	unsigned int j = 0;
 	char* buffer = malloc (sizeof(char) * (strlen(query)+1));
 	char c;

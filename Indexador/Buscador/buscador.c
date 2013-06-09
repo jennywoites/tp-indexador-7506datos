@@ -1,6 +1,6 @@
 #include "buscador.h"
 #include "../Carpetas Compartidas/TDAs/hash.h"
-#include "../Carpetas Compartidas/TDAs/abb.h"
+//#include "../Carpetas Compartidas/TDAs/abb.h"
 #include "../Carpetas Compartidas/Manejo de Archivos/termino.h"
 #include "../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
 #include "Lexico/levantador.h"
@@ -49,27 +49,21 @@ resultado_t* buscador_buscar(buscador_t* buscador, lista_t* terminos_buscados, c
 	size_t cont = 0;
 
 	lista_iter_t* iter = lista_iter_crear(terminos_buscados);
-	abb_t* arbol_buscados = abb_crear(strcmp,NULL);
 	while (!lista_iter_al_final(iter)){
 		//Esto es lo que hay que cambiar:
 		char* termino = lista_iter_ver_actual(iter);
 
 		if (hash_pertenece(buscador->almacenador, termino)){
 			termino_t* term = hash_obtener(buscador->almacenador, termino);
-			if (!abb_pertenece(arbol_buscados, termino)){
-				vector_terminos[cont] = term;
-				cont++;
-			}
-			abb_guardar(arbol_buscados, termino, NULL);
+			vector_terminos[cont] = term;
 		}else{
 			vector_terminos[cont] = NULL; 	//Aca podriamos decir que no hay ninguna solucion
-			cont++;							//Posible, porque no se encontro uno de los terminos
 		}
+		cont++;
 		lista_iter_avanzar(iter);
 	}
 	lista_iter_destruir(iter);
 
-	abb_destruir(arbol_buscados);
 	resultado_t* resul = resultado_crear(vector_terminos, cont, dirOffsets);
 	free(vector_terminos);
 	return resul;
