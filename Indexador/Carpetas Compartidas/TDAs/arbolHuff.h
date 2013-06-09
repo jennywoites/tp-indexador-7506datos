@@ -7,7 +7,8 @@
 #include "../Manejo de Archivos/debuffer.h"
 #include "../Manejo de Archivos/buffer.h"
 
-#define DATO_NULO 100
+//debe ser mayor a cualquier b
+#define DATO_NULO 100000
 #define DIR_IZQ 0
 #define DIR_DER 1
 
