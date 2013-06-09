@@ -16,16 +16,6 @@ codificador_t* codificador_crear(buffer_t* buffer);
 
 void codificador_destruir(codificador_t* cod);
 
-//void codificador_codificarUnario(codificador_t* cod, unsigned int num);
-//
-//void codificador_codificarBinario(codificador_t* cod, unsigned int num, size_t longitud);
-//
-//void codificador_codificarUnario(codificador_t* cod, unsigned int num);
-//
-//void codificador_codificarGamma(codificador_t* cod, unsigned int num);
-//
-//void codificador_codificarDelta(codificador_t* cod, unsigned int num);
-
 void codificador_codificarUnario(buffer_t* cod, unsigned int num);
 
 void codificador_codificarBinario(buffer_t* cod, unsigned int num, size_t longitud);
@@ -35,5 +25,7 @@ void codificador_codificarUnario(buffer_t* cod, unsigned int num);
 void codificador_codificarGamma(buffer_t* cod, unsigned int num);
 
 void codificador_codificarDelta(buffer_t* cod, unsigned int num);
+
+void codificador_codificarBinarioPrefijo(buffer_t* cod, unsigned int num, size_t b);
 
 #endif /*CODIFICADOR_H_*/

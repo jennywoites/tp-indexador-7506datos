@@ -75,15 +75,10 @@ void codificador_codificarDelta(buffer_t* cod, unsigned int num){
 	codificador_codificarBinario(cod, num_binario, cant_bits_binario);
 }
 
-int* comparacion_prefijo(const char* a, const char* b){
-	unsigned int numIzq = atoi(a);
-	unsigned int numDer = atoi(b);
-	return b-a;
-}
 
-void codificador_codificarBinarioPrefijo(buffer_t* buffer, unsigned int num, unsigned int b){
+void codificador_codificarBinarioPrefijo(buffer_t* buffer, unsigned int num, size_t b){
 
-	arbol_huff_t* arbol = arbol_huff_crear((cmp_func_t)comparacion_prefijo, b);
+	arbol_huff_t* arbol = arbol_huff_crear(b);
 
 	if(!arbol)
 		return;
