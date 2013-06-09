@@ -134,9 +134,9 @@ void __copiarListas(lista_t* dst, lista_t* org, size_t pos){
 lista_iter_t* iter = lista_iter_crear(org);
 	while (!lista_iter_al_final(iter)){
 		size_t* act = lista_iter_ver_actual(iter);
-		if (*act - pos > 0){
+		if ((*act) >= pos){
 			size_t* cpy = malloc (sizeof(size_t));
-			*cpy = *act - pos;
+			*cpy = (*act) - pos;
 			lista_insertar_ultimo(dst, cpy);
 		}
 		lista_iter_avanzar(iter);
@@ -154,8 +154,8 @@ void intersecarPosiciones(lista_t** posiciones, lista_t* posSec, size_t num){
 		bool pasado = false;
 		while(!lista_iter_al_final(iterSec) && !pasado){
 			size_t* posSec = lista_iter_ver_actual(iterSec);
-			pasado = ((*posSec) - num) > (*pos);
-			if ((*posSec-num) == *pos){
+			pasado = (((*posSec) - num) > (*pos)) && (*posSec > num);
+			if ((*posSec - num) == *pos){
 				size_t* cpy = malloc (sizeof(size_t));
 				*cpy = *pos;
 				lista_insertar_ultimo(aux, cpy);
