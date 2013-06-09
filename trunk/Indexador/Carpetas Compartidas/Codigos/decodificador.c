@@ -88,6 +88,24 @@ unsigned int decodificador_decodificarDelta(debuffer_t* decodificador){
 	return numero;
 }
 
+unsigned int decodificador_decodificarGolomb(debuffer_t* decodificador, size_t b){
+	if ((!decodificador) || (b == 0))
+			return NO_NUMERO;
+
+	arbol_huff_t* arbol = arbol_huff_crear((cmp_func_t)comparacion_prefijo, b);
+
+	if(!arbol)
+		return NO_NUMERO;
+
+	unsigned int numero = 0;
+	unsigned int q = decodificador_decodificarUnario(debuffer);
+	unsigned int r = arbol_huff_obtener_numero(arbol,debuffer);
+
+	numero = r + 1 + (q * b);
+
+	return numero;
+}
+
 void decodificador_destruir(decodificador_t* decodificador){
 	free(decodificador);
 }

@@ -180,6 +180,30 @@ lista_t* arbol_huff_obtener_lista_bits(arbol_huff_t* arbol,unsigned int num){
 	return lista;
 }
 
+
+unsigned int arbol_huff_obtener_numero(arbol_huff_t* arbol,debuffer_t* debuffer){
+	if(!arbol || !debuffer){
+		return NULL;
+	}
+
+	unsigned int numero;
+	Byte_t direccion;
+
+	nodo_arbol_huff_t* nodo_actual = arbol->raiz;
+
+	while(nodo_actual->dato == DATO_NULO){
+		direccion = debuffer_leer_bit(debuffer);
+		if (direccion == DIR_IZQ)
+				nodo_actual = nodo_actual->izq;
+		else //es DIR_DER
+			nodo_actual = nodo_actual->der;
+	}
+
+	numero = nodo_actual->dato;
+
+	return numero;
+}
+
 //Se encarga de eliminar toda las estructuras almacenadas en el nodo.
 void nodo_arbol_huff_destruir(nodo_arbol_huff_t *nodo){
 	//si no hay nodo, no hay qué destruir
