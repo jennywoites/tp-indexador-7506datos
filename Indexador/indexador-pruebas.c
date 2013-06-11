@@ -27,9 +27,19 @@ void print_test(char* name, bool result){
     printf("%s: %s\n", name, result? "OK" : "ERROR");
 }
 
+size_t obtenerCantidadDocs(const char* ruta){
+	FILE* arch = fopen(ruta, lectura_archivos());
+	debuffer_t* debuff = debuffer_crear(arch, 80);
+	size_t c = decodificador_decodificarDelta(debuff);
+	debuffer_destruir(debuff);
+	fclose(arch);
+	return c;
+}
+
 void buscar(){
 	printf("Cargando el lexico en memoria, espere un instante\n");
-	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES);
+	size_t cant = obtenerCantidadDocs(INDICE);
+	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES, cant);
 	printf("Cargado el lexico\n");
 
 	while (1){ //por ahora lo cortamos con ctrl+c, luego hago una funcion posta :P
