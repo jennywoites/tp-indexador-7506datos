@@ -227,7 +227,7 @@ size_t cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t*
 		
 
 		docAnterior = *docActual;
-		//*offset = (*offset) + difOffset;
+		// *offset = (*offset) + difOffset;
 		free(docActual);
 		cola_t* posiciones = lista_borrar_primero (posiciones_x_documentos);
 
@@ -244,7 +244,7 @@ size_t cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t*
 			//fprintf(archIndice, "%lu ", *posActual - posAnterior);
 
 			posAnterior = *posActual;
-			//*offset = (*offset) + 1;
+			// *offset = (*offset) + 1;
 			free(posActual);
 		}
 		cola_destruir(posiciones,NULL);

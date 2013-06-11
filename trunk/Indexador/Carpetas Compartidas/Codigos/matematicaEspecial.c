@@ -41,5 +41,11 @@ unsigned int maxPot2(unsigned int num){
 
 size_t calcular_B_optimo(float p){
 	//FIXME:
-	return 100;
+
+	float b_float = - log(2-p) / log(1-p);
+
+	size_t b = b_float;
+	if (b < b_float) b++;
+
+	return b;
 }
