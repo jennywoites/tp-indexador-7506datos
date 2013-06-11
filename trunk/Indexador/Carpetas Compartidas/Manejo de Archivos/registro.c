@@ -186,14 +186,17 @@ size_t cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t*
 	float p = (float) lista_largo(documentos) / cant_docs;
 	size_t b = calcular_B_optimo(p);
 
+	bool borrar = false;
 	if (p > 0.5){
 		documentos = complementarLista(documentos, cant_docs);
+		borrar = true;
+		p = 1-p;
 	}
 
 	unsigned long docAnterior = 0;
 	while (!lista_esta_vacia(documentos)){
 		unsigned long* docActual = lista_borrar_primero(documentos);
-		comprimir_IndiceDistanciaDocumentos(buffIndice, *docActual - docAnterior, b);
+		comprimir_IndiceDistanciaDocumentos(buffIndice, *docActual - docAnterior, b, p);
 		docAnterior = *docActual;
 		free(docActual);
 	}
@@ -253,7 +256,7 @@ size_t cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t*
 	int difOffset = buffer_obtener_contador(buffIndice);
 	buffer_reset_contador(buffIndice);
 	*offset = (*offset) + difOffset;
-	if (p > 0.5) lista_destruir(documentos, free);
+	if (borrar) lista_destruir(documentos, free);
 	return b;
 }
 

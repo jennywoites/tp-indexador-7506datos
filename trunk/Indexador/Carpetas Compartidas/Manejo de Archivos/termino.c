@@ -170,13 +170,15 @@ lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, size_t b)
 	float p = (float)cant_documentos / CANT_DOCS;
 
 	size_t frec_usada = cant_documentos;
+	float p_usada = p;
 	if ( p > 0.5){
 		frec_usada = CANT_DOCS - cant_documentos;
+		p_usada = 1-p;
 	}
 
 	size_t num_doc_actual = 0;
 	for (size_t i = 0; i < frec_usada;i++){
-		num_doc_actual += descomprimir_IndiceDistanciaDocumentos(debuffer, b);
+		num_doc_actual += descomprimir_IndiceDistanciaDocumentos(debuffer, b, p_usada);
 		size_t* actual = malloc (sizeof(size_t));
 		*actual = num_doc_actual;
 		lista_insertar_ultimo(documentos,actual );
