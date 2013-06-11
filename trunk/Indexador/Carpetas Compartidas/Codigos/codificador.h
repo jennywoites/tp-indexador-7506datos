@@ -28,6 +28,6 @@ void codificador_codificarDelta(buffer_t* cod, unsigned int num);
 
 void codificador_codificarBinarioPrefijo(buffer_t* cod, unsigned int num, size_t b);
 
-void codificador_codificarGolomb(buffer_t* buffer, unsigned int num, unsigned int b);
+void codificador_codificarGolomb(buffer_t* buffer, unsigned int num, size_t b);
 
 #endif /*CODIFICADOR_H_*/
