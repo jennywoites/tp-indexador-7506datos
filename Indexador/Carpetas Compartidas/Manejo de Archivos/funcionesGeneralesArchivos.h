@@ -2,7 +2,7 @@
 #define FUNCIONESGENERALESARCHIVOS_H_
 #include <stdbool.h>
 #include <stdio.h>
-
+#include "../TDAs/lista.h"
 
 //Permite hacer lectura anticipada, para casos de apareo y similares.
 bool lectura_anticipada(FILE* arch, char* c);
@@ -37,5 +37,7 @@ char** separarSiSonNumeros(char* buffer, unsigned int* cant);
 void __toUPPERCase(char* cadena);
 
 char* __obtenerNombreDoc(const char* paths, const char* offsets,  size_t num);
+
+lista_t* complementarLista(lista_t* org, size_t cant);
 
 #endif /* FUNCIONESGENERALESARCHIVOS_H_ */

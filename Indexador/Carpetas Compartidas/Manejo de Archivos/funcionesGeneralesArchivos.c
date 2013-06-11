@@ -267,3 +267,19 @@ char* __obtenerNombreDoc(const char* paths, const char* offsets,  size_t num){
 	fclose(off);
 	return ruta;
 }
+
+lista_t* complementarLista(lista_t* org, size_t cant){
+	lista_t* cmpt = lista_crear();
+	size_t* doc = lista_borrar_primero(org);
+	for (size_t i = 1; i <= cant; i++){
+		if (!doc || i != *doc){
+			size_t* valor = malloc (sizeof(size_t));
+			*valor = i;
+			lista_insertar_ultimo(cmpt, valor);
+		}else{
+			if (doc) free(doc);
+			doc = lista_borrar_primero(org);
+		}
+	}
+	return cmpt;
+}
