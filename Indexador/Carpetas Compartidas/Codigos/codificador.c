@@ -88,10 +88,10 @@ void codificador_codificarBinarioPrefijo(buffer_t* buffer, unsigned int num, siz
 	while(!lista_esta_vacia(lista_bits)){
 		Byte_t* numero = lista_borrar_primero(lista_bits);
 		buffer_escribir_bit(buffer, *numero);
-		if (*numero == 0)
-			printf("imprime: 0 \n" );
-		if (*numero == 1)
-			printf("imprime: 1 \n" );
+		//if (*numero == 0)
+			//printf("imprime: 0 \n" );
+		//if (*numero == 1)
+			//printf("imprime: 1 \n" );
 		free(numero);
 	}
 	
@@ -101,7 +101,7 @@ void codificador_codificarBinarioPrefijo(buffer_t* buffer, unsigned int num, siz
 
 }
 
-void codificador_codificarGolomb(buffer_t* buffer, unsigned int num, unsigned int b){
+void codificador_codificarGolomb(buffer_t* buffer, unsigned int num, size_t b){
 	if ((b == 0) || (num == 0))
 		return;
 	
