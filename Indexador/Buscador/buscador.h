@@ -8,7 +8,7 @@ typedef struct buscador buscador_t;
 /* Permite crear un buscador a partir de las rutas de los archivos de Front
  * Coding y otro con los caracteres diferentes.
  * Memoria: Almacena memoria para el buscador*/
-buscador_t* buscador_crear(const char* rutaFrontCoding, const char* rutaDiferentes);
+buscador_t* buscador_crear(const char* rutaFrontCoding, const char* rutaDiferentes, size_t cant);
 
 /* Permite liberar la memoria reservada para un buscador*/
 void buscador_destruir(buscador_t*);
