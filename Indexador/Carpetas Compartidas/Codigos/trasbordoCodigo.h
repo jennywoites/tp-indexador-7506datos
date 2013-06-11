@@ -10,7 +10,7 @@ void comprimir_FrecuenciaDocumentos(buffer_t* cod, unsigned int num);
 
 void comprimir_FrecuenciaPosiciones(buffer_t* cod, unsigned int num);
 
-void comprimir_IndiceDistanciaDocumentos(buffer_t* cod, unsigned int num, size_t b);
+void comprimir_IndiceDistanciaDocumentos(buffer_t* cod, unsigned int num, size_t b, float p);
 
 void comprimir_IndiceDistanciaPosiciones(buffer_t* cod, unsigned int num);
 
@@ -27,7 +27,7 @@ unsigned int descomprimir_FrecuenciaDocumentos(debuffer_t* cod);
 
 unsigned int descomprimir_FrecuenciaPosiciones(debuffer_t* cod);
 
-unsigned int descomprimir_IndiceDistanciaDocumentos(debuffer_t* cod, size_t b);
+unsigned int descomprimir_IndiceDistanciaDocumentos(debuffer_t* cod, size_t b, float p);
 
 unsigned int descomprimir_IndiceDistanciaPosiciones(debuffer_t* cod);
 
