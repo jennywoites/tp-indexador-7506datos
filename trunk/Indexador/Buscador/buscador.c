@@ -17,6 +17,7 @@
 //necesitar varias cosas mas!
 struct buscador{
 	hash_t* almacenador;
+	size_t cant_docs;
 };
 
 
@@ -29,13 +30,14 @@ bool guardar_aux(void* a, const char* b, void* c){
 	return hash_guardar((hash_t*) a, b, c);
 }
 
-buscador_t* buscador_crear(const char* rutaFrontCoding, const char* rutaDiferentes){
+buscador_t* buscador_crear(const char* rutaFrontCoding, const char* rutaDiferentes, size_t cant){
 	buscador_t* b = malloc (sizeof(buscador_t));
 	if (!b) return NULL;
 
 	b->almacenador = hash_crear(destructor_terminos);
 	levantador_obtenerContenedorLexico(b->almacenador, guardar_aux, rutaFrontCoding, rutaDiferentes);
-
+	b->cant_docs = cant;
+	termino_setearCantDocs(cant);
 	return b;
 }
 
