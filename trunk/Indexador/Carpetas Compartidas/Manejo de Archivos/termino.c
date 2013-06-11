@@ -6,13 +6,16 @@
 #include "../../Carpetas Compartidas/Codigos/trasbordoCodigo.h"
 #include <sys/stat.h>
 
+size_t CANT_DOCS = 0;
+
 struct termino{
 	char* termino;
 	size_t offset;
 	size_t frecuencia;
+	size_t b;
 };
 
-termino_t* termino_crear (const char* term, size_t offset, size_t frec){
+termino_t* termino_crear (const char* term, size_t offset, size_t frec, size_t b){
 	if (!term) return NULL;
 
 	termino_t* t = malloc (sizeof(termino_t));
@@ -27,6 +30,7 @@ termino_t* termino_crear (const char* term, size_t offset, size_t frec){
 	strcpy(t->termino, term);
 	t->offset = offset;
 	t->frecuencia = frec;
+	t->b = b;
 	return t;
 }
 
@@ -73,11 +77,12 @@ termino_t* termino_leer(termino_t* termino_anterior, debuffer_t* debuff_FrontCod
 	size_t dist = descomprimir_LexicoDiferentes(debuff_FrontCoding);
 	size_t off = descomprimir_LexicoOffset(debuff_FrontCoding);
 	size_t frec = descomprimir_FrecuenciaDocumentos(debuff_FrontCoding);
+	size_t b = descomprimir_BGolomb(debuff_FrontCoding);
 
 	if( rep == NO_NUMERO || dist == NO_NUMERO || off == NO_NUMERO || frec == NO_NUMERO )
 		return NULL;
 	rep--;
-	off--;
+	//off--;
 	
 	
 	char* cad = malloc (sizeof(char) * (rep + dist + 1));
@@ -93,7 +98,7 @@ termino_t* termino_leer(termino_t* termino_anterior, debuffer_t* debuff_FrontCod
 	if (termino_anterior)
 		off_ant = termino_anterior->offset;
 
-	termino_t* t = termino_crear(cad, off + off_ant, frec);
+	termino_t* t = termino_crear(cad, off + off_ant, frec, b);
 	free(cad);
 
 	return t;
@@ -117,7 +122,7 @@ void termino_imprimir(termino_t* termino){
 	printf("El termino %s tiene frecuencia %u\n", termino->termino, termino->frecuencia);
 }
 
-lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos);
+lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, size_t b);
 
 //Si no logro abrir el archivo o la frecuencia del termino es 0, devuelve NULL
 lista_t* termino_decodificarPunteros(termino_t* termino,const char* ruta){
@@ -149,33 +154,68 @@ lista_t* termino_decodificarPunteros(termino_t* termino,const char* ruta){
 	fseek(arch, offset_bytes,SEEK_SET); //SEEK_SET offset desde el inicio del archivo
 	debuffer_descartar_bits(debuffer,bits_a_desechar);
 
-	lista_t* listado = obtener_listado(debuffer, frecuencia);
+	lista_t* listado = obtener_listado(debuffer, frecuencia, termino->b);
 	fclose(arch);
 	debuffer_destruir(debuffer);
 	return listado;
 }
 
-lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos){
+lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, size_t b){
 	if(!debuffer)
 		return NULL;
 
 	lista_t* listado_datos = lista_crear();
-	lista_insertar_primero(listado_datos, lista_crear());
+	lista_t* documentos = lista_crear();
 
-	if(!listado_datos)
+	float p = (float)cant_documentos / CANT_DOCS;
+
+	size_t frec_usada = cant_documentos;
+	if ( p > 0.5){
+		frec_usada = CANT_DOCS - cant_documentos;
+	}
+
+	size_t num_doc_actual = 0;
+	for (size_t i = 0; i < frec_usada;i++){
+		num_doc_actual += descomprimir_IndiceDistanciaDocumentos(debuffer, b);
+		size_t* actual = malloc (sizeof(size_t));
+		*actual = num_doc_actual;
+		lista_insertar_ultimo(documentos,actual );
+	}
+
+	if (p > 0.5){
+		lista_t* cmpt = complementarLista(documentos, CANT_DOCS);
+		lista_destruir(documentos, free);
+		documentos = cmpt;
+	}
+	lista_insertar_primero(listado_datos, documentos);
+
+	for (size_t i = 0; i < cant_documentos; i++){
+		size_t posicion_actual = 0;
+		lista_t* posiciones = lista_crear();
+		size_t cant_posiciones = descomprimir_FrecuenciaPosiciones(debuffer);
+		for (size_t j = 0; j < cant_posiciones; j++){
+			posicion_actual += descomprimir_IndiceDistanciaPosiciones(debuffer);
+			size_t* valor = malloc (sizeof(size_t));
+			*valor = posicion_actual;
+			lista_insertar_ultimo(posiciones, valor);
+		}
+		lista_insertar_ultimo(listado_datos, posiciones);
+	}
+
+	/*if(!listado_datos)
 		return NULL;
 
 	size_t cant_doc_actual = 0;
 	unsigned int cant_posiciones;
 	unsigned int pos_actual;
-	size_t num_doc_actual = 0;
+
 	unsigned int numero;
 	unsigned int numero_anterior;
 	size_t* nueva_pos;
 
 	while(cant_doc_actual < cant_documentos){
 		//num_doc_actual += decodificador_decodificarGamma(debuffer);
-		num_doc_actual += descomprimir_IndiceDistanciaDocumentos(debuffer);
+		num_doc_actual += descomprimir_IndiceDistanciaDocumentos(debuffer, b);
 		lista_t* listado_documentos = lista_ver_primero(listado_datos);
 		size_t* actual = malloc (sizeof(size_t));
 		*actual = num_doc_actual;
@@ -201,6 +241,11 @@ lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos){
 		}
 		cant_doc_actual ++;
 	}
-
+*/
 	return listado_datos;
+}
+
+
+void termino_setearCantDocs(size_t valor){
+	CANT_DOCS = valor;
 }
