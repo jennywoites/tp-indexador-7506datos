@@ -11,7 +11,7 @@ typedef struct termino termino_t;
 /* Permite crear un termino a partir de un string, un offset (al archivo de indice)
  * y la frecuencia.
  * Memoria: pide memoria del heap para almacenar el termino.*/
-termino_t* termino_crear (const char* term, size_t offset, size_t frec, size_t b);
+termino_t* termino_crear (const char* term, size_t offset, size_t frec);
 
 /* Libera la memoria utilizada por el termino en cuestion.*/
 void termino_destruir(termino_t*);
@@ -35,7 +35,7 @@ void termino_imprimir(termino_t*);
  * pos 0, documentos (num) en los que se encuentra el pos termino.
  * Posiciones siguientes (tantas como la cant de elementos de la primera lista)
  * son los numeros de posiciones.*/
-lista_t* termino_decodificarPunteros(termino_t* termino,const char* ruta);
+lista_t* termino_decodificarPunteros(termino_t* termino,const char* ruta, const char* ruta_tams);
 
 void termino_setearCantDocs(size_t valor);
 

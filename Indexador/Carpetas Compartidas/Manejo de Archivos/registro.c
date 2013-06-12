@@ -90,13 +90,13 @@ unsigned long stringToLong(char* num){
 	return n;
 }
 
-size_t cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t* posiciones_x_documentos, unsigned long *offset, unsigned long* cantidad, size_t cantidad_docs);
+void cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t* posiciones_x_documentos, unsigned long *offset, unsigned long* cantidad, size_t cantidad_docs, const char* ruta_tams);
 
-void cerrar_termino(buffer_t* buffFrontCoding, unsigned long cant, size_t b);
+void cerrar_termino(buffer_t* buffFrontCoding, unsigned long cant);
 
 void crear_termino(buffer_t* buffFrontCoding, FILE* archDiferentes, registro_t* actual,registro_t* anterior, unsigned long offset);
 
-void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_t* buffIndice, buffer_t* buffFrontCoding, FILE* archDiferentes, lista_t* documentos, lista_t* posiciones_x_documento, size_t cant_documentos){
+void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_t* buffIndice, buffer_t* buffFrontCoding, FILE* archDiferentes, lista_t* documentos, lista_t* posiciones_x_documento, size_t cant_documentos, const char* ruta_tams){
 	unsigned long offsetActual = 0;
 	bool agregarTermino = true;
 	if (anterior && actual)
@@ -105,9 +105,8 @@ void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_
 	if (agregarTermino){
 		if (anterior){
 			unsigned long cantidad;
-			size_t b;
-			b = cerrar_punterosTermino(buffIndice, documentos, posiciones_x_documento, &offsetActual, &cantidad, cant_documentos);
-			cerrar_termino(buffFrontCoding, cantidad, b);
+			cerrar_punterosTermino(buffIndice, documentos, posiciones_x_documento, &offsetActual, &cantidad, cant_documentos, ruta_tams);
+			cerrar_termino(buffFrontCoding, cantidad);
 		}else{
 			codificador_codificarDelta(buffIndice, cant_documentos);
 			offsetActual = buffer_obtener_contador(buffIndice);
@@ -144,11 +143,10 @@ void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_
 //FUNCIONES QUE AGREGAN LOS TERMINOS, ETC.....
 //POR AHORA LAS HAGO A LO CABEZA
 
-void cerrar_termino(buffer_t* buffFrontCoding, unsigned long cant, size_t b){
+void cerrar_termino(buffer_t* buffFrontCoding, unsigned long cant){
 	//compresor_comprimirFrecuencia(archLexico, cant);
 	//codificador_codificarDelta(buffFrontCoding,cant);
 	comprimir_FrecuenciaDocumentos(buffFrontCoding,cant);
-	comprimir_BGolomb(buffFrontCoding, b);
 	//fprintf(archFrontCoding,"%lu\n", cant);
 }
 
@@ -174,43 +172,78 @@ void crear_termino(buffer_t* buffFrontCoding, FILE* archDiferentes, registro_t* 
 	}
 
 	//compresor_comprimirOffset(archLexico, offset);
-	//TODO: ver de no comprimir el primer offset, y sacar ese +1
 	//codificador_codificarDelta(buffFrontCoding,offset+1);
 	comprimir_LexicoOffset(buffFrontCoding, offset);
 	//fprintf(archFrontCoding, ";%lu;", offset);
 }
 
-size_t cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t* posiciones_x_documentos, unsigned long *offset, unsigned long* cantidad, size_t cant_docs){
+void cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t* posiciones_x_documentos, unsigned long *offset, unsigned long* cantidad, size_t cant_docs, const char* ruta_tamanios){
 	*cantidad = lista_largo(documentos);
+	size_t documentos_indexados[*cantidad];
+
+	size_t i = 0;
+	lista_iter_t* iter = lista_iter_crear(documentos);
+	while (!lista_iter_al_final(iter)){
+		size_t* doc = lista_iter_ver_actual(iter);
+		documentos_indexados[i] = *doc;
+		i++;
+		lista_iter_avanzar(iter);
+	}
+	lista_iter_destruir(iter);
 
 	float p = (float) lista_largo(documentos) / cant_docs;
-	size_t b = calcular_B_optimo(p);
 
 	bool borrar = false;
+
 	if (p > 0.5){
 		documentos = complementarLista(documentos, cant_docs);
 		borrar = true;
 		p = 1-p;
 	}
 
+	//size_t frec_prima = lista_largo(documentos);
+	//size_t n_prima = cant_docs;
+	float p_prima = p;
+
 	unsigned long docAnterior = 0;
 	while (!lista_esta_vacia(documentos)){
+		size_t b = calcular_B_optimo(p_prima);
 		unsigned long* docActual = lista_borrar_primero(documentos);
-		comprimir_IndiceDistanciaDocumentos(buffIndice, *docActual - docAnterior, b, p);
+		size_t distancia = *docActual - docAnterior;
+		comprimir_IndiceDistanciaDocumentos(buffIndice,distancia , b);
 		docAnterior = *docActual;
 		free(docActual);
+
+		//frec_prima--;
+		//n_prima -= distancia;
+		//if (n_prima > 0)
+		//	p_prima = (float) frec_prima / n_prima;
 	}
 
 	for (size_t i = 0; i < *cantidad; i++){
 		cola_t* posiciones = lista_borrar_primero (posiciones_x_documentos);
+		size_t doc = documentos_indexados[i];
+		size_t cant_posiciones = obtenerCantDocumentos(ruta_tamanios,doc);
+
+		float p_pos = (float) cola_largo(posiciones) / cant_posiciones;
 		comprimir_FrecuenciaPosiciones(buffIndice,(unsigned long)cola_largo(posiciones));
+
+		//size_t n_prima_pos = cant_posiciones;
+		//size_t frec_prima_pos = cola_largo(posiciones);
 
 		unsigned long posAnterior = 0;
 		while (!cola_esta_vacia(posiciones)){
+			size_t b_pos = calcular_B_optimo(p_pos);
 			unsigned long* posActual = cola_desencolar(posiciones);
-			comprimir_IndiceDistanciaPosiciones(buffIndice,   *posActual - posAnterior);
+			size_t distancia = *posActual - posAnterior;
+			comprimir_IndiceDistanciaPosiciones(buffIndice, distancia  , b_pos);
 			posAnterior = *posActual;
 			free(posActual);
+
+			//frec_prima_pos--;
+			//n_prima_pos -= distancia;
+			//if (n_prima_pos > 0)
+			//	p_pos = (float) frec_prima_pos / n_prima_pos;
 		}
 		cola_destruir(posiciones,NULL);
 
@@ -257,7 +290,6 @@ size_t cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t*
 	buffer_reset_contador(buffIndice);
 	*offset = (*offset) + difOffset;
 	if (borrar) lista_destruir(documentos, free);
-	return b;
 }
 
 size_t registro_totales(){
