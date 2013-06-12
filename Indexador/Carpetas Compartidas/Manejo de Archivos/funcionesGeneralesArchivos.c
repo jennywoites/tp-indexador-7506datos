@@ -283,3 +283,17 @@ lista_t* complementarLista(lista_t* org, size_t cant){
 	}
 	return cmpt;
 }
+
+size_t obtenerCantDocumentos(const char* ruta_tamanios, size_t doc){
+	FILE* arch = fopen(ruta_tamanios, lectura_archivos());
+	if (!arch) {
+		return 0;
+	}
+
+	size_t cant;
+	fseek(arch, sizeof(size_t) * (doc-1), SEEK_SET);
+	fread(&cant, sizeof(size_t),1,arch);
+
+	fclose(arch);
+	return cant;
+}

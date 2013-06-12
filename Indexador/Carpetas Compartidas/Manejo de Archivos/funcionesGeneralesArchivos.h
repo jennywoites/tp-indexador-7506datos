@@ -40,4 +40,6 @@ char* __obtenerNombreDoc(const char* paths, const char* offsets,  size_t num);
 
 lista_t* complementarLista(lista_t* org, size_t cant);
 
+size_t obtenerCantDocumentos(const char* ruta_tamanios, size_t doc);
+
 #endif /* FUNCIONESGENERALESARCHIVOS_H_ */
