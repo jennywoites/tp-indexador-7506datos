@@ -22,7 +22,7 @@ int mainDEGOL (){
 
 	//codificador_t* cod = codificador_crear(buff);
 	
-	okGOL(decodificador_decodificarGolomb(decod, 20), 1);
+	/*okGOL(decodificador_decodificarGolomb(decod, 20), 1);
 	okGOL(decodificador_decodificarGolomb(decod, 20), 2);
 	okGOL(decodificador_decodificarGolomb(decod, 20), 3);
 	okGOL(decodificador_decodificarGolomb(decod, 20), 4);
@@ -41,7 +41,7 @@ int mainDEGOL (){
 	okGOL(decodificador_decodificarGolomb(decod, 20), 100);
 	okGOL(decodificador_decodificarGolomb(decod, 20), 18);
 	okGOL(decodificador_decodificarGolomb(decod, 20), 19);
-
+*/
 	debuffer_destruir(decod);
 
 	fclose(file);

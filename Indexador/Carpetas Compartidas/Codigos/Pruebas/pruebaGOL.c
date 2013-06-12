@@ -11,7 +11,7 @@ int mainPruebasGol (){
 
 	//codificador_t* cod = codificador_crear(buff);
 	
-	printf("el 1\n");
+	/*printf("el 1\n");
 	codificador_codificarGolomb(cod, 1, 20);
 	printf("el 2\n");
 	codificador_codificarGolomb(cod, 2, 20);
@@ -49,7 +49,7 @@ int mainPruebasGol (){
 	codificador_codificarGolomb(cod, 18, 20);
 	printf("el 19\n");
 	codificador_codificarGolomb(cod, 19, 20);
-
+*/
 	
 	buffer_rellenar(cod);
 
