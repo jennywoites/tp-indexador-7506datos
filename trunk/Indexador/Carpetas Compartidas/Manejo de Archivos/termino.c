@@ -12,10 +12,9 @@ struct termino{
 	char* termino;
 	size_t offset;
 	size_t frecuencia;
-	size_t b;
 };
 
-termino_t* termino_crear (const char* term, size_t offset, size_t frec, size_t b){
+termino_t* termino_crear (const char* term, size_t offset, size_t frec){
 	if (!term) return NULL;
 
 	termino_t* t = malloc (sizeof(termino_t));
@@ -30,7 +29,6 @@ termino_t* termino_crear (const char* term, size_t offset, size_t frec, size_t b
 	strcpy(t->termino, term);
 	t->offset = offset;
 	t->frecuencia = frec;
-	t->b = b;
 	return t;
 }
 
@@ -77,7 +75,6 @@ termino_t* termino_leer(termino_t* termino_anterior, debuffer_t* debuff_FrontCod
 	size_t dist = descomprimir_LexicoDiferentes(debuff_FrontCoding);
 	size_t off = descomprimir_LexicoOffset(debuff_FrontCoding);
 	size_t frec = descomprimir_FrecuenciaDocumentos(debuff_FrontCoding);
-	size_t b = descomprimir_BGolomb(debuff_FrontCoding);
 
 	if( rep == NO_NUMERO || dist == NO_NUMERO || off == NO_NUMERO || frec == NO_NUMERO )
 		return NULL;
@@ -98,7 +95,7 @@ termino_t* termino_leer(termino_t* termino_anterior, debuffer_t* debuff_FrontCod
 	if (termino_anterior)
 		off_ant = termino_anterior->offset;
 
-	termino_t* t = termino_crear(cad, off + off_ant, frec, b);
+	termino_t* t = termino_crear(cad, off + off_ant, frec);
 	free(cad);
 
 	return t;
@@ -119,13 +116,13 @@ void termino_imprimir(termino_t* termino){
 		return;
 	}
 
-	printf("El termino %s tiene frecuencia %u\n", termino->termino, termino->frecuencia);
+	printf("El termino %s tiene frecuencia %lu\n", termino->termino, termino->frecuencia);
 }
 
-lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, size_t b);
+lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, const char* ruta_tams);
 
 //Si no logro abrir el archivo o la frecuencia del termino es 0, devuelve NULL
-lista_t* termino_decodificarPunteros(termino_t* termino,const char* ruta){
+lista_t* termino_decodificarPunteros(termino_t* termino,const char* ruta, const char* ruta_tams){
 	if (!termino) return NULL;
 	FILE* arch = fopen(ruta, lectura_archivos());
 
@@ -154,49 +151,70 @@ lista_t* termino_decodificarPunteros(termino_t* termino,const char* ruta){
 	fseek(arch, offset_bytes,SEEK_SET); //SEEK_SET offset desde el inicio del archivo
 	debuffer_descartar_bits(debuffer,bits_a_desechar);
 
-	lista_t* listado = obtener_listado(debuffer, frecuencia, termino->b);
+	lista_t* listado = obtener_listado(debuffer, frecuencia, ruta_tams);
 	fclose(arch);
 	debuffer_destruir(debuffer);
 	return listado;
 }
 
-lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, size_t b){
+lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, const char* ruta_tams){
 	if(!debuffer)
 		return NULL;
+
+	float p = (float) cant_documentos / CANT_DOCS;
 
 	lista_t* listado_datos = lista_crear();
 	lista_t* documentos = lista_crear();
 
-	float p = (float)cant_documentos / CANT_DOCS;
-
 	size_t frec_usada = cant_documentos;
-	float p_usada = p;
+	bool complementar = false;
 	if ( p > 0.5){
 		frec_usada = CANT_DOCS - cant_documentos;
-		p_usada = 1-p;
+		complementar = true;
+		p = 1 - p;
 	}
+
+	size_t b = calcular_B_optimo(p);
 
 	size_t num_doc_actual = 0;
 	for (size_t i = 0; i < frec_usada;i++){
-		num_doc_actual += descomprimir_IndiceDistanciaDocumentos(debuffer, b, p_usada);
+		num_doc_actual += descomprimir_IndiceDistanciaDocumentos(debuffer, b);
 		size_t* actual = malloc (sizeof(size_t));
 		*actual = num_doc_actual;
 		lista_insertar_ultimo(documentos,actual );
 	}
 
-	if (p > 0.5){
+	if (complementar){
 		lista_t* cmpt = complementarLista(documentos, CANT_DOCS);
 		lista_destruir(documentos, free);
 		documentos = cmpt;
 	}
 	lista_insertar_primero(listado_datos, documentos);
 
-	for (size_t i = 0; i < cant_documentos; i++){
+	size_t documentos_levantados[lista_largo(documentos)];
+	size_t i = 0;
+	lista_iter_t* iter = lista_iter_crear(documentos);
+	while (!lista_iter_al_final(iter)){
+		size_t* doc = lista_iter_ver_actual(iter);
+		documentos_levantados[i] = *doc;
+		i++;
+		lista_iter_avanzar(iter);
+	}
+	lista_iter_destruir(iter);
+
+
+	for (i = 0; i < cant_documentos; i++){
 		size_t posicion_actual = 0;
 		lista_t* posiciones = lista_crear();
 		size_t cant_posiciones = descomprimir_FrecuenciaPosiciones(debuffer);
+		size_t total_pos = obtenerCantDocumentos(ruta_tams , documentos_levantados[i]);
+		float p_pos = (float) cant_posiciones / total_pos;
+//		printf("posiciones %lu de %lu, p = %f\n", cant_posiciones, total_pos, p_pos);
+//		getchar();
+		size_t b_pos = calcular_B_optimo(p_pos);
+
 		for (size_t j = 0; j < cant_posiciones; j++){
-			posicion_actual += descomprimir_IndiceDistanciaPosiciones(debuffer);
+			posicion_actual += descomprimir_IndiceDistanciaPosiciones(debuffer, b_pos);
 			size_t* valor = malloc (sizeof(size_t));
 			*valor = posicion_actual;
 			lista_insertar_ultimo(posiciones, valor);

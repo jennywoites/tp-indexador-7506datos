@@ -30,7 +30,7 @@ registro_t* registro_leer(FILE*);
 void registro_escribir(FILE*, registro_t*);
 
 /* Escribe un termino en el indice, con un cierto formato. Lo hace con un cierto formato, y no necesariamente imprime cuando le dicen.*/
-void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_t* buffIndice, buffer_t* buffFrontCoding, FILE* archDiferentes, lista_t* documentos, lista_t* posiciones_x_documento, size_t cant_documentos);
+void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_t* buffIndice, buffer_t* buffFrontCoding, FILE* archDiferentes, lista_t* documentos, lista_t* posiciones_x_documento, size_t cant_documentos, const char* ruta_tams);
 
 /* Permite obteneer la cantidad total de registros creados*/
 size_t registro_totales();
