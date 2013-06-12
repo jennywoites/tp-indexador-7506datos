@@ -14,8 +14,8 @@ buscador_t* buscador_crear(const char* rutaFrontCoding, const char* rutaDiferent
 void buscador_destruir(buscador_t*);
 
 //FIXME: esto deberia devolver un solucion_t*, por ahora solo va a imprimir los OK :P
-resultado_t* buscador_buscar(buscador_t* buscador, lista_t* terminos_buscados, const char* dirOffsets);
+resultado_t* buscador_buscar(buscador_t* buscador, lista_t* terminos_buscados, const char* dirOffsets, const char* ruta_tams);
 
-void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const char* index, const char* paths, const char* offsetPaths);
+void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const char* index, const char* paths, const char* offsetPaths, const char* ruta_tams);
 
 #endif /* BUSCADOR_H_ */

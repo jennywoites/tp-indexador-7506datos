@@ -33,15 +33,14 @@ bool guardar_aux(void* a, const char* b, void* c){
 buscador_t* buscador_crear(const char* rutaFrontCoding, const char* rutaDiferentes, size_t cant){
 	buscador_t* b = malloc (sizeof(buscador_t));
 	if (!b) return NULL;
-
+	termino_setearCantDocs(cant);
 	b->almacenador = hash_crear(destructor_terminos);
 	levantador_obtenerContenedorLexico(b->almacenador, guardar_aux, rutaFrontCoding, rutaDiferentes);
 	b->cant_docs = cant;
-	termino_setearCantDocs(cant);
 	return b;
 }
 
-resultado_t* buscador_buscar(buscador_t* buscador, lista_t* terminos_buscados, const char* dirOffsets){
+resultado_t* buscador_buscar(buscador_t* buscador, lista_t* terminos_buscados, const char* dirOffsets, const char* ruta_tams){
 	if (!buscador || !terminos_buscados || lista_largo(terminos_buscados) == 0){
 		return NULL;
 	}
@@ -66,7 +65,7 @@ resultado_t* buscador_buscar(buscador_t* buscador, lista_t* terminos_buscados, c
 	}
 	lista_iter_destruir(iter);
 
-	resultado_t* resul = resultado_crear(vector_terminos, cont, dirOffsets);
+	resultado_t* resul = resultado_crear(vector_terminos, cont, dirOffsets, ruta_tams);
 	free(vector_terminos);
 	return resul;
 }
@@ -78,7 +77,7 @@ void buscador_destruir(buscador_t* busq){
 	free(busq);
 }
 
-void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const char* index, const char* paths, const char* offsetPaths){
+void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const char* index, const char* paths, const char* offsetPaths, const char* ruta_tams){
 	if (!buscador || !termino) return;
 	printf("Busqueda por palabra: %s\n",termino);
 
@@ -88,7 +87,7 @@ void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const c
 		return;
 	}
 
-	lista_t* infoTermino = termino_decodificarPunteros(term, index);
+	lista_t* infoTermino = termino_decodificarPunteros(term, index, ruta_tams);
 
 	lista_t* documentos = lista_borrar_primero(infoTermino);
 	lista_iter_t* iter = lista_iter_crear(documentos);
@@ -100,7 +99,7 @@ void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const c
 		free(nomDoc);
 		lista_t* posiciones = lista_borrar_primero(infoTermino);
 
-		printf("%u veces\n",lista_largo(posiciones));
+		printf("%lu veces\n",lista_largo(posiciones));
 
 		lista_destruir(posiciones, free);
 		lista_iter_avanzar(iter);

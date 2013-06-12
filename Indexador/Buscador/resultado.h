@@ -4,7 +4,7 @@
 
 typedef struct resultado resultado_t;
 
-resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* dirOffsets);
+resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* dirOffsets, const char* ruta_tams);
 
 lista_t* resultado_realizarIntersecciones(resultado_t* resul);
 
