@@ -2,7 +2,6 @@
 #include <stddef.h>
 #include "matematicaEspecial.h"
 #include <stdio.h>
-#include "../TDAs/arbolHuff.h"
 
 struct decodificador{
 	debuffer_t* debuffer;
@@ -89,11 +88,9 @@ unsigned int decodificador_decodificarDelta(debuffer_t* decodificador){
 	return numero;
 }
 
-unsigned int decodificador_decodificarGolomb(debuffer_t* debuffer, size_t b){
+unsigned int decodificador_decodificarGolomb(debuffer_t* debuffer, size_t b, arbol_huff_t* arbol){
 	if ((!debuffer) || (b == 0))
 			return NO_NUMERO;
-
-	arbol_huff_t* arbol = arbol_huff_crear(b);
 
 	if(!arbol)
 		return NO_NUMERO;
@@ -105,8 +102,6 @@ unsigned int decodificador_decodificarGolomb(debuffer_t* debuffer, size_t b){
 	unsigned int q = qmas1 - 1;
 
 	numero = r + 1 + (q * b);
-
-	arbol_huff_destruir(arbol);
 
 	return numero;
 }
