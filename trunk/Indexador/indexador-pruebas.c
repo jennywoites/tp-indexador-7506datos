@@ -10,6 +10,7 @@
 #include "Buscador/resultado.h"
 #include "Buscador/Parseo/parserQuery.h"
 #include "Carpetas Compartidas/TDAs/lista.h"
+#include "Carpetas Compartidas/Codigos/trasbordoCodigo.h"
 
 #include <time.h>
 #include <bits/time.h>
@@ -21,6 +22,7 @@ const char* LEXICO = "lexico.jem";
 const char* DIFERENTES = "diferentes.jem";
 const char* NOMBRE_ARCHIVOS = "archs.jem";
 const char* OFFSET_ARCHIVOS = "offarchs.jem";
+const char* POSICIONES_ARCHIVOS = "cantPosArchs.jem";
 
 
 void print_test(char* name, bool result){
@@ -59,13 +61,13 @@ void buscar(){
 		lista_iter_destruir(iter);
 
 		if (lista_largo(busquedas) > 1){
-			resultado_t* resul = buscador_buscar(busq, busquedas,INDICE);
+			resultado_t* resul = buscador_buscar(busq, busquedas,INDICE,POSICIONES_ARCHIVOS);
 			lista_t* soluciones = resultado_realizarIntersecciones(resul);
 			solucion_emitir(soluciones, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
 			lista_destruir(soluciones, destructor_solucion);
 			resultado_destruir(resul);
 		}else{
-			buscador_busquedaPuntual(busq, (char*)lista_ver_primero(busquedas),INDICE, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
+			buscador_busquedaPuntual(busq, (char*)lista_ver_primero(busquedas),INDICE, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS, POSICIONES_ARCHIVOS);
 		}
 		clock_t tiempo = clock() - tiempo_ini;
 
@@ -93,12 +95,12 @@ void indexar(){
 		return;
 	}
 
-	aux = parserIndex_parsearArchivos(directorio, rutas,cant,SALIDA_PARSER, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
+	aux = parserIndex_parsearArchivos(directorio, rutas,cant,SALIDA_PARSER, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS, POSICIONES_ARCHIVOS);
 
 	if (aux == PARSERINDEX_OK){
 		log_emitir("Paseo Realizado Correctamente", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
 		aux = sorting_ordenarArchivo(SALIDA_PARSER, SALIDA_SORT);
-		indexer_indexar(cant,SALIDA_SORT, INDICE, LEXICO, DIFERENTES);
+		indexer_indexar(cant,SALIDA_SORT, INDICE, LEXICO, DIFERENTES, POSICIONES_ARCHIVOS);
 
 		remove(SALIDA_PARSER);
 		remove(SALIDA_SORT);
@@ -115,6 +117,7 @@ void indexar(){
 
 
 int main (int argc, char** argv){
-	indexar();
+	buscar();
+	destruirTrasbordo();
 	return 0;
 }
