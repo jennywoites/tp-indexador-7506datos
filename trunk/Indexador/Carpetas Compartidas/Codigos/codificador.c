@@ -7,6 +7,7 @@
 #include "../TDAs/lista.h"
 #include <string.h>
 #include "../TDAs/heap.h"
+#include "../TDAs/hash.h"
 
 #define CANT_CHARS 3
 
@@ -76,9 +77,7 @@ void codificador_codificarDelta(buffer_t* cod, unsigned int num){
 }
 
 
-void codificador_codificarBinarioPrefijo(buffer_t* buffer, unsigned int num, size_t b){
-
-	arbol_huff_t* arbol = arbol_huff_crear(b);
+void codificador_codificarBinarioPrefijo(buffer_t* buffer, unsigned int num, size_t b, arbol_huff_t* arbol){
 
 	if(!arbol)
 		return;
@@ -97,11 +96,9 @@ void codificador_codificarBinarioPrefijo(buffer_t* buffer, unsigned int num, siz
 	
 	lista_destruir(lista_bits, free);
 	
-	arbol_huff_destruir(arbol);
-
 }
 
-void codificador_codificarGolomb(buffer_t* buffer, unsigned int num, size_t b){
+void codificador_codificarGolomb(buffer_t* buffer, unsigned int num, size_t b, arbol_huff_t* arbol){
 	if ((b == 0) || (num == 0))
 		return;
 	
@@ -109,7 +106,7 @@ void codificador_codificarGolomb(buffer_t* buffer, unsigned int num, size_t b){
 	unsigned int r = num - (q * b) - 1;
 	
 	codificador_codificarUnario(buffer, q + 1);
-	codificador_codificarBinarioPrefijo(buffer, r, b);
+	codificador_codificarBinarioPrefijo(buffer, r, b, arbol);
 }
 
 
