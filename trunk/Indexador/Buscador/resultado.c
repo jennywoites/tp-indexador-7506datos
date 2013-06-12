@@ -51,7 +51,7 @@ char* __sizeToString(size_t num){
 }
 
 
-resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* dirOffsets){
+resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* dirOffsets, const char* ruta_tams){
 	if (!terminos|| cantidad <= 1 || !dirOffsets)
 		return NULL;
 	resultado_t* resul = malloc (sizeof(resultado_t));
@@ -67,7 +67,7 @@ resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* 
 	for (size_t i = 0; i < cantidad; i++){
 
 		termino_t* actual = terminos[i];
-		lista_t* infoTerminos = termino_decodificarPunteros(actual, dirOffsets);
+		lista_t* infoTerminos = termino_decodificarPunteros(actual, dirOffsets, ruta_tams);
 		if (!infoTerminos){
 			resultado_destruir(resul);
 			return NULL;
