@@ -9,10 +9,10 @@
 void okGOL(unsigned int num1, unsigned int num2){
 	if (num1 != num2)
 		printf("ERROR!!!!!!!!!!!!!!!!!!!!!!, %d y tiro un %d\n", num2, num1);
-	else
-		printf("OK\n");
+	//else
+		//printf("OK\n");
 }
-int mainDEGOL (){
+int mainPruebasDEGol (){
 	//para pruebas, hay que pasarse al fprintf en el buffer.c
 	FILE* file = fopen("gol.jem","r");
 	struct stat st;
@@ -21,6 +21,12 @@ int mainDEGOL (){
 	debuffer_t* decod = debuffer_crear(file, cant_bytes);
 
 	//codificador_t* cod = codificador_crear(buff);
+	
+	arbol_huff_t * a = arbol_huff_crear(394764);
+	for (unsigned int i = 1; i < 4000; i++){
+		okGOL(decodificador_decodificarGolomb(decod, 394764, a), i);
+		i += 7;
+	}
 	
 	/*okGOL(decodificador_decodificarGolomb(decod, 20), 1);
 	okGOL(decodificador_decodificarGolomb(decod, 20), 2);

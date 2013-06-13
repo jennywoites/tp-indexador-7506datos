@@ -1,8 +1,8 @@
 final: compilar construir
-	valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./pruebaDEGOL -h
+	time ./pruebaDEGOL
 	
 compilar: construir
-	gcc -Wall --pedantic --std=c99 buffer.o debuffer.o heap.o decodificador.o lista.o arbolHuff.o matematicaEspecial.o -g pruebaDEGOL.c -o pruebaDEGOL
+	gcc -Wall --pedantic --std=c99 buffer.o debuffer.o heap.o decodificador.o lista.o arbolHuff.o matematicaEspecial.o -lm -g pruebaDEGOL.c -o pruebaDEGOL
 construir:
 	gcc -Wall --pedantic -g --std=c99 -c ../../'Manejo de Archivos'/buffer.c
 	gcc -Wall --pedantic -g --std=c99 -c ../../'Manejo de Archivos'/debuffer.c

@@ -11,6 +11,14 @@ int mainPruebasGol (){
 
 	//codificador_t* cod = codificador_crear(buff);
 	
+	arbol_huff_t * a = arbol_huff_crear(394764);
+	for (unsigned int i = 1; i < 4000; i++){
+		codificador_codificarGolomb(cod, i, 394764, a);
+		i += 7;
+	}
+	
+
+	arbol_huff_destruir(a);
 	/*printf("el 1\n");
 	codificador_codificarGolomb(cod, 1, 20);
 	printf("el 2\n");
