@@ -44,6 +44,11 @@ size_t calcular_B_optimo(float p){
 
 	float b_float = - log(2-p) / log(1-p);
 
+//	if (p>1){
+//		printf("%f \n", log(1-p));
+//		getchar();
+//	}
+
 	size_t b = b_float;
 	if (b < b_float) b++;
 
