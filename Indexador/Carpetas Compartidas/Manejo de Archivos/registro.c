@@ -299,3 +299,7 @@ size_t registro_totales(){
 void registro_aumentarCantidad(){
 	cant_registros++;
 }
+
+void registroImpr(registro_t* r){
+	printf ( "%s %lu %lu\n", r->termino,r->documento, r->posicion);
+}
