@@ -36,4 +36,7 @@ void registro_escribirEnIndice(registro_t* actual, registro_t* anterior, buffer_
 size_t registro_totales();
 
 void registro_aumentarCantidad();
+
+void registroImpr(registro_t* r);
+
 #endif /* REGISTRO_H_ */
