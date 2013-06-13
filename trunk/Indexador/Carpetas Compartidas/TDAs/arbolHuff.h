@@ -8,7 +8,8 @@
 #include "../Manejo de Archivos/buffer.h"
 
 //debe ser mayor a cualquier b
-#define DATO_NULO 100000
+//FIXME: !
+#define DATO_NULO -1
 #define DIR_IZQ 0
 #define DIR_DER 1
 
