@@ -32,9 +32,10 @@ int indexer_indexar(size_t cant_documentos,const char* origen, const char* desti
 	registro_t* registro_anterior = NULL;
 
 	log_emitir("Inicia el Indexado de archivos", LOG_ENTRADA_PROCESO);
-	emitir_impresion("Indexando", 0, 1);
+	
 	unsigned long i = 0;
 	size_t freq = registro_totales() / FRECUENCIA_DE_IMPRESION;
+	//freq = 1000;
 	while (!feof(archOrigen)){
 		if (i %  freq == 0)
 			emitir_impresion("Indexando Terminos y Punteros", i, registro_totales());
