@@ -11,6 +11,7 @@
 #define CANT_ARCHIVOS_SEGUIDOS 10
 #define CANT_REGISTROS_POR_ARCHIVO 20000
 
+//const char* SALIDA_TEMPORAL = "../../../../../../media/OpSys/Debug/tempmerge.jem";	//salida para archivos temporales
 const char* SALIDA_TEMPORAL = "tempmerge.jem";	//salida para archivos temporales
 
 /*Definicion del tipo de datos a guardar dentro del heap para hacer de auxiliar en el merge*/
