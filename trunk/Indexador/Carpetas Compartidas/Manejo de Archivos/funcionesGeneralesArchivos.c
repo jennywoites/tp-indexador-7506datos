@@ -108,8 +108,13 @@ char* __crear_ruta(unsigned int num, unsigned int maximo, const char* salida_tem
 
 	char* ruta = malloc (sizeof(char) * (strlen(salida_temporal) + 1 + cant));
 	char* numeroCadena = numeroToString(num, cant);
-	strcpy(ruta, numeroCadena);
+//	strcpy(ruta, salida_temporal);
 
+//	for (unsigned int i = strlen(salida_temporal); i < (strlen(numeroCadena)+strlen(salida_temporal));i++){
+//		ruta[i] = numeroCadena[i - strlen(salida_temporal)];
+//	}
+		
+	strcpy(ruta, numeroCadena);
 	for (unsigned int i = strlen(numeroCadena); i < (strlen(numeroCadena)+strlen(salida_temporal));i++){
 		ruta[i] = salida_temporal[i - strlen(numeroCadena)];
 	}
@@ -152,9 +157,9 @@ void emitir_impresion(const char* mensaje,size_t num, size_t total){
 		return;
 	}*/
 	system ("exec clear");
-	float porc = ((float) num )/ total;
-	porc *= 100;
-	printf("%s : %f%% Completado \n", mensaje, porc);
+	//float porc = ((float) num )/ total;
+	//porc *= 100;
+	printf("%s : %lu / %lu Completado \n", mensaje, num, total);
 }
 
 bool caracterDeSeparacion(char c){
