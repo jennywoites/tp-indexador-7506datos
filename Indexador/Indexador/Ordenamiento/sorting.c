@@ -7,6 +7,7 @@
 #include "../../Carpetas Compartidas/Log/log.h"
 #include "../Merge/merger.h"
 
+//const char* SALIDA_TEMPORAL_SORT = "../../../../../../media/OpSys/Debug/tempsort.jem";
 const char* SALIDA_TEMPORAL_SORT = "tempsort.jem";
 
 #define SORT_CANT_REGISTROS 2000000
