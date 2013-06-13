@@ -49,18 +49,20 @@ size_t obtenerCantidadDocs(const char* ruta){
 	return c;
 }
 
-void buscar(){
-	printf("Cargando el lexico en memoria, espere un instante\n");
-	size_t cant = obtenerCantidadDocs(INDICE);
-	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES, cant);
-	printf("Cargado el lexico\n");
+void realizar_busqueda(size_t cant, buscador_t* busq){
 
-	while (1){ //por ahora lo cortamos con ctrl+c, luego hago una funcion posta :P
 		printf("Ingrese busqueda\n");
 		char* query = leer_texto();
-		if (strlen(query) == 0){free(query); continue;}
+		if (strlen(query) == 0){
+			free(query);
+			printf("Su busqueda esta vacia. \n");
+			return;
+		}
 
-		if (strcmp(query, "salir") == 0){free(query); break;}
+		if (strcmp(query, "salir") == 0){
+			free(query);
+			return;
+		}
 
 		clock_t tiempo_ini = clock();
 
@@ -88,7 +90,47 @@ void buscar(){
 
 		lista_destruir(busquedas,free);
 		free(query);
+
+}
+
+bool validar_respuesta(int num){
+	return ((num == 1) || (num ==2));
+}
+
+bool continuar_busqueda(){
+	bool valida = false;
+	int num;
+
+	while(!valida){
+		printf("Desea realizar una nueva busqueda? \n");
+		printf("1: Si \n 2: No \n");
+		num = leer_numero();
+		valida = validar_respuesta(num);
+		if(!valida)
+			printf("Su respuesta es incorrecta. Por favor ingrese 1 o 2 \n \n");
 	}
+
+	if (num == 1)
+		return true;
+
+	return false;
+}
+
+void buscar(){
+	printf("Cargando el lexico en memoria, espere un instante\n");
+	size_t cant = obtenerCantidadDocs(INDICE);
+	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES, cant);
+	printf("Cargado el lexico\n");
+
+	bool continuar_buscando = true;
+
+	while(continuar_buscando){
+		realizar_busqueda(cant,busq);
+		continuar_buscando = continuar_busqueda();
+	}
+
+	printf("\n \n \n");
+	printf("Adios!! \n \n");
 	buscador_destruir(busq);
 
 }
