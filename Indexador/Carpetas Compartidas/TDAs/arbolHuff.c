@@ -9,11 +9,13 @@ typedef struct nodo_huff{
 	unsigned int dato;
 	struct nodo_huff* izq;
 	struct nodo_huff* der;
+	struct nodo_huff* padre;
 //	bool valido;
 }nodo_arbol_huff_t;
 
 struct arbol_huff{
 	nodo_arbol_huff_t* raiz;
+	nodo_arbol_huff_t** vector_hojas;
 };
 
 void crear_con_base_de_arbol(arbol_huff_t* arbol, size_t b);
@@ -28,6 +30,12 @@ arbol_huff_t* arbol_huff_crear(size_t b){
 	if (!arbol) return NULL;
 
 	arbol->raiz=NULL;
+
+	arbol->vector_hojas = malloc(sizeof(nodo_arbol_huff_t*)*b);
+	if (!arbol->vector_hojas){
+		free(arbol);
+		return NULL;
+	}
 
 	crear_con_base_de_arbol(arbol,b);
 
@@ -61,10 +69,13 @@ void crear_con_base_de_arbol(arbol_huff_t* arbol, size_t b){
 
 	strcpy(clave, "1");
 
+	nodo_arbol_huff_t* nodo;
 	unsigned int dato;
 	for(unsigned int i=0; i<b;i++){
 		dato = i;
-		heap_encolar(heap, (void*) nodo_arbol_huff_crear(clave,dato));//, true) );
+		nodo = nodo_arbol_huff_crear(clave,dato);
+		heap_encolar(heap, (void*) nodo);//, true) );
+		arbol->vector_hojas[i] = nodo;
 	}
 
 	nodo_arbol_huff_t* nodoIzq;
@@ -131,6 +142,8 @@ nodo_arbol_huff_t* arbol_huff_unir_nodos(nodo_arbol_huff_t* nodoIzq, nodo_arbol_
 
 	nodoUnion->izq = nodoIzq;
 	nodoUnion->der = nodoDer;
+	nodoIzq->padre = nodoUnion;
+	nodoDer->padre = nodoUnion;
 
 	free(claveUnion);
 
@@ -169,6 +182,29 @@ bool encontrar_en_arbol(nodo_arbol_huff_t* nodo, unsigned int num, lista_t* list
 
 }
 
+void encontrar_desde_nodo(arbol_huff_t* arbol,unsigned int num,lista_t* lista){
+
+	nodo_arbol_huff_t* nodo_actual = arbol->vector_hojas[num];
+	nodo_arbol_huff_t* nodo_anterior;
+
+	while(nodo_actual != arbol->raiz){
+		Byte_t* direccion = malloc(sizeof(Byte_t));
+		if(!direccion)
+			return ;
+
+
+		nodo_anterior = nodo_actual;
+		nodo_actual = nodo_actual->padre;
+
+		if(nodo_actual->izq == nodo_anterior)
+			*direccion = DIR_IZQ;
+		else
+			*direccion = DIR_DER;
+
+		lista_insertar_primero(lista,direccion);
+	}
+}
+
 
 lista_t* arbol_huff_obtener_lista_bits(arbol_huff_t* arbol,unsigned int num){
 
@@ -177,7 +213,8 @@ lista_t* arbol_huff_obtener_lista_bits(arbol_huff_t* arbol,unsigned int num){
 	if(!lista)
 		return NULL;
 
-	encontrar_en_arbol(arbol->raiz,num,lista);
+	//encontrar_en_arbol(arbol->raiz,num,lista);
+	encontrar_desde_nodo(arbol,num,lista);
 
 	return lista;
 }
@@ -238,6 +275,8 @@ void arbol_huff_destruir(arbol_huff_t *arbol){
 	free(nodo->clave);
 	//libero la estructura nodo
 	free(nodo);
+	//libero el vector
+	free(arbol->vector_hojas);
 	//libero la estructura arbol
 	free(arbol);
 }
