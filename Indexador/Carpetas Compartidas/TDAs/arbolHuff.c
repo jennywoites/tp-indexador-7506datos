@@ -9,6 +9,7 @@ typedef struct nodo_huff{
 	unsigned int dato;
 	struct nodo_huff* izq;
 	struct nodo_huff* der;
+//	bool valido;
 }nodo_arbol_huff_t;
 
 struct arbol_huff{
@@ -17,7 +18,7 @@ struct arbol_huff{
 
 void crear_con_base_de_arbol(arbol_huff_t* arbol, size_t b);
 nodo_arbol_huff_t* arbol_huff_unir_nodos(nodo_arbol_huff_t* nodoIzq, nodo_arbol_huff_t* nodoDer);
-nodo_arbol_huff_t* nodo_arbol_huff_crear(const char* clave, unsigned int dato);
+nodo_arbol_huff_t* nodo_arbol_huff_crear(const char* clave, unsigned int dato);//, bool valido);
 
 
 //Crea el arbol, asignando las funciones de comparacion y de destruccion
@@ -63,7 +64,7 @@ void crear_con_base_de_arbol(arbol_huff_t* arbol, size_t b){
 	unsigned int dato;
 	for(unsigned int i=0; i<b;i++){
 		dato = i;
-		heap_encolar(heap, (void*) nodo_arbol_huff_crear(clave,dato) );
+		heap_encolar(heap, (void*) nodo_arbol_huff_crear(clave,dato));//, true) );
 	}
 
 	nodo_arbol_huff_t* nodoIzq;
@@ -86,7 +87,7 @@ void crear_con_base_de_arbol(arbol_huff_t* arbol, size_t b){
 
 
 //Crea el nodo con la clave y el dato correspondientes
-nodo_arbol_huff_t* nodo_arbol_huff_crear(const char* clave, unsigned int dato){
+nodo_arbol_huff_t* nodo_arbol_huff_crear(const char* clave, unsigned int dato){//, bool valido){
 	//Pido memoria para la estructura de nodo
 	nodo_arbol_huff_t* nodo = malloc(sizeof(nodo_arbol_huff_t));
 	if (!nodo) return NULL;
@@ -106,6 +107,7 @@ nodo_arbol_huff_t* nodo_arbol_huff_crear(const char* clave, unsigned int dato){
 	//Le copio el dato
 	nodo->dato=dato;
 
+	//nodo->valido=valido;
 	return nodo;
 }
 
@@ -114,18 +116,18 @@ nodo_arbol_huff_t* arbol_huff_unir_nodos(nodo_arbol_huff_t* nodoIzq, nodo_arbol_
 	if(!nodoIzq || !nodoDer)
 		return NULL;
 
-	//FIXME: ojo con esto
 	unsigned int numIzq = atoi(nodoIzq->clave);
 	unsigned int numDer = atoi(nodoDer->clave);
 	unsigned int suma = numIzq + numDer;
 
-	char* claveUnion = malloc(sizeof(char)* 6);
+	//FIXME: ojo con esto
+	char* claveUnion = malloc(sizeof(char)* 12);
 
 	//itoa(suma, claveUnion, 10);
 
 	sprintf(claveUnion,"%u", suma);
 
-	nodo_arbol_huff_t* nodoUnion = nodo_arbol_huff_crear(claveUnion,DATO_NULO);
+	nodo_arbol_huff_t* nodoUnion = nodo_arbol_huff_crear(claveUnion,DATO_NULO);//, false);
 
 	nodoUnion->izq = nodoIzq;
 	nodoUnion->der = nodoDer;
@@ -141,6 +143,7 @@ bool encontrar_en_arbol(nodo_arbol_huff_t* nodo, unsigned int num, lista_t* list
 		return false;
 
 	//printf("encontrar: %u \n",nodo->dato);
+	//if(nodo->valido && nodo->dato == num)
 	if(nodo->dato == num)
 		return true;
 
