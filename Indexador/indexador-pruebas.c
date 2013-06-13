@@ -15,6 +15,17 @@
 #include <time.h>
 #include <bits/time.h>
 
+/*
+const char* SALIDA_PARSER = "../../../../../../media/OpSys/Debug/parser.jem";
+const char* SALIDA_SORT = "../../../../../../media/OpSys/Debug/sort.jem";
+const char* INDICE = "../../../../../../media/OpSys/Debug/indice.jem";
+const char* LEXICO = "../../../../../../media/OpSys/Debug/lexico.jem";
+const char* DIFERENTES = "../../../../../../media/OpSys/Debug/diferentes.jem";
+const char* NOMBRE_ARCHIVOS = "../../../../../../media/OpSys/Debug/archs.jem";
+const char* OFFSET_ARCHIVOS = "../../../../../../media/OpSys/Debug/offarchs.jem";
+const char* POSICIONES_ARCHIVOS = "../../../../../../media/OpSys/Debug/cantPosArchs.jem";
+*/
+
 const char* SALIDA_PARSER = "parser.jem";
 const char* SALIDA_SORT = "sort.jem";
 const char* INDICE = "indice.jem";
@@ -117,7 +128,7 @@ void indexar(){
 
 
 int main (int argc, char** argv){
-	buscar();
+	indexar();
 	destruirTrasbordo();
 	return 0;
 }
