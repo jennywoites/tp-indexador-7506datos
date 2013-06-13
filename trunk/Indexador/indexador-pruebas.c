@@ -103,7 +103,7 @@ bool continuar_busqueda(){
 
 	while(!valida){
 		printf("Desea realizar una nueva busqueda? \n");
-		printf("1: Si \n 2: No \n");
+		printf("1: Si \n2: No \n");
 		num = leer_numero();
 		valida = validar_respuesta(num);
 		if(!valida)
@@ -129,8 +129,7 @@ void buscar(){
 		continuar_buscando = continuar_busqueda();
 	}
 
-	printf("\n \n \n");
-	printf("Adios!! \n \n");
+	printf("\nAdios!! \n \n");
 	buscador_destruir(busq);
 
 }
