@@ -107,7 +107,7 @@ bool continuar_busqueda(){
 		num = leer_numero();
 		valida = validar_respuesta(num);
 		if(!valida)
-			printf("Su respuesta es incorrecta. Por favor ingrese 1 o 2 \n \n");
+			printf("Su respuesta es invalida. Por favor ingrese 1 o 2 \n \n");
 	}
 
 	if (num == 1)
