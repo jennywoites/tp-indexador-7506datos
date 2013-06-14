@@ -123,13 +123,12 @@ char* __crear_ruta(unsigned int num, unsigned int maximo, const char* salida_tem
 	return ruta;
 }
 
-char* __crear_ruta_repo(char* directorio, const char* agregado){
-	char* ruta = malloc (sizeof(char) * (strlen(directorio) + 2 + strlen(agregado)));
+char* __crear_ruta_repo(const char* directorio, const char* agregado){
+	char* ruta = malloc (sizeof(char) * (strlen(directorio) + 2 + strlen(agregado)) );
 	strcpy(ruta, directorio);
 	ruta[strlen(directorio)] = '-';
-	for (unsigned int i = strlen(directorio)+1; i < (strlen(directorio)+strlen(agregado)+2);i++){
+	for (unsigned int i = strlen(directorio)+1; i < (strlen(directorio)+strlen(agregado)+1);i++){
 		ruta[i] = agregado[i - strlen(directorio) - 1];
-		ruta[i+1] =  '\0';
 	}
 	ruta[(strlen(directorio) + 1 + strlen(agregado))] = '\0';
 	return ruta;
