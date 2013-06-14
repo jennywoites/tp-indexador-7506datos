@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int main (){
+int mainF (){
 	char * directorio = malloc(sizeof(char)*10);
 	strcpy(directorio, "hola");
 	
