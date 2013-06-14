@@ -1,0 +1,8 @@
+final: compilar construir
+	./pruebaF
+	
+compilar: construir
+	gcc -Wall --pedantic --std=c99 funcionesGeneralesArchivos.o lista.o -g pruebaF.c -o pruebaF
+construir:
+	gcc -Wall --pedantic -g --std=c99 -c ../funcionesGeneralesArchivos.c
+	gcc -Wall --pedantic -g --std=c99 -c ../../TDAs/lista.c
