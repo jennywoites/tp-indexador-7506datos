@@ -188,14 +188,19 @@ bool caracterPrescindible(char c){
 	 return false;
 	 */
 
-	if (c == '@') return true;
+	if (c >= '0' && c <= '9') return false;
+	if (c >= 'A' && c <= 'Z') return false;
+	return true;
+
+
+	/*if (c == '@') return true;
 	if (c == '&') return true;
 	if (c == '_') return true;
 	if (c < '0') return true;
 	if (c > '9' && c < 'A') return true;
 	if (c > 'Z' && c < 'a') return true;
 	if (c > 'z') return true;
-	return false;
+	return false;*/
 }
 
 char* eliminarCaracteresPrescindibles(char* cadena, bool duplicante){
