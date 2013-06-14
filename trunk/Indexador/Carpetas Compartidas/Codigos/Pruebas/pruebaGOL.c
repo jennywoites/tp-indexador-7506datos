@@ -11,22 +11,23 @@ int mainPruebasGol (){
 
 	//codificador_t* cod = codificador_crear(buff);
 	
-	arbol_huff_t * a = arbol_huff_crear(394764);
-	for (unsigned int i = 1; i < 4000; i++){
-		codificador_codificarGolomb(cod, i, 394764, a);
-		i += 7;
-	}
+	//arbol_huff_t * a = arbol_huff_crear(394764);
+	//for (unsigned int i = 1; i < 4000; i++){
+		//codificador_codificarGolomb(cod, i, 394764, a, NULL);
+		//i += 7;
+	//}
 	
 
-	arbol_huff_destruir(a);
-	/*printf("el 1\n");
+	//arbol_huff_destruir(a);
+	printf("el 1\n");
 	codificador_codificarGolomb(cod, 1, 20);
 	printf("el 2\n");
 	codificador_codificarGolomb(cod, 2, 20);
 	printf("el 3\n");
 	codificador_codificarGolomb(cod, 3, 20);
-	printf("el 4\n");
-	codificador_codificarGolomb(cod, 4, 20);
+	printf("el 24\n");
+	codificador_codificarGolomb(cod, 24, 20);
+	/*
 	printf("el 5\n");
 	codificador_codificarGolomb(cod, 5, 20);
 	printf("el 6\n");

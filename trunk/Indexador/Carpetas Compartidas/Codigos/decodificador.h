@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "../Manejo de Archivos/debuffer.h"
 #include "../TDAs/arbolHuff.h"
+#include "../TDAs/creadorPrefijo.h"
 
 #define NO_NUMERO 0
 
@@ -17,6 +18,6 @@ unsigned int decodificador_decodificarUnario(debuffer_t* decodificador);
 unsigned int decodificador_decodificarBinario(debuffer_t* decodificador, size_t longitud);
 unsigned int decodificador_decodificarGamma(debuffer_t* decodificador);
 unsigned int decodificador_decodificarDelta(debuffer_t* decodificador);
-unsigned int decodificador_decodificarGolomb(debuffer_t* debuffer, size_t b, arbol_huff_t* arbol);
+unsigned int decodificador_decodificarGolomb(debuffer_t* debuffer, size_t b);
 
 #endif /*DECODIFICADOR_H_*/

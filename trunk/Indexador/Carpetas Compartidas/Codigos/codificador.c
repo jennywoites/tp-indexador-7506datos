@@ -6,6 +6,7 @@
 #include "../TDAs/arbolHuff.h"
 #include "../TDAs/lista.h"
 #include <string.h>
+#include <math.h>
 #include "../TDAs/heap.h"
 #include "../TDAs/hash.h"
 
@@ -77,36 +78,38 @@ void codificador_codificarDelta(buffer_t* cod, unsigned int num){
 }
 
 
-void codificador_codificarBinarioPrefijo(buffer_t* buffer, unsigned int num, size_t b, arbol_huff_t* arbol){
-
-	if(!arbol)
-		return;
+void codificador_codificarBinarioPrefijo(buffer_t* buffer, unsigned int num, size_t b){
 	
-	lista_t* lista_bits = arbol_huff_obtener_lista_bits(arbol,num);
-	
-	while(!lista_esta_vacia(lista_bits)){
-		Byte_t* numero = lista_borrar_primero(lista_bits);
-		buffer_escribir_bit(buffer, *numero);
-		//if (*numero == 0)
-			//printf("imprime: 0 \n" );
-		//if (*numero == 1)
-			//printf("imprime: 1 \n" );
-		free(numero);
-	}
-	
-	lista_destruir(lista_bits, free);
+	//lista_t* lista_bits = arbol_huff_obtener_lista_bits(arbol,num);
+//	lista_t* lista_bits = creadorPrefijo_obtener_lista_bits(cp, num);
+//
+//	while(!lista_esta_vacia(lista_bits)){
+//		Byte_t* numero = lista_borrar_primero(lista_bits);
+//		buffer_escribir_bit(buffer, *numero);
+//		//if (*numero == 0)
+//			//printf("imprime: 0 \n" );
+//		//if (*numero == 1)
+//			//printf("imprime: 1 \n" );
+//		free(numero);
+//	}
+//
+//	lista_destruir(lista_bits, free);
 	
 }
 
-void codificador_codificarGolomb(buffer_t* buffer, unsigned int num, size_t b, arbol_huff_t* arbol){
+void codificador_codificarGolomb(buffer_t* buffer, unsigned int num, size_t b){
 	if ((b == 0) || (num == 0))
 		return;
-	
+
 	unsigned int q = (num - 1) / b;
 	unsigned int r = num - (q * b) - 1;
 	
 	codificador_codificarUnario(buffer, q + 1);
-	codificador_codificarBinarioPrefijo(buffer, r, b, arbol);
+
+	float logaritmo = (float) log(b) / log(2);
+	size_t digitos = ceil( logaritmo );
+
+	codificador_codificarBinario (buffer, r, digitos);
 }
 
 
