@@ -201,8 +201,8 @@ void cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t* p
 		p = 1-p;
 	}
 
-	//size_t frec_prima = lista_largo(documentos);
-	//size_t n_prima = cant_docs;
+	size_t frec_prima = lista_largo(documentos);
+	size_t n_prima = cant_docs;
 	float p_prima = p;
 
 	unsigned long docAnterior = 0;
@@ -214,10 +214,13 @@ void cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t* p
 		docAnterior = *docActual;
 		free(docActual);
 
-		//frec_prima--;
-		//n_prima -= distancia;
-		//if (n_prima > 0)
-		//	p_prima = (float) frec_prima / n_prima;
+		frec_prima--;
+		n_prima -= distancia;
+		if (n_prima > 0)
+			p_prima = (float) frec_prima / n_prima;
+		if (p_prima == 1){
+			while(!lista_esta_vacia(documentos)) free(lista_borrar_primero(documentos));
+		}
 	}
 
 	for (size_t i = 0; i < *cantidad; i++){
@@ -228,8 +231,8 @@ void cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t* p
 		float p_pos = (float) cola_largo(posiciones) / cant_posiciones;
 		comprimir_FrecuenciaPosiciones(buffIndice,(unsigned long)cola_largo(posiciones));
 
-		//size_t n_prima_pos = cant_posiciones;
-		//size_t frec_prima_pos = cola_largo(posiciones);
+		size_t n_prima_pos = cant_posiciones;
+		size_t frec_prima_pos = cola_largo(posiciones);
 
 		unsigned long posAnterior = 0;
 		while (!cola_esta_vacia(posiciones)){
@@ -240,10 +243,14 @@ void cerrar_punterosTermino(buffer_t* buffIndice,lista_t* documentos, lista_t* p
 			posAnterior = *posActual;
 			free(posActual);
 
-			//frec_prima_pos--;
-			//n_prima_pos -= distancia;
-			//if (n_prima_pos > 0)
-			//	p_pos = (float) frec_prima_pos / n_prima_pos;
+			frec_prima_pos--;
+			n_prima_pos -= distancia;
+			if (n_prima_pos > 0)
+				p_pos = (float) frec_prima_pos / n_prima_pos;
+			if (p_pos == 1){
+				while(!cola_esta_vacia(posiciones)) free(cola_desencolar(posiciones));
+			}
+
 		}
 		cola_destruir(posiciones,NULL);
 

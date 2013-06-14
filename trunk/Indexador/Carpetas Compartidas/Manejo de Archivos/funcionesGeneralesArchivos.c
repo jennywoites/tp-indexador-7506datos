@@ -188,9 +188,9 @@ bool caracterPrescindible(char c){
 	 return false;
 	 */
 
-	if (c == '@') return false;
-	if (c == '&') return false;
-	if (c == '_') return false;
+	if (c == '@') return true;
+	if (c == '&') return true;
+	if (c == '_') return true;
 	if (c < '0') return true;
 	if (c > '9' && c < 'A') return true;
 	if (c > 'Z' && c < 'a') return true;
