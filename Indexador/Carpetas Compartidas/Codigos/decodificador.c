@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include "matematicaEspecial.h"
 #include <stdio.h>
+#include <math.h>
 
 struct decodificador{
 	debuffer_t* debuffer;
@@ -88,16 +89,17 @@ unsigned int decodificador_decodificarDelta(debuffer_t* decodificador){
 	return numero;
 }
 
-unsigned int decodificador_decodificarGolomb(debuffer_t* debuffer, size_t b, arbol_huff_t* arbol){
+unsigned int decodificador_decodificarGolomb(debuffer_t* debuffer, size_t b){
 	if ((!debuffer) || (b == 0))
 			return NO_NUMERO;
 
-	if(!arbol)
-		return NO_NUMERO;
-
 	unsigned int numero = 0;
 	unsigned int qmas1 = decodificador_decodificarUnario(debuffer);
-	unsigned int r = arbol_huff_obtener_numero(arbol,debuffer);
+
+	float logaritmo = (float) log(b) / log(2);
+	size_t digitos = ceil( logaritmo );
+
+	unsigned int r = decodificador_decodificarBinario (debuffer, digitos);
 
 	unsigned int q = qmas1 - 1;
 

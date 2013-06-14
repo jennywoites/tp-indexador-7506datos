@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "../Manejo de Archivos/buffer.h"
 #include "../TDAs/arbolHuff.h"
+#include "../TDAs/creadorPrefijo.h"
 
 #define CODIGO_UNARIO 0
 #define CODIGO_BINARIO 1
@@ -27,8 +28,8 @@ void codificador_codificarGamma(buffer_t* cod, unsigned int num);
 
 void codificador_codificarDelta(buffer_t* cod, unsigned int num);
 
-void codificador_codificarBinarioPrefijo(buffer_t* cod, unsigned int num, size_t b, arbol_huff_t* arbol);
+void codificador_codificarBinarioPrefijo(buffer_t* cod, unsigned int num, size_t b);
 
-void codificador_codificarGolomb(buffer_t* buffer, unsigned int num, size_t b, arbol_huff_t* arbol);
+void codificador_codificarGolomb(buffer_t* buffer, unsigned int num, size_t b);
 
 #endif /*CODIFICADOR_H_*/

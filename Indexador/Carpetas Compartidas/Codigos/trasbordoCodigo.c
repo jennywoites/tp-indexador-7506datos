@@ -11,8 +11,8 @@ void destructorArbol(void* a){
 }
 
 arbol_huff_t* obtenerArbolito(size_t b, int *borrado){
-	//if (1)
-	//	return arbol_huff_crear(b);
+	return NULL;
+
 	if (!arboles) arboles = hash_crear(destructorArbol);
 	char* clave = malloc (sizeof(char)*50);
 	sprintf(clave,"%lu", b);
@@ -22,9 +22,9 @@ arbol_huff_t* obtenerArbolito(size_t b, int *borrado){
 		arbolito = hash_obtener(arboles, clave);
 	}else{
 		arbolito = arbol_huff_crear(b);
-		if (b < 300) *borrado = 1;
+		if (b < 30) *borrado = 1;
 		else if (b > 20000) *borrado = 1;
-		else if (hash_cantidad(arboles) <= CANT_ALMACENADOS )
+		else// if (hash_cantidad(arboles) <= CANT_ALMACENADOS )
 			hash_guardar(arboles, clave, arbolito);
 	}
 	free(clave);
@@ -41,22 +41,12 @@ void comprimir_FrecuenciaPosiciones(buffer_t* cod, unsigned int num){
 
 void comprimir_IndiceDistanciaDocumentos(buffer_t* cod, unsigned int num, size_t b){
 	//codificador_codificarGamma(cod,num);
-	int borrado;
-//	if(b>10000){
-//		printf("%lu \n", -b);
-//		getchar();
-//	}
-	arbol_huff_t* arbolito = obtenerArbolito(b, &borrado);
-	codificador_codificarGolomb(cod, num, b, arbolito);
-	if (borrado) arbol_huff_destruir(arbolito);
+	codificador_codificarGolomb(cod, num, b);
 }
 
 void comprimir_IndiceDistanciaPosiciones(buffer_t* cod, unsigned int num, size_t b){
 	//codificador_codificarDelta(cod, num);
-	int borrado;
-	arbol_huff_t* arbolito = obtenerArbolito(b, &borrado);
-	codificador_codificarGolomb(cod, num, b, arbolito);
-	if (borrado) arbol_huff_destruir(arbolito);
+	codificador_codificarGolomb(cod, num, b);
 }
 
 void comprimir_LexicoRepetidos(buffer_t* cod, unsigned int num){
@@ -81,19 +71,13 @@ unsigned int descomprimir_FrecuenciaPosiciones(debuffer_t* cod){
 
 unsigned int descomprimir_IndiceDistanciaDocumentos(debuffer_t* cod, size_t b){
 	//return decodificador_decodificarGamma(cod);
-	int borrado;
-	arbol_huff_t* arbolito = obtenerArbolito(b, &borrado);
-	unsigned int devolver = decodificador_decodificarGolomb(cod, b, arbolito);
-	if (borrado) arbol_huff_destruir(arbolito);
+	unsigned int devolver = decodificador_decodificarGolomb(cod, b);
 	return devolver;
 }
 
 unsigned int descomprimir_IndiceDistanciaPosiciones(debuffer_t* cod, size_t b){
 	//return decodificador_decodificarDelta(cod);
-	int borrado;
-	arbol_huff_t* arbolito = obtenerArbolito(b, &borrado);
-	unsigned int devolver = decodificador_decodificarGolomb(cod, b, arbolito);
-	if (borrado) arbol_huff_destruir(arbolito);
+	unsigned int devolver = decodificador_decodificarGolomb(cod, b);
 	return devolver;
 }
 
