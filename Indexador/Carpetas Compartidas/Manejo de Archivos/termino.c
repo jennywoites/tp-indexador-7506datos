@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-#include "../../Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
+#include "funcionesGeneralesArchivos.h"
 #include "../../Carpetas Compartidas/Codigos/trasbordoCodigo.h"
 #include <sys/stat.h>
 
@@ -116,7 +116,7 @@ void termino_imprimir(termino_t* termino){
 		return;
 	}
 
-	printf("El termino %s tiene frecuencia %lu\n", termino->termino, termino->frecuencia);
+	printf("El termino %s tiene frecuencia %u\n", termino->termino, termino->frecuencia);
 }
 
 lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, const char* ruta_tams);
@@ -174,14 +174,31 @@ lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, const cha
 		p = 1 - p;
 	}
 
-	size_t b = calcular_B_optimo(p);
+	float p_prima = p;
+	size_t frec_prima = frec_usada;
+	size_t n_prima = CANT_DOCS;
 
 	size_t num_doc_actual = 0;
 	for (size_t i = 0; i < frec_usada;i++){
-		num_doc_actual += descomprimir_IndiceDistanciaDocumentos(debuffer, b);
+		size_t b = calcular_B_optimo(p_prima);
+
+		size_t distancia = descomprimir_IndiceDistanciaDocumentos(debuffer, b);
+		num_doc_actual += distancia;
 		size_t* actual = malloc (sizeof(size_t));
 		*actual = num_doc_actual;
 		lista_insertar_ultimo(documentos,actual );
+
+		frec_prima--;
+		n_prima -= distancia;
+		if (n_prima > 0) p_prima = (float) frec_prima / n_prima;
+		if (p_prima == 1){
+			for (size_t j = num_doc_actual + 1;j <= CANT_DOCS;j++){
+				actual = malloc (sizeof(size_t));
+				*actual = j;
+				lista_insertar_ultimo(documentos, actual);
+			}
+			break;
+		}
 	}
 
 	if (complementar){
@@ -211,13 +228,30 @@ lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, const cha
 		float p_pos = (float) cant_posiciones / total_pos;
 //		printf("posiciones %lu de %lu, p = %f\n", cant_posiciones, total_pos, p_pos);
 //		getchar();
-		size_t b_pos = calcular_B_optimo(p_pos);
+
+		size_t n_pos_prima = total_pos;
+		size_t frec_pos_prima = cant_posiciones;
 
 		for (size_t j = 0; j < cant_posiciones; j++){
-			posicion_actual += descomprimir_IndiceDistanciaPosiciones(debuffer, b_pos);
+			size_t b_pos = calcular_B_optimo(p_pos);
+			size_t distancia = descomprimir_IndiceDistanciaPosiciones(debuffer, b_pos);
+			posicion_actual += distancia;
 			size_t* valor = malloc (sizeof(size_t));
 			*valor = posicion_actual;
 			lista_insertar_ultimo(posiciones, valor);
+
+			n_pos_prima -= distancia;
+			frec_pos_prima--;
+			if (n_pos_prima > 0) p_pos = (float) frec_pos_prima / n_pos_prima;
+
+			if (p_pos == 1){
+				for (size_t k = posicion_actual + 1; k <= total_pos; k++){
+					size_t* valor = malloc (sizeof(size_t));
+					*valor = k;
+					lista_insertar_ultimo(posiciones, valor);
+				}
+				break;
+			}
 		}
 		lista_insertar_ultimo(listado_datos, posiciones);
 	}

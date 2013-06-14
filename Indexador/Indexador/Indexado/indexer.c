@@ -6,7 +6,7 @@
 #include "../../Carpetas Compartidas/Log/log.h"
 #include "../../Carpetas Compartidas/TDAs/cola.h"
 #define TAM_TERMINO_IMPOSIBLE 200
-#define FRECUENCIA_DE_IMPRESION 1000
+#define FRECUENCIA_DE_IMPRESION 5000
 
 
 //void indexarEntrada(registro_t* actual, registro_t* anterior, FILE* archIndex, FILE* archLexico, unsigned long *frecDoc, unsigned long *frecPos, unsigned long* offset);
