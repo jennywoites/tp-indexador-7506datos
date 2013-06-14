@@ -169,9 +169,9 @@ void emitir_impresion(const char* mensaje,size_t num, size_t total){
 		return;
 	}*/
 	system ("exec clear");
-	//float porc = ((float) num )/ total;
-	//porc *= 100;
-	printf("%s : %lu / %lu Completado \n", mensaje, num, total);
+	float porc = ((float) num )/ total;
+	porc *= 100;
+	printf("%s : %f%% Completado \n", mensaje, porc);
 }
 
 bool caracterDeSeparacion(char c){
