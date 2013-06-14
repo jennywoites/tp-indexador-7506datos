@@ -11,7 +11,9 @@
 #include "Buscador/resultado.h"
 #include "Buscador/Parseo/parserQuery.h"
 #include "Carpetas Compartidas/TDAs/lista.h"
+#include "Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
 #include "Carpetas Compartidas/Codigos/trasbordoCodigo.h"
+#include "Carpetas Compartidas/Compresion/zippeador.h"
 
 #include <time.h>
 #include <bits/time.h>
@@ -19,29 +21,24 @@
 #define OPC_INDEXAR 1
 #define OPC_BUSCAR 2
 #define OPC_ERROR -1
-#define RUTA_DEFAULT "Textos_ejemplo_parseo"
 #define OPC_IMPRIMIR_AYUDA 3
 #define OPC_IMPRIMIR_VERSION 4
 
-/*
-const char* SALIDA_PARSER = "../../../../../../media/OpSys/Debug/parser.jem";
-const char* SALIDA_SORT = "../../../../../../media/OpSys/Debug/sort.jem";
-const char* INDICE = "../../../../../../media/OpSys/Debug/indice.jem";
-const char* LEXICO = "../../../../../../media/OpSys/Debug/lexico.jem";
-const char* DIFERENTES = "../../../../../../media/OpSys/Debug/diferentes.jem";
-const char* NOMBRE_ARCHIVOS = "../../../../../../media/OpSys/Debug/archs.jem";
-const char* OFFSET_ARCHIVOS = "../../../../../../media/OpSys/Debug/offarchs.jem";
-const char* POSICIONES_ARCHIVOS = "../../../../../../media/OpSys/Debug/cantPosArchs.jem";
-*/
+#define RUTA_DEFAULT "EL_REPO"
 
 const char* SALIDA_PARSER = "parser.jem";
 const char* SALIDA_SORT = "sort.jem";
-const char* INDICE = "indice.jem";
-const char* LEXICO = "lexico.jem";
-const char* DIFERENTES = "diferentes.jem";
-const char* NOMBRE_ARCHIVOS = "archs.jem";
-const char* OFFSET_ARCHIVOS = "offarchs.jem";
-const char* POSICIONES_ARCHIVOS = "cantPosArchs.jem";
+
+const char* TEMP[] = {"indiceTEMP.jem","lexicoTEMP.jem" ,"diferentesTEMP.jem", "archsTEMP.jem", "offarchsTEMP.jem", "cantPosArchsTEMP.jem"};
+#define CANT_RUTAS_NECESARIAS 6
+const char* DEFINITIVOS[] = {"indice.jem","lexico.jem" ,"diferentes.jem", "archs.jem", "offarchs.jem", "cantPosArchs.jem"};
+
+#define RUTA_INDICE 0
+#define RUTA_LEXICO 1
+#define RUTA_DIFERENTES 2
+#define RUTA_PATHS 3
+#define RUTA_OFFSET_ARCHS 4
+#define RUTA_POS_X_ARCH 5
 
 
 void print_test(char* name, bool result){
@@ -57,54 +54,45 @@ size_t obtenerCantidadDocs(const char* ruta){
 	return c;
 }
 
-void definir_nombres_archivos(char* directorio,char* indice,char* lexico,char* diferentes){
-	indice = __crear_ruta_repo(directorio, "INDICE");
-	lexico = __crear_ruta_repo(directorio, "LEXICO");
-	diferentes = __crear_ruta_repo(directorio, "DIFERENTES");
+char** definir_nombres_archivos(const char* repositorio, const char** rutas_agregados ){
+	char** elv = malloc (sizeof(char*) * CANT_RUTAS_NECESARIAS);
+	for (size_t i = 0; i < CANT_RUTAS_NECESARIAS; i++){
+		elv[i] = __crear_ruta_repo(repositorio, rutas_agregados[i]);
+	}
+	return elv;
 }
 
-
-void realizar_busqueda(size_t cant, buscador_t* busq){
-
-		printf("Ingrese busqueda\n");
-		char* query = leer_texto();
-		if (strlen(query) == 0){
-			free(query);
-			printf("Su busqueda esta vacia. \n");
-			return;
-		}
-
-		if (strcmp(query, "salir") == 0){
-			free(query);
-			return;
-		}
-
-		clock_t tiempo_ini = clock();
-
-		lista_t* busquedas = parserQuery_parsearConsulta(query);
-		lista_iter_t* iter = lista_iter_crear(busquedas);
-		while (!lista_iter_al_final(iter)){
-			printf("%s\n", (char*)lista_iter_ver_actual(iter));
-			lista_iter_avanzar(iter);}
-		lista_iter_destruir(iter);
-
-		if (lista_largo(busquedas) > 1){
-			resultado_t* resul = buscador_buscar(busq, busquedas,INDICE,POSICIONES_ARCHIVOS);
-			lista_t* soluciones = resultado_realizarIntersecciones(resul);
-			solucion_emitir(soluciones, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS);
-			lista_destruir(soluciones, destructor_solucion);
-			resultado_destruir(resul);
-		}else{
-			buscador_busquedaPuntual(busq, (char*)lista_ver_primero(busquedas),INDICE, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS, POSICIONES_ARCHIVOS);
-		}
-		clock_t tiempo = clock() - tiempo_ini;
-
-		float segsTot = (float) tiempo / CLOCKS_PER_SEC;
-
-		printf("Tiempo de busqueda: %f segundos\n", segsTot);
-
-		lista_destruir(busquedas,free);
+void realizar_busqueda(size_t cant, buscador_t* busq, char** salidas){
+	printf("Ingrese Consulta:\n");
+	char* query = leer_texto();
+	if (strlen(query) == 0){
 		free(query);
+		printf("Su Consulta no tiene terminos relevantes. \n");
+		return;
+	}
+
+	clock_t tiempo_ini = clock();
+
+	lista_t* busquedas = parserQuery_parsearConsulta(query);
+
+	if (lista_largo(busquedas) > 1){
+		resultado_t* resul = buscador_buscar(busq, busquedas,salidas[RUTA_INDICE], salidas[RUTA_POS_X_ARCH]);
+
+		lista_t* soluciones = resultado_realizarIntersecciones(resul);
+		solucion_emitir(soluciones, salidas[RUTA_PATHS], salidas[RUTA_OFFSET_ARCHS]);
+		lista_destruir(soluciones, destructor_solucion);
+		resultado_destruir(resul);
+	}else{
+		buscador_busquedaPuntual(busq, (char*)lista_ver_primero(busquedas),salidas[RUTA_INDICE], salidas[RUTA_PATHS], salidas[RUTA_OFFSET_ARCHS], salidas[RUTA_POS_X_ARCH]);
+	}
+	clock_t tiempo = clock() - tiempo_ini;
+
+	float segsTot = (float) tiempo / CLOCKS_PER_SEC;
+
+	printf("Tiempo de busqueda: %f segundos\n", segsTot);
+
+	lista_destruir(busquedas,free);
+	free(query);
 
 }
 
@@ -131,27 +119,44 @@ bool continuar_busqueda(){
 	return false;
 }
 
-void buscar(char* directorio){
+void buscar(const char* directorio, const char* repositorio){
 	printf("Cargando el lexico en memoria, espere un instante\n");
-	size_t cant = obtenerCantidadDocs(INDICE);
-	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES, cant);
+
+	char** salidas_def = definir_nombres_archivos(repositorio, DEFINITIVOS);
+	char** salidas_temp = definir_nombres_archivos(repositorio, TEMP);
+
+	for (size_t i = 0; i < CANT_RUTAS_NECESARIAS; i++){
+		zippeador_descomprimir(salidas_def[i], salidas_temp[i]);
+		free(salidas_def[i]);
+	}
+	free(salidas_def);
+
+	size_t cant = obtenerCantidadDocs(salidas_temp[RUTA_INDICE]);
+	buscador_t* busq = buscador_crear(salidas_temp[RUTA_LEXICO],salidas_temp[RUTA_DIFERENTES], cant);
 	printf("Cargado el lexico\n");
 
 	bool continuar_buscando = true;
 
 	while(continuar_buscando){
-		realizar_busqueda(cant,busq);
+		realizar_busqueda(cant,busq,  salidas_temp);
 		continuar_buscando = continuar_busqueda();
 	}
 
 	printf("\nAdios!! \n \n");
 	buscador_destruir(busq);
 
+	for (size_t i = 0; i < CANT_RUTAS_NECESARIAS; i++){
+		remove(salidas_temp[i]);
+		free(salidas_temp[i]);
+	}
+	free(salidas_temp);
 }
 
-void indexar(char* directorio){
+void indexar(const char* directorio,const char* repositorio){
 	char** rutas;
 	unsigned long cant;
+
+	char **salidas = definir_nombres_archivos(repositorio, TEMP);
 
 	int aux = parserIndex_obtenerRutasDirectorios(directorio, &rutas, &cant);
 
@@ -160,12 +165,12 @@ void indexar(char* directorio){
 		return;
 	}
 
-	aux = parserIndex_parsearArchivos(directorio, rutas,cant,SALIDA_PARSER, NOMBRE_ARCHIVOS, OFFSET_ARCHIVOS, POSICIONES_ARCHIVOS);
+	aux = parserIndex_parsearArchivos(directorio, rutas,cant,SALIDA_PARSER, salidas[RUTA_PATHS], salidas[RUTA_OFFSET_ARCHS], salidas[RUTA_POS_X_ARCH]);
 
 	if (aux == PARSERINDEX_OK){
 		log_emitir("Paseo Realizado Correctamente", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
 		aux = sorting_ordenarArchivo(SALIDA_PARSER, SALIDA_SORT);
-		indexer_indexar(cant,SALIDA_SORT, INDICE, LEXICO, DIFERENTES, POSICIONES_ARCHIVOS);
+		indexer_indexar(cant,SALIDA_SORT, salidas[RUTA_INDICE], salidas[RUTA_LEXICO], salidas[RUTA_DIFERENTES], salidas[RUTA_POS_X_ARCH]);
 
 		remove(SALIDA_PARSER);
 		remove(SALIDA_SORT);
@@ -178,6 +183,18 @@ void indexar(char* directorio){
 	}
 	free(rutas);
 	log_emitir("Se termino de Indexar los documentos", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
+
+
+	char** salidas_def = definir_nombres_archivos(repositorio, DEFINITIVOS);
+
+	for (size_t i = 0; i < CANT_RUTAS_NECESARIAS; i++){
+		zippeador_comprimir(salidas[i], salidas_def[i]);
+		remove(salidas[i]);
+		free(salidas[i]);
+		free(salidas_def[i]);
+	}
+	free(salidas);
+	free(salidas_def);
 }
 
 void imprimir_ayuda(){
@@ -198,7 +215,7 @@ void imprimir_version(){
 	fprintf(stdout," BUCHWALD, Martin Ezequiel (93155) \n GENENDER PEÑA, Ezequiel David (93163) \n WOITES, Jennifer Andrea (93274) \n");
 }
 
-int obtener_parametros(int argc,char* argv[],char** ruta_directorio){
+int obtener_parametros(int argc,char* argv[],char** ruta_directorio, char** repo){
 
 	int opcion = OPC_INDEXAR;//opcion default
 
@@ -207,21 +224,22 @@ int obtener_parametros(int argc,char* argv[],char** ruta_directorio){
 	//struct de lineas de comando
 	struct option opciones[]={
 		{"help",no_argument,NULL,'h'},//pos0
-		{"version",no_argument,NULL,'V'},//pos1
+		{"version",no_argument,NULL,'v'},//pos1
 		{"indexar",no_argument,NULL,'i'},//pos2
 		{"buscar",no_argument,NULL,'b'},//pos3
-		{"ruta_directorio",required_argument,NULL,'r'},//pos4
+		{"ruta_directorio",required_argument,NULL,'d'},//pos4
+		{"repositorio",required_argument,NULL,'r'},//pos5
 		{0,0,0,0}
 	};
 
 	char caracter;
 
 	//mientras haya opciones las lee y las procesa
-	while ((caracter = (getopt_long(argc,argv,"hVibr:",opciones,NULL)))!=-1){
+	while ((caracter = (getopt_long(argc,argv,"hvibd:r:",opciones,NULL)))!=-1){
 		switch(caracter){
 			case 'h'://help
 				return OPC_IMPRIMIR_AYUDA;
-			case 'V'://Version
+			case 'v'://Version
 				return OPC_IMPRIMIR_VERSION;
 			case 'i'://indexar
 				opcion = OPC_INDEXAR;
@@ -229,9 +247,13 @@ int obtener_parametros(int argc,char* argv[],char** ruta_directorio){
 			case 'b'://buscar
 				opcion = OPC_BUSCAR;
 				break;
-			case 'r'://ruta directorio
+			case 'd'://ruta directorio
 				if (strcmp(optarg,"-")!=0) //si son distintos
 					*ruta_directorio = optarg;
+				break;
+			case 'r':
+				if (strcmp(optarg,"-")!=0) //si son distintos
+					*repo = optarg;
 				break;
 			case '?'://error
 				return OPC_ERROR;
@@ -246,16 +268,19 @@ int main (int argc, char** argv){
 	int opcion; //guarda el modo del programa
 
 	char* directorio = NULL;
+	char* repositorio = NULL;
 
-	opcion = obtener_parametros(argc,argv,&directorio);
+	opcion = obtener_parametros(argc,argv,&directorio, &repositorio);
+
+	if (!repositorio || !directorio) return 1;
 
 	switch (opcion){
 		case OPC_INDEXAR:
-			indexar(directorio);
+			indexar(directorio, repositorio);
 			//destruirTrasbordo(directorio);
 			break;
 		case OPC_BUSCAR:
-			buscar(directorio);
+			buscar(directorio, repositorio);
 			//destruirTrasbordo(directorio);
 			break;
 		case OPC_IMPRIMIR_AYUDA:

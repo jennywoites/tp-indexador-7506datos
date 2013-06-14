@@ -41,7 +41,6 @@ int filtro (struct dirent* d){
 int parserIndex_obtenerRutasDirectorios(const char* directorio, char*** rutas, unsigned long* cant){
 	struct dirent** directorios = NULL;
 
-
 	(*cant) = scandir(directorio, &directorios, filtro, NULL);
 	//El tercer campo es una funcion de filtro que si devuelve 0, hara que se ignore
 	//el directorio/archivo leido. El cuarto campo es una funcion de ordenamiento
@@ -128,9 +127,9 @@ void tratarPalabra(char* palabra, unsigned long doc, unsigned long pos, FILE* sa
 }
 
 
-int comprimirNombres(char* directorio, char** rutas_archivos, unsigned long cant, const char* salida, const char* offset, size_t* tamanios, const char* ruta_tam);
+int comprimirNombres(const char* directorio, char** rutas_archivos, unsigned long cant, const char* salida, const char* offset, size_t* tamanios, const char* ruta_tam);
 
-int parserIndex_parsearArchivos(char* directorio, char** rutas_archivos, unsigned long num, const char* ruta_salida, const char* salida_nombres, const char* offset_archivos, const char* rutas_tamanios){
+int parserIndex_parsearArchivos(const char* directorio, char** rutas_archivos, unsigned long num, const char* ruta_salida, const char* salida_nombres, const char* offset_archivos, const char* rutas_tamanios){
 	if (num == 0) return PARSERINDEX_OK;
 
 	FILE* arch = fopen(ruta_salida, escritura_archivos());
@@ -153,7 +152,7 @@ int parserIndex_parsearArchivos(char* directorio, char** rutas_archivos, unsigne
 	return PARSERINDEX_ERROR;
 }
 
-int comprimirNombres(char* directorio, char** rutas_archivos, unsigned long cant, const char* salida, const char* offset, size_t* tamanios, const char* ruta_tam){
+int comprimirNombres(const char* directorio, char** rutas_archivos, unsigned long cant, const char* salida, const char* offset, size_t* tamanios, const char* ruta_tam){
 	//Por ahora solo los imprimo de cabeza:
 	FILE* nombres = fopen(salida, escritura_archivos());
 	FILE* offsets = fopen(offset, escritura_archivos());
