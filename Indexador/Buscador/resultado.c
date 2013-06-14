@@ -207,23 +207,36 @@ lista_t* resultado_realizarIntersecciones(resultado_t* resul){
 	return soluciones;
 }
 
+int comparacionDeSoluciones(const void* a,const void* b){
+	solucion_t* s1 = (solucion_t*) a;
+	solucion_t* s2 = (solucion_t*) b;
+	return s1->cant - s2->cant;
+}
 
 void solucion_emitir(lista_t* soluciones, const char* paths, const char* offsets){
 	if (lista_largo(soluciones) == 0){
 		printf ("No se encontro la frase buscada\n");
 		return;
 	}
-	printf("La frase buscada se encontro en %u documentos\n", lista_largo(soluciones));
+
+	printf("La frase buscada se encontro en %lu documentos\n", lista_largo(soluciones));
 	printf("Los documentos fueron:\n");
+	heap_t* heap = heap_crear(comparacionDeSoluciones);
 	lista_iter_t* iter = lista_iter_crear(soluciones);
 	while (!lista_iter_al_final(iter)){
 		solucion_t* solucion = lista_iter_ver_actual(iter);
-		char* nombre_doc = __obtenerNombreDoc(paths, offsets, solucion->doc);
-		printf("En %s se encontro la frase %u veces\n", nombre_doc, solucion->cant);
-		free(nombre_doc);
+		heap_encolar(heap, solucion);
 		lista_iter_avanzar(iter);
 	}
 	lista_iter_destruir(iter);
+
+	while (!heap_esta_vacio(heap)){
+		solucion_t* solucion = heap_desencolar(heap);
+		char* nombre_doc = __obtenerNombreDoc(paths, offsets, solucion->doc);
+		printf("En %s se encontro la frase %lu veces\n", nombre_doc, solucion->cant);
+		free(nombre_doc);
+	}
+	heap_destruir(heap, NULL);
 }
 
 void destructor_solucion(void* a){
@@ -240,3 +253,4 @@ void resultado_destruir(resultado_t* resul){
 	free(resul->hashes_terminos);
 	free(resul);
 }
+
