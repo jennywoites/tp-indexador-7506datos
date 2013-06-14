@@ -6,6 +6,7 @@
 #include "Carpetas Compartidas/interaccion.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <getopt.h>
 #include "Buscador/buscador.h"
 #include "Buscador/resultado.h"
 #include "Buscador/Parseo/parserQuery.h"
@@ -14,6 +15,13 @@
 
 #include <time.h>
 #include <bits/time.h>
+
+#define OPC_INDEXAR 1
+#define OPC_BUSCAR 2
+#define OPC_ERROR -1
+#define RUTA_DEFAULT "Textos_ejemplo_parseo"
+#define OPC_IMPRIMIR_AYUDA 3
+#define OPC_IMPRIMIR_VERSION 4
 
 /*
 const char* SALIDA_PARSER = "../../../../../../media/OpSys/Debug/parser.jem";
@@ -48,6 +56,13 @@ size_t obtenerCantidadDocs(const char* ruta){
 	fclose(arch);
 	return c;
 }
+
+void definir_nombres_archivos(char* directorio,char* indice,char* lexico,char* diferentes){
+	indice = __crear_ruta_repo(directorio, "INDICE");
+	lexico = __crear_ruta_repo(directorio, "LEXICO");
+	diferentes = __crear_ruta_repo(directorio, "DIFERENTES");
+}
+
 
 void realizar_busqueda(size_t cant, buscador_t* busq){
 
@@ -116,7 +131,7 @@ bool continuar_busqueda(){
 	return false;
 }
 
-void buscar(){
+void buscar(char* directorio){
 	printf("Cargando el lexico en memoria, espere un instante\n");
 	size_t cant = obtenerCantidadDocs(INDICE);
 	buscador_t* busq = buscador_crear(LEXICO,DIFERENTES, cant);
@@ -134,11 +149,9 @@ void buscar(){
 
 }
 
-void indexar(){
+void indexar(char* directorio){
 	char** rutas;
 	unsigned long cant;
-
-	const char* directorio = "Textos_ejemplo_parseo";
 
 	int aux = parserIndex_obtenerRutasDirectorios(directorio, &rutas, &cant);
 
@@ -167,9 +180,94 @@ void indexar(){
 	log_emitir("Se termino de Indexar los documentos", LOG_ENTRADA_INFORMATIVA_IMPORTANTE);
 }
 
+void imprimir_ayuda(){
+	fprintf(stdout,"OPCIONES \n");
+	fprintf(stdout,"-h --Imprime en pantalla informacion de Ayuda. \n");
+	fprintf(stdout,"-V --Imprime la versión del programa. \n");
+	fprintf(stdout,"-i --Indexa un repositorio. Es la opcion por defecto. \n");
+	fprintf(stdout,"-b --Busca una frase en un repositorio. \n");
+	fprintf(stdout,"-r --Ruta del repositorio. \n");
+}
+
+//imprime la version del programa al stdout
+void imprimir_version(){
+	fprintf(stdout,"Trabajo Practico - Organizacion de Datos \n");
+	fprintf(stdout,"Indexador - Buscador \n");
+	fprintf(stdout,"Primer Cuatrimestre - 2013 \n");
+	fprintf(stdout,"Grupo: 5 \n");
+	fprintf(stdout," BUCHWALD, Martin Ezequiel (93155) \n GENENDER PEÑA, Ezequiel David (93163) \n WOITES, Jennifer Andrea (93274) \n");
+}
+
+int obtener_parametros(int argc,char* argv[],char** ruta_directorio){
+
+	int opcion = OPC_INDEXAR;//opcion default
+
+	*ruta_directorio = RUTA_DEFAULT; //directorio default
+
+	//struct de lineas de comando
+	struct option opciones[]={
+		{"help",no_argument,NULL,'h'},//pos0
+		{"version",no_argument,NULL,'V'},//pos1
+		{"indexar",no_argument,NULL,'i'},//pos2
+		{"buscar",no_argument,NULL,'b'},//pos3
+		{"ruta_directorio",required_argument,NULL,'r'},//pos4
+		{0,0,0,0}
+	};
+
+	char caracter;
+
+	//mientras haya opciones las lee y las procesa
+	while ((caracter = (getopt_long(argc,argv,"hVibr:",opciones,NULL)))!=-1){
+		switch(caracter){
+			case 'h'://help
+				return OPC_IMPRIMIR_AYUDA;
+			case 'V'://Version
+				return OPC_IMPRIMIR_VERSION;
+			case 'i'://indexar
+				opcion = OPC_INDEXAR;
+				break;
+			case 'b'://buscar
+				opcion = OPC_BUSCAR;
+				break;
+			case 'r'://ruta directorio
+				if (strcmp(optarg,"-")!=0) //si son distintos
+					*ruta_directorio = optarg;
+				break;
+			case '?'://error
+				return OPC_ERROR;
+		}
+	}
+	return opcion;
+}
+
 
 int main (int argc, char** argv){
-	indexar();
-	destruirTrasbordo();
+
+	int opcion; //guarda el modo del programa
+
+	char* directorio = NULL;
+
+	opcion = obtener_parametros(argc,argv,&directorio);
+
+	switch (opcion){
+		case OPC_INDEXAR:
+			indexar(directorio);
+			//destruirTrasbordo(directorio);
+			break;
+		case OPC_BUSCAR:
+			buscar(directorio);
+			//destruirTrasbordo(directorio);
+			break;
+		case OPC_IMPRIMIR_AYUDA:
+			imprimir_ayuda();
+			break;
+		case OPC_IMPRIMIR_VERSION:
+			imprimir_version();
+			break;
+		case OPC_ERROR:
+			fprintf(stderr,"Parametros no validos. Intente nuevamente \n");
+			break;
+	}
+
 	return 0;
 }
