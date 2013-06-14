@@ -23,6 +23,8 @@ char* obtenerLinea(FILE* archivo);
  * y un numero maximo de archivos temporales a crear*/
 char* __crear_ruta(unsigned int num, unsigned int maximo, const char* salida_temporal);
 
+char* __crear_ruta_repo(char* directorio, const char* agregado);
+
 /* Realiza impresiones para mejorar la 'experiencia del usuario'*/
 void emitir_impresion(const char* mensaje,size_t num, size_t total);
 
