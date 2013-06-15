@@ -93,7 +93,8 @@ resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* 
 }
 
 lista_t* obtenerAparicionDocumentos (resultado_t* resul){
-
+	if (!resul) return NULL;
+	
 	lista_t* interseccion = lista_crear();
 	hash_iter_t* iter = hash_iter_crear(resul->hashes_terminos[0]->hash);
 	size_t i = 1;

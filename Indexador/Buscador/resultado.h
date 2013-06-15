@@ -10,6 +10,8 @@ lista_t* resultado_realizarIntersecciones(resultado_t* resul);
 
 void solucion_emitir(lista_t* soluciones, const char* paths, const char* offsets);
 
+lista_t* obtenerAparicionDocumentos (resultado_t* resul);
+
 void resultado_destruir(resultado_t* resul);
 
 void destructor_solucion(void* a);

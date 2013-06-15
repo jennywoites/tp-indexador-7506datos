@@ -245,7 +245,7 @@ void buscador_busquedaImperfecta(buscador_t* buscador, lista_t* query, const cha
 
 
 	if (heap_cantidad(heap) == 0){
-		printf("No se encontraron soluciones simialres de calidad minima %f\n", IMPORTANCIA_MINIMA);
+		printf("No se encontraron soluciones similares de calidad minima %f\n", IMPORTANCIA_MINIMA);
 		heap_destruir(heap, NULL);
 		return;
 	}
