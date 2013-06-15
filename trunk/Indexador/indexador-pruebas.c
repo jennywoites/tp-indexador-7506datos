@@ -205,6 +205,7 @@ void imprimir_ayuda(){
 	fprintf(stdout,"-h --Imprime en pantalla informacion de Ayuda. \n");
 	fprintf(stdout,"-V --Imprime la versión del programa. \n");
 	fprintf(stdout,"-i --Indexa un repositorio. Es la opcion por defecto. \n");
+	fprintf(stdout,"-p --Indicar al buscador que se desea obtener resultados inexactos \n");
 	fprintf(stdout,"-b --Busca una frase en un repositorio. \n");
 	fprintf(stdout,"-r --Ruta del repositorio. \n");
 }
@@ -281,7 +282,9 @@ int main (int argc, char** argv){
 
 	opcion = obtener_parametros(argc,argv,&directorio, &repositorio, &imperfectas);
 
-	if (!repositorio || !directorio) return 1;
+	if (!repositorio && (opcion == OPC_INDEXAR || opcion == OPC_BUSCAR)) return 1;
+	if (!directorio && opcion == OPC_INDEXAR) return 1;
+
 
 	switch (opcion){
 		case OPC_INDEXAR:
