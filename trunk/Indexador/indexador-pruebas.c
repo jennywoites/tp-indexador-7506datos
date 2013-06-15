@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <getopt.h>
+#include <dirent.h>
 #include "Buscador/buscador.h"
 #include "Buscador/resultado.h"
 #include "Buscador/Parseo/parserQuery.h"
@@ -28,8 +29,6 @@
 
 #define RUTA_DEFAULT "EL_REPO"
 #define REPO_DEFAULT "Repo"
-
-#define RUTA_DEFAULT "EL_REPO"
 
 const char* SALIDA_PARSER = "parser.jem";
 const char* SALIDA_SORT = "sort.jem";
@@ -160,9 +159,24 @@ bool continuar_busqueda(){
 }
 
 void buscar(const char* directorio, const char* repositorio, bool permitirImperfectas, size_t opcion_busqueda){
+	char** salidas_def = definir_nombres_archivos(repositorio, DEFINITIVOS);
+	bool correcto = true;
+	for (size_t i = 0; i < CANT_RUTAS_NECESARIAS && correcto; i++){
+		FILE* aux = fopen(salidas_def[i], "r");
+		if (!aux) correcto = false;
+		else fclose(aux);
+	}
+
+	if (!correcto){
+		for (size_t i = 0; i < CANT_RUTAS_NECESARIAS; i++)
+			free(salidas_def[i]);
+		free(salidas_def);
+		printf("No se puede realizar la busqueda pues no se encuentran todos los archivos necesarios\n");
+		return;
+	}
+
 	printf("Cargando el lexico en memoria, espere un instante\n");
 
-	char** salidas_def = definir_nombres_archivos(repositorio, DEFINITIVOS);
 	char** salidas_temp = definir_nombres_archivos(repositorio, TEMP);
 
 	for (size_t i = 0; i < CANT_RUTAS_NECESARIAS; i++){
@@ -193,9 +207,33 @@ void buscar(const char* directorio, const char* repositorio, bool permitirImperf
 	destruccionCache();
 }
 
+int filtro_aux (struct dirent* d){
+	if (strcmp(d->d_name, ".") == 0 || strcmp(d->d_name, "..") == 0) return 0;
+
+	//Por ahora, a los sub-directorios los descartamos (y cualquier cosa que no sea un archivo)
+	return 1;
+}
+
+
+
+bool existeDirectorio(const char* directorio){
+	struct dirent** directorios = NULL;
+	int valor;
+	valor = scandir(directorio, &directorios, filtro_aux, NULL);
+	for (int i = 0; i < valor; i++)
+		free(directorios[i]);
+	free(directorios);
+	return valor != -1;
+}
+
 void indexar(const char* directorio,const char* repositorio){
 	char** rutas;
 	unsigned long cant;
+
+	if (!existeDirectorio(directorio)){
+		printf("No se puede indexar dado que no existe el directorio indicado\n");
+		return;
+	}
 
 	char **salidas = definir_nombres_archivos(repositorio, TEMP);
 
