@@ -9,8 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define IMPORTANCIA_MINIMA 0.6
+#define IMPORTANCIA_MINIMA 0.7
 #define MAX_CANT_QUERY_SIMILAR 10
+#define MAX_SOLUCIONES_CALIDAD 5
 
 /**************************************************************************************/
 /*                                     BUSCADOR                                       */
@@ -153,6 +154,7 @@ void conjunto_calidad_imprimir(conjunto_calidad_t* conj, const char* paths, cons
 	lista_iter_destruir(iter);
 	printf("se encontro:\n");
 	solucion_emitir(conj->solucion, paths, offsets);
+	printf("\n");
 }
 
 int comparacionConjuntoCalidad(const void* a, const void* b){
@@ -205,7 +207,7 @@ bool solucionador_Backtracking(lista_t* lista_actual, lista_t* org, heap_t* heap
 
 	if (lista_largo(lista_actual) == 2) return false;
 
-	for (size_t i = 0; i < lista_largo(lista_actual); i++){
+	for (size_t i = 0; i < lista_largo(lista_actual) && (heap_cantidad(heap) < MAX_SOLUCIONES_CALIDAD); i++){
 		lista_t* aux = copiarSinAlguno(lista_actual, i);
 		if (!solucionador_Backtracking(aux, org, heap, dirOffsets, rutaTams))
 			lista_destruir(aux, NULL);
@@ -219,6 +221,7 @@ bool solucionador_Backtracking(lista_t* lista_actual, lista_t* org, heap_t* heap
 void buscador_busquedaImperfecta(buscador_t* buscador, lista_t* query, const char* index, const char* paths, const char* offsetPaths, const char* ruta_tams){
 	if (lista_largo(query) > MAX_CANT_QUERY_SIMILAR ){
 		printf("No se realizan busquedas similares pues la cantidad de terminos de la consulta es muy grande, lo que ocasionaria una busqueda demasiado lenta");
+		return;
 	}
 	printf("Se realizan busquedas similares!\n");
 	printf("Aguarde un momento mientras se van realizando los calculos (este proceso puede tardar algunos minutos, pues es mas complejo que una busqueda normal)\n");
@@ -234,13 +237,18 @@ void buscador_busquedaImperfecta(buscador_t* buscador, lista_t* query, const cha
 
 	heap_t* heap = heap_crear(comparacionConjuntoCalidad);
 
-	for (size_t i = 0; i < lista_largo(lista_terminos); i++){
+	for (size_t i = 0; i < lista_largo(lista_terminos) && heap_cantidad(heap) < MAX_SOLUCIONES_CALIDAD; i++){
 		lista_t* aux = copiarSinAlguno(lista_terminos, i);
 		if (!solucionador_Backtracking(aux, lista_terminos, heap, index, ruta_tams))
 			lista_destruir(aux, NULL);
 	}
 
-	//HACER ALGO CON LA LISTA
+
+	if (heap_cantidad(heap) == 0){
+		printf("No se encontraron soluciones simialres de calidad minima %f\n", IMPORTANCIA_MINIMA);
+		heap_destruir(heap, NULL);
+		return;
+	}
 
 	while (!heap_esta_vacio(heap)){
 		conjunto_calidad_t* conj = heap_desencolar(heap);
