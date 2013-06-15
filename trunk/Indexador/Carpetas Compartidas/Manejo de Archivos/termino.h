@@ -39,4 +39,7 @@ lista_t* termino_decodificarPunteros(termino_t* termino,const char* ruta, const 
 
 void termino_setearCantDocs(size_t valor);
 
+
+float calculoImportancia (lista_t* modif, lista_t* org);
+
 #endif /* TERMINO_H_ */
