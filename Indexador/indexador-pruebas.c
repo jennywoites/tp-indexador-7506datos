@@ -62,7 +62,7 @@ char** definir_nombres_archivos(const char* repositorio, const char** rutas_agre
 	return elv;
 }
 
-void realizar_busqueda(size_t cant, buscador_t* busq, char** salidas){
+void realizar_busqueda(size_t cant, buscador_t* busq, char** salidas, bool permitirImperfectas){
 	printf("Ingrese Consulta:\n");
 	char* query = leer_texto();
 	if (strlen(query) == 0){
@@ -77,11 +77,14 @@ void realizar_busqueda(size_t cant, buscador_t* busq, char** salidas){
 
 	if (lista_largo(busquedas) > 1){
 		resultado_t* resul = buscador_buscar(busq, busquedas,salidas[RUTA_INDICE], salidas[RUTA_POS_X_ARCH]);
-
 		lista_t* soluciones = resultado_realizarIntersecciones(resul);
+		size_t cant_soluciones = lista_largo(soluciones);
 		solucion_emitir(soluciones, salidas[RUTA_PATHS], salidas[RUTA_OFFSET_ARCHS]);
 		lista_destruir(soluciones, destructor_solucion);
 		resultado_destruir(resul);
+		if (cant_soluciones == 0 && permitirImperfectas){
+			buscador_busquedaImperfecta(busq, busquedas, salidas[RUTA_INDICE], salidas[RUTA_PATHS], salidas[RUTA_OFFSET_ARCHS], salidas[RUTA_POS_X_ARCH]);
+		}
 	}else{
 		buscador_busquedaPuntual(busq, (char*)lista_ver_primero(busquedas),salidas[RUTA_INDICE], salidas[RUTA_PATHS], salidas[RUTA_OFFSET_ARCHS], salidas[RUTA_POS_X_ARCH]);
 	}
@@ -119,7 +122,7 @@ bool continuar_busqueda(){
 	return false;
 }
 
-void buscar(const char* directorio, const char* repositorio){
+void buscar(const char* directorio, const char* repositorio, bool permitirImperfectas){
 	printf("Cargando el lexico en memoria, espere un instante\n");
 
 	char** salidas_def = definir_nombres_archivos(repositorio, DEFINITIVOS);
@@ -138,7 +141,7 @@ void buscar(const char* directorio, const char* repositorio){
 	bool continuar_buscando = true;
 
 	while(continuar_buscando){
-		realizar_busqueda(cant,busq,  salidas_temp);
+		realizar_busqueda(cant,busq,  salidas_temp, permitirImperfectas);
 		continuar_buscando = continuar_busqueda();
 	}
 
@@ -215,11 +218,12 @@ void imprimir_version(){
 	fprintf(stdout," BUCHWALD, Martin Ezequiel (93155) \n GENENDER PEÑA, Ezequiel David (93163) \n WOITES, Jennifer Andrea (93274) \n");
 }
 
-int obtener_parametros(int argc,char* argv[],char** ruta_directorio, char** repo){
+int obtener_parametros(int argc,char* argv[],char** ruta_directorio, char** repo, bool* imperfectas){
 
 	int opcion = OPC_INDEXAR;//opcion default
 
 	*ruta_directorio = RUTA_DEFAULT; //directorio default
+	*imperfectas = false;
 
 	//struct de lineas de comando
 	struct option opciones[]={
@@ -229,13 +233,14 @@ int obtener_parametros(int argc,char* argv[],char** ruta_directorio, char** repo
 		{"buscar",no_argument,NULL,'b'},//pos3
 		{"ruta_directorio",required_argument,NULL,'d'},//pos4
 		{"repositorio",required_argument,NULL,'r'},//pos5
+		{"imperfectas",no_argument,NULL,'p'},//pos6
 		{0,0,0,0}
 	};
 
 	char caracter;
 
 	//mientras haya opciones las lee y las procesa
-	while ((caracter = (getopt_long(argc,argv,"hvibd:r:",opciones,NULL)))!=-1){
+	while ((caracter = (getopt_long(argc,argv,"hvibd:r:p",opciones,NULL)))!=-1){
 		switch(caracter){
 			case 'h'://help
 				return OPC_IMPRIMIR_AYUDA;
@@ -255,6 +260,9 @@ int obtener_parametros(int argc,char* argv[],char** ruta_directorio, char** repo
 				if (strcmp(optarg,"-")!=0) //si son distintos
 					*repo = optarg;
 				break;
+			case 'p':
+				*imperfectas = true;
+				break;
 			case '?'://error
 				return OPC_ERROR;
 		}
@@ -269,8 +277,9 @@ int main (int argc, char** argv){
 
 	char* directorio = NULL;
 	char* repositorio = NULL;
+	bool imperfectas = false;
 
-	opcion = obtener_parametros(argc,argv,&directorio, &repositorio);
+	opcion = obtener_parametros(argc,argv,&directorio, &repositorio, &imperfectas);
 
 	if (!repositorio || !directorio) return 1;
 
@@ -280,7 +289,7 @@ int main (int argc, char** argv){
 			//destruirTrasbordo(directorio);
 			break;
 		case OPC_BUSCAR:
-			buscar(directorio, repositorio);
+			buscar(directorio, repositorio, imperfectas);
 			//destruirTrasbordo(directorio);
 			break;
 		case OPC_IMPRIMIR_AYUDA:

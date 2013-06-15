@@ -303,3 +303,33 @@ lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, const cha
 void termino_setearCantDocs(size_t valor){
 	CANT_DOCS = valor;
 }
+
+float calculoImportancia (lista_t* modif, lista_t* org){
+	size_t suma_total = 0;
+	size_t modularizador = lista_largo(org) - 1;
+
+	lista_iter_t* iter = lista_iter_crear(org);
+
+	while (!lista_iter_al_final(iter)){
+		termino_t* termino = lista_iter_ver_actual(iter);
+		if (termino)
+			suma_total += termino->frecuencia;
+		lista_iter_avanzar(iter);
+	}
+	lista_iter_destruir(iter);
+
+	size_t sumaMod = 0;
+
+	lista_iter_t* iterMod = lista_iter_crear(modif);
+	while (!lista_iter_al_final(iterMod)){
+		termino_t* termino = lista_iter_ver_actual(iterMod);
+		if (termino){
+			sumaMod += (suma_total - termino->frecuencia);
+		}
+		lista_iter_avanzar(iterMod);
+	}
+	lista_iter_destruir(iterMod);
+	float imp = (float) sumaMod / suma_total;
+	imp /= modularizador;
+	return imp;
+}
