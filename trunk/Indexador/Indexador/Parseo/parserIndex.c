@@ -38,9 +38,12 @@ int filtro (struct dirent* d){
 	return 1;
 }
 
+int comparar(const struct dirent** a, const struct dirent** b){
+	return strcmp((*a)->d_name, (*b)->d_name);
+}
+
 int parserIndex_obtenerRutasDirectorios(const char* directorio, char*** rutas, unsigned long* cant){
 	struct dirent** directorios = NULL;
-
 	(*cant) = scandir(directorio, &directorios, filtro, NULL);
 	//El tercer campo es una funcion de filtro que si devuelve 0, hara que se ignore
 	//el directorio/archivo leido. El cuarto campo es una funcion de ordenamiento
