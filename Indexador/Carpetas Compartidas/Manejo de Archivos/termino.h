@@ -42,4 +42,6 @@ void termino_setearCantDocs(size_t valor);
 
 float calculoImportancia (lista_t* modif, lista_t* org);
 
+void destruccionCache();
+
 #endif /* TERMINO_H_ */
