@@ -11,6 +11,7 @@
 #include "Buscador/resultado.h"
 #include "Buscador/Parseo/parserQuery.h"
 #include "Carpetas Compartidas/TDAs/lista.h"
+#include "Carpetas Compartidas/Manejo de Archivos/termino.h"
 #include "Carpetas Compartidas/Manejo de Archivos/funcionesGeneralesArchivos.h"
 #include "Carpetas Compartidas/Codigos/trasbordoCodigo.h"
 #include "Carpetas Compartidas/Compresion/zippeador.h"
@@ -189,6 +190,7 @@ void buscar(const char* directorio, const char* repositorio, bool permitirImperf
 		free(salidas_temp[i]);
 	}
 	free(salidas_temp);
+	destruccionCache();
 }
 
 void indexar(const char* directorio,const char* repositorio){

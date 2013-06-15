@@ -5,6 +5,79 @@
 #include "funcionesGeneralesArchivos.h"
 #include "../../Carpetas Compartidas/Codigos/trasbordoCodigo.h"
 #include <sys/stat.h>
+#include "../TDAs/cache.h"
+
+cache_t* CACHE = NULL;
+
+///////////////// FUNCIONES PARA LA CACHE
+
+void* copiarPunteros(const void* cpy){
+	lista_t* punteros = (lista_t*) cpy;
+	lista_iter_t* iter = lista_iter_crear(punteros);
+	//el primer elemento es la clave
+	lista_iter_avanzar(iter);
+	lista_t* copiaPuntero = lista_crear();
+
+	while (!lista_iter_al_final(iter)){
+		lista_t* lista_punteros = lista_iter_ver_actual(iter);
+		lista_t* lista_copia_punteros = lista_crear();
+		lista_iter_t* iterPunc = lista_iter_crear(lista_punteros);
+		while (!lista_iter_al_final(iterPunc)){
+			size_t* puntero = lista_iter_ver_actual(iterPunc);
+			size_t* value_copy = malloc (sizeof(size_t));
+			*value_copy = *puntero;
+			lista_insertar_ultimo(lista_copia_punteros, value_copy);
+			lista_iter_avanzar(iterPunc);
+		}
+		lista_iter_destruir(iterPunc);
+		lista_insertar_ultimo(copiaPuntero, lista_copia_punteros);
+		lista_iter_avanzar(iter);
+	}
+	lista_iter_destruir(iter);
+	return copiaPuntero;
+}
+
+int comparacionPunteros(const void* a, const void* b){
+	lista_t* punteros1 = (lista_t*) a;
+	lista_t* punteros2 = (lista_t*) b;
+	lista_iter_t* iter1 = lista_iter_crear(punteros1);
+	lista_iter_t* iter2 = lista_iter_crear(punteros2);
+	lista_iter_avanzar(iter1);
+	lista_iter_avanzar(iter2);
+	lista_t* doc1 = lista_iter_ver_actual(iter1);
+	lista_t* doc2 = lista_iter_ver_actual(iter2);
+	lista_iter_destruir(iter1);
+	lista_iter_destruir(iter2);
+	return lista_largo(doc1) - lista_largo(doc2);
+}
+
+void destructorListaPunteros(void* a){
+	lista_t* lista = (lista_t*)a;
+	lista_destruir(lista, free);
+}
+
+void destructorPunteros(void* a){
+	lista_t* punteros = (lista_t*)a;
+	//la clave
+	free(lista_borrar_primero(punteros));
+	lista_destruir(punteros, destructorListaPunteros);
+}
+
+char* obtenerClavePunteros(void* a){
+	lista_t* punteros = (lista_t*)a;
+	return (lista_ver_primero(punteros));
+}
+
+void unirPunteroTermino(lista_t* punteros, char* termino){
+	lista_insertar_primero(punteros, termino);
+}
+
+void destruccionCache(){
+	cache_destruir(CACHE);
+}
+
+/////////////////
+
 
 size_t CANT_DOCS = 0;
 
@@ -124,6 +197,18 @@ lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, const cha
 //Si no logro abrir el archivo o la frecuencia del termino es 0, devuelve NULL
 lista_t* termino_decodificarPunteros(termino_t* termino,const char* ruta, const char* ruta_tams){
 	if (!termino) return NULL;
+
+	if (!CACHE) CACHE = cache_crear(copiarPunteros, comparacionPunteros,obtenerClavePunteros,destructorPunteros);
+
+	char* nomTermino = termino_obtenerPalabra(termino);
+
+	if (cache_pertenece(CACHE, nomTermino)){
+		lista_t* l = cache_obtener(CACHE, nomTermino);
+		free(nomTermino);
+		return l;
+	}
+
+
 	FILE* arch = fopen(ruta, lectura_archivos());
 
 	if (!arch)
@@ -154,6 +239,14 @@ lista_t* termino_decodificarPunteros(termino_t* termino,const char* ruta, const 
 	lista_t* listado = obtener_listado(debuffer, frecuencia, ruta_tams);
 	fclose(arch);
 	debuffer_destruir(debuffer);
+
+	unirPunteroTermino(listado, nomTermino);
+	if (cache_guardar(CACHE, nomTermino, listado)){
+		return cache_obtener(CACHE, nomTermino);
+	}
+
+	free(lista_borrar_primero(listado));
+
 	return listado;
 }
 
@@ -333,3 +426,4 @@ float calculoImportancia (lista_t* modif, lista_t* org){
 	imp /= modularizador;
 	return imp;
 }
+
