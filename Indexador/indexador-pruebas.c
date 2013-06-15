@@ -18,11 +18,15 @@
 #include <time.h>
 #include <bits/time.h>
 
-#define OPC_INDEXAR 1
-#define OPC_BUSCAR 2
 #define OPC_ERROR -1
-#define OPC_IMPRIMIR_AYUDA 3
-#define OPC_IMPRIMIR_VERSION 4
+#define OPC_INDEXAR 1
+#define OPC_BUSCAR_POR_FRASES 2
+#define OPC_BUSCAR_PALABRAS 3
+#define OPC_IMPRIMIR_AYUDA 4
+#define OPC_IMPRIMIR_VERSION 5
+
+#define RUTA_DEFAULT "EL_REPO"
+#define REPO_DEFAULT "Repo"
 
 #define RUTA_DEFAULT "EL_REPO"
 
@@ -62,7 +66,7 @@ char** definir_nombres_archivos(const char* repositorio, const char** rutas_agre
 	return elv;
 }
 
-void realizar_busqueda(size_t cant, buscador_t* busq, char** salidas, bool permitirImperfectas){
+void realizar_busqueda(size_t cant, buscador_t* busq, char** salidas, bool permitirImperfectas, size_t opcion_busqueda){
 	printf("Ingrese Consulta:\n");
 	char* query = leer_texto();
 	if (strlen(query) == 0){
@@ -77,9 +81,36 @@ void realizar_busqueda(size_t cant, buscador_t* busq, char** salidas, bool permi
 
 	if (lista_largo(busquedas) > 1){
 		resultado_t* resul = buscador_buscar(busq, busquedas,salidas[RUTA_INDICE], salidas[RUTA_POS_X_ARCH]);
-		lista_t* soluciones = resultado_realizarIntersecciones(resul);
-		size_t cant_soluciones = lista_largo(soluciones);
-		solucion_emitir(soluciones, salidas[RUTA_PATHS], salidas[RUTA_OFFSET_ARCHS]);
+
+		lista_t* soluciones;
+		size_t cant_soluciones;
+
+		switch(opcion_busqueda){
+		case OPC_BUSCAR_POR_FRASES:
+			soluciones = resultado_realizarIntersecciones(resul);
+			solucion_emitir(soluciones, salidas[RUTA_PATHS], salidas[RUTA_OFFSET_ARCHS]);
+			cant_soluciones = lista_largo(soluciones);
+			break;
+		case OPC_BUSCAR_PALABRAS:
+			soluciones = obtenerAparicionDocumentos(resul);
+			if (!soluciones){
+				cant_soluciones = 0;
+				printf("No hay resultados para su busqueda \n");
+			}else{
+				cant_soluciones = lista_largo(soluciones);
+				if (cant_soluciones==0)
+					printf("No hay resultados para su busqueda \n");
+				if (cant_soluciones>0)
+					printf("Las palabras buscadas aparecen en los siguientes documentos: \n");
+				while (!lista_esta_vacia(soluciones)){
+					unsigned int doc = atoi ( lista_borrar_primero(soluciones) );
+					char* nombre_doc = __obtenerNombreDoc(salidas[RUTA_PATHS], salidas[RUTA_OFFSET_ARCHS], doc);
+					printf("Documento: %s \n", nombre_doc);
+					free(nombre_doc);
+				}
+			}
+			break;
+		}
 		lista_destruir(soluciones, destructor_solucion);
 		resultado_destruir(resul);
 		if (cant_soluciones == 0 && permitirImperfectas){
@@ -99,30 +130,35 @@ void realizar_busqueda(size_t cant, buscador_t* busq, char** salidas, bool permi
 
 }
 
-bool validar_respuesta(int num){
-	return ((num == 1) || (num ==2));
+bool validar_respuesta(char caract){
+	return ((caract == '1') || (caract == '2'));
 }
 
 bool continuar_busqueda(){
 	bool valida = false;
-	int num;
+	char caract;
+	int i = 0;
 
 	while(!valida){
 		printf("Desea realizar una nueva busqueda? \n");
 		printf("1: Si \n2: No \n");
-		num = leer_numero();
-		valida = validar_respuesta(num);
+		caract = getchar();
+
+		valida = validar_respuesta(caract);
 		if(!valida)
 			printf("Su respuesta es invalida. Por favor ingrese 1 o 2 \n \n");
 	}
+	while (getchar() != '\n')
+			i++;
 
-	if (num == 1)
+	if (caract == '1')
 		return true;
+
 
 	return false;
 }
 
-void buscar(const char* directorio, const char* repositorio, bool permitirImperfectas){
+void buscar(const char* directorio, const char* repositorio, bool permitirImperfectas, size_t opcion_busqueda){
 	printf("Cargando el lexico en memoria, espere un instante\n");
 
 	char** salidas_def = definir_nombres_archivos(repositorio, DEFINITIVOS);
@@ -141,7 +177,7 @@ void buscar(const char* directorio, const char* repositorio, bool permitirImperf
 	bool continuar_buscando = true;
 
 	while(continuar_buscando){
-		realizar_busqueda(cant,busq,  salidas_temp, permitirImperfectas);
+		realizar_busqueda(cant,busq,  salidas_temp, permitirImperfectas, opcion_busqueda);
 		continuar_buscando = continuar_busqueda();
 	}
 
@@ -205,9 +241,11 @@ void imprimir_ayuda(){
 	fprintf(stdout,"-h --Imprime en pantalla informacion de Ayuda. \n");
 	fprintf(stdout,"-V --Imprime la versión del programa. \n");
 	fprintf(stdout,"-i --Indexa un repositorio. Es la opcion por defecto. \n");
-	fprintf(stdout,"-p --Indicar al buscador que se desea obtener resultados inexactos \n");
 	fprintf(stdout,"-b --Busca una frase en un repositorio. \n");
-	fprintf(stdout,"-r --Ruta del repositorio. \n");
+	fprintf(stdout,"-t --Busca varias palabras en un repositorio. \n");
+	fprintf(stdout,"-p --Busca una frase, permite una busqueda aproximada en caso de no encontrar solucion exacta. \n");
+	fprintf(stdout,"-d --Ruta del repositorio. \n");
+	fprintf(stdout,"-r --Nombre del repositorio. \n");
 }
 
 //imprime la version del programa al stdout
@@ -224,6 +262,7 @@ int obtener_parametros(int argc,char* argv[],char** ruta_directorio, char** repo
 	int opcion = OPC_INDEXAR;//opcion default
 
 	*ruta_directorio = RUTA_DEFAULT; //directorio default
+	*repo = REPO_DEFAULT; //repositorio default
 	*imperfectas = false;
 
 	//struct de lineas de comando
@@ -232,6 +271,7 @@ int obtener_parametros(int argc,char* argv[],char** ruta_directorio, char** repo
 		{"version",no_argument,NULL,'v'},//pos1
 		{"indexar",no_argument,NULL,'i'},//pos2
 		{"buscar",no_argument,NULL,'b'},//pos3
+		{"buscar_todas",no_argument,NULL,'t'},//pos3
 		{"ruta_directorio",required_argument,NULL,'d'},//pos4
 		{"repositorio",required_argument,NULL,'r'},//pos5
 		{"imperfectas",no_argument,NULL,'p'},//pos6
@@ -241,7 +281,7 @@ int obtener_parametros(int argc,char* argv[],char** ruta_directorio, char** repo
 	char caracter;
 
 	//mientras haya opciones las lee y las procesa
-	while ((caracter = (getopt_long(argc,argv,"hvibd:r:p",opciones,NULL)))!=-1){
+	while ((caracter = (getopt_long(argc,argv,"hvibtd:r:p",opciones,NULL)))!=-1){
 		switch(caracter){
 			case 'h'://help
 				return OPC_IMPRIMIR_AYUDA;
@@ -251,7 +291,10 @@ int obtener_parametros(int argc,char* argv[],char** ruta_directorio, char** repo
 				opcion = OPC_INDEXAR;
 				break;
 			case 'b'://buscar
-				opcion = OPC_BUSCAR;
+				opcion = OPC_BUSCAR_POR_FRASES;
+				break;
+			case 't'://buscar todas las palabras
+				opcion = OPC_BUSCAR_PALABRAS;
 				break;
 			case 'd'://ruta directorio
 				if (strcmp(optarg,"-")!=0) //si son distintos
@@ -282,18 +325,18 @@ int main (int argc, char** argv){
 
 	opcion = obtener_parametros(argc,argv,&directorio, &repositorio, &imperfectas);
 
-	if (!repositorio && (opcion == OPC_INDEXAR || opcion == OPC_BUSCAR)) return 1;
-	if (!directorio && opcion == OPC_INDEXAR) return 1;
-
+	if (!repositorio || !directorio) return 1;
 
 	switch (opcion){
 		case OPC_INDEXAR:
 			indexar(directorio, repositorio);
 			//destruirTrasbordo(directorio);
 			break;
-		case OPC_BUSCAR:
-			buscar(directorio, repositorio, imperfectas);
-			//destruirTrasbordo(directorio);
+		case OPC_BUSCAR_POR_FRASES:
+			buscar(directorio, repositorio,imperfectas,OPC_BUSCAR_POR_FRASES);
+			break;
+		case OPC_BUSCAR_PALABRAS:
+			buscar(directorio, repositorio,imperfectas,OPC_BUSCAR_PALABRAS);
 			break;
 		case OPC_IMPRIMIR_AYUDA:
 			imprimir_ayuda();
