@@ -35,6 +35,7 @@ int indexer_indexar(size_t cant_documentos,const char* origen, const char* desti
 	
 	unsigned long i = 0;
 	size_t freq = registro_totales() / FRECUENCIA_DE_IMPRESION;
+	if (freq == 0) freq = 1;
 	while (!feof(archOrigen)){
 		if (i %  freq == 0)
 			emitir_impresion("Indexando Terminos y Punteros", i, registro_totales());
