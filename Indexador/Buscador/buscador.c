@@ -105,7 +105,7 @@ void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const c
 		free(nomDoc);
 		lista_t* posiciones = lista_borrar_primero(infoTermino);
 
-		printf("%u veces\n",lista_largo(posiciones));
+		printf("%zu veces\n",lista_largo(posiciones));
 
 		lista_destruir(posiciones, free);
 		lista_iter_avanzar(iter);
