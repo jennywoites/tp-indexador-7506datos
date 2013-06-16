@@ -9,7 +9,7 @@
 
 const char* SALIDA_TEMPORAL_SORT = "tempsort.jem";
 
-#define SORT_CANT_REGISTROS 8000000
+#define SORT_CANT_REGISTROS 2000000
 #define SORT_CANT_RUTAS_MAX 999
 
 
@@ -107,6 +107,7 @@ int sorting_ordenarArchivo(const char* entrada, const char* salida){
 		fclose(archSal);
 		sort_desfreezar(&heap);
 	}
+
 	fclose(archEnt);
 	int ok = merger_MergearArchivos(rutas, num,salida);
 
