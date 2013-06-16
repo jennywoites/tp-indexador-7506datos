@@ -220,7 +220,10 @@ void solucion_emitir(lista_t* soluciones, const char* paths, const char* offsets
 		return;
 	}
 
-	printf("La frase buscada se encontro en %zu documentos\n", lista_largo(soluciones));
+	if (lista_largo(soluciones)==1)
+		printf("La frase buscada se encontro en 1 documento\n");
+	else
+		printf("La frase buscada se encontro en %zu documentos\n", lista_largo(soluciones));
 	printf("Los documentos fueron:\n");
 	heap_t* heap = heap_crear(comparacionDeSoluciones);
 	lista_iter_t* iter = lista_iter_crear(soluciones);
@@ -234,7 +237,10 @@ void solucion_emitir(lista_t* soluciones, const char* paths, const char* offsets
 	while (!heap_esta_vacio(heap)){
 		solucion_t* solucion = heap_desencolar(heap);
 		char* nombre_doc = __obtenerNombreDoc(paths, offsets, solucion->doc);
-		printf("En %s se encontro la frase %zu veces\n", nombre_doc, solucion->cant);
+		if (solucion->cant==1)
+			printf("En %s se encontro la frase 1 vez\n", nombre_doc);
+		else
+			printf("En %s se encontro la frase %zu veces\n", nombre_doc, solucion->cant);
 		free(nombre_doc);
 	}
 	heap_destruir(heap, NULL);
