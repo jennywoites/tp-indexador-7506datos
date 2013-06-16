@@ -81,7 +81,6 @@ int merger_MergearArchivos(char** rutas, int cant, const char* salida_final){
 	log_emitir("Finalizada primera etapa del merge", LOG_ENTRADA_PROCESO);
 
 	emitir_impresion("Mergeando Archivos temporales", 0,4);
-	getchar();
 
 	log_emitir("Se inicia segunda etapa del merge", LOG_ENTRADA_PROCESO);
 
