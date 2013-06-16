@@ -282,7 +282,7 @@ void indexar(const char* directorio,const char* repositorio){
 void imprimir_ayuda(){
 	fprintf(stdout,"OPCIONES \n");
 	fprintf(stdout,"-h --Imprime en pantalla informacion de Ayuda. \n");
-	fprintf(stdout,"-V --Imprime la versión del programa. \n");
+	fprintf(stdout,"-v --Imprime la versión del programa. \n");
 	fprintf(stdout,"-i --Indexa un repositorio. Es la opcion por defecto. \n");
 	fprintf(stdout,"-b --Busca una frase en un repositorio. \n");
 	fprintf(stdout,"-t --Busca varias palabras en un repositorio. \n");
