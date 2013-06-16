@@ -20,4 +20,6 @@ void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const c
 
 void buscador_busquedaImperfecta(buscador_t* buscador, lista_t* query, const char* index, const char* paths, const char* offsetPaths, const char* ruta_tams);
 
+void buscador_busquedaImperfectaMontecarlo(buscador_t* buscador, lista_t* query, const char* index, const char* paths, const char* offsetPaths, const char* ruta_tams);
+
 #endif /* BUSCADOR_H_ */

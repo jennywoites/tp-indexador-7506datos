@@ -9,9 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define IMPORTANCIA_MINIMA 0.7
-#define MAX_CANT_QUERY_SIMILAR 10
+#define IMPORTANCIA_MINIMA 0.6
+#define MAX_CANT_QUERY_SIMILAR 15
 #define MAX_SOLUCIONES_CALIDAD 5
+#define MONTECARLO_INTENTOS 20
+#include <time.h>
 
 /**************************************************************************************/
 /*                                     BUSCADOR                                       */
@@ -135,7 +137,7 @@ conjunto_calidad_t* conjunto_calidad_crear(lista_t* terminos, float imp, lista_t
 
 void conjunto_calidad_destruir(conjunto_calidad_t* conj){
 	if (!conj) return;
-	destructor_solucion(conj->solucion);
+	lista_destruir(conj->solucion, destructor_solucion);
 	lista_destruir(conj->terminos_reales, NULL);
 	free(conj);
 }
@@ -217,15 +219,15 @@ bool solucionador_Backtracking(lista_t* lista_actual, lista_t* org, heap_t* heap
 }
 
 
-
 void buscador_busquedaImperfecta(buscador_t* buscador, lista_t* query, const char* index, const char* paths, const char* offsetPaths, const char* ruta_tams){
 	if (lista_largo(query) > MAX_CANT_QUERY_SIMILAR ){
-		printf("No se realizan busquedas similares pues la cantidad de terminos de la consulta es muy grande, lo que ocasionaria una busqueda demasiado lenta");
+		printf("No se realizan busquedas similares pues la cantidad de terminos de la consulta es muy grande, lo que ocasionaria una busqueda demasiado lenta\n");
 		return;
 	}
+	if (lista_largo(query) <= 2) return;
 	printf("Se realizan busquedas similares!\n");
 	printf("Aguarde un momento mientras se van realizando los calculos (este proceso puede tardar algunos minutos, pues es mas complejo que una busqueda normal)\n");
-	if (lista_largo(query) <= 2) return;
+
 
 	lista_t* lista_terminos = lista_crear();
 	lista_iter_t* iter = lista_iter_crear(query);
@@ -257,4 +259,65 @@ void buscador_busquedaImperfecta(buscador_t* buscador, lista_t* query, const cha
 	}
 
 	heap_destruir(heap,NULL);
+}
+
+
+
+void buscador_busquedaImperfectaMontecarlo(buscador_t* buscador, lista_t* query, const char* index, const char* paths, const char* offsetPaths, const char* ruta_tams){
+	if (lista_largo(query) <= 2) return;
+	printf("Se realizan busquedas similares via Montecarlo!\n");
+	printf("Aguarde un momento mientras se van realizando los calculos (este proceso puede tardar algunos minutos, pues es mas complejo que una busqueda normal)\n");
+
+	size_t intentos = 0;
+	bool solucionado = false;
+
+	lista_t* terminosDeLaQuery = lista_crear();
+	lista_iter_t* iter = lista_iter_crear(query);
+	while (!lista_iter_al_final(iter)){
+		char* nom = lista_iter_ver_actual(iter);
+		lista_insertar_ultimo(terminosDeLaQuery, hash_obtener(buscador->almacenador, nom));
+		lista_iter_avanzar(iter);
+	}
+	lista_iter_destruir(iter);
+
+	lista_t* copy_out = copiarSinAlguno(terminosDeLaQuery, lista_largo(query)+1);
+	conjunto_calidad_t* conj = NULL;
+	while (intentos < MONTECARLO_INTENTOS && !solucionado && lista_largo(copy_out) > 2){
+		size_t eliminar = (rand() % lista_largo(copy_out));
+		lista_t* aux = copiarSinAlguno(copy_out, eliminar);
+		lista_destruir(copy_out, NULL);
+		copy_out = aux;
+
+		termino_t* terminos[lista_largo(copy_out)];
+		lista_iter_t* iter = lista_iter_crear(copy_out);
+		size_t idx = 0;
+		while (!lista_iter_al_final(iter)){
+			terminos[idx] = lista_iter_ver_actual(iter);
+			lista_iter_avanzar(iter);
+			idx++;
+		}
+		lista_iter_destruir(iter);
+
+		resultado_t* resultado = resultado_crear(terminos,lista_largo(copy_out),index,ruta_tams);
+		lista_t* soluciones = resultado_realizarIntersecciones(resultado);
+		resultado_destruir(resultado);
+		if (lista_largo(soluciones) > 0){
+			float imp = calculoImportancia (copy_out, terminosDeLaQuery);
+			conj = conjunto_calidad_crear(copy_out, imp, soluciones);
+			solucionado = true;
+		}else{
+			lista_destruir(soluciones, destructor_solucion);
+		}
+		intentos++;
+	}
+	lista_destruir(terminosDeLaQuery,NULL);
+	if (!solucionado){
+		printf("No se encontraron resultados via le metodo de Montecarlo\n");
+		lista_destruir(copy_out, NULL);
+		return;
+	}
+
+	conjunto_calidad_imprimir(conj, paths, offsetPaths);
+	conjunto_calidad_destruir(conj);
+
 }

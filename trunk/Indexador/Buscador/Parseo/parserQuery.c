@@ -39,7 +39,7 @@ lista_t* parserQuery_parsearConsulta(const char* query){
 	for (unsigned int i = 0; i <= strlen(query); i++){
 		if (i < strlen(query))
 			c = query[i];
-		if (!caracterDeSeparacion(c) && i < strlen(query)){
+		if (i < strlen(query) && !caracterDeSeparacion(c)){
 			buffer[j] = c;
 			j++;
 		}else{
