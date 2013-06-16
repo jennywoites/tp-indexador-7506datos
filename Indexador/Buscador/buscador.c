@@ -105,6 +105,9 @@ void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const c
 		free(nomDoc);
 		lista_t* posiciones = lista_borrar_primero(infoTermino);
 
+		if (lista_largo(posiciones)==1)
+				printf("1 vez\n");
+		else
 		printf("%zu veces\n",lista_largo(posiciones));
 
 		lista_destruir(posiciones, free);
@@ -312,7 +315,7 @@ void buscador_busquedaImperfectaMontecarlo(buscador_t* buscador, lista_t* query,
 	}
 	lista_destruir(terminosDeLaQuery,NULL);
 	if (!solucionado){
-		printf("No se encontraron resultados via le metodo de Montecarlo\n");
+		printf("No se encontraron resultados via el metodo de Montecarlo\n");
 		lista_destruir(copy_out, NULL);
 		return;
 	}
