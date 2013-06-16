@@ -11,7 +11,6 @@
 #define CANT_ARCHIVOS_SEGUIDOS 10
 #define CANT_REGISTROS_POR_ARCHIVO 20000
 
-//const char* SALIDA_TEMPORAL = "../../../../../../media/OpSys/Debug/tempmerge.jem";	//salida para archivos temporales
 const char* SALIDA_TEMPORAL = "tempmerge.jem";	//salida para archivos temporales
 
 /*Definicion del tipo de datos a guardar dentro del heap para hacer de auxiliar en el merge*/
@@ -62,7 +61,6 @@ int merger_MergearArchivos(char** rutas, int cant, const char* salida_final){
 	if (cant % CANT_ARCHIVOS_SEGUIDOS == 0)
 		corrector = 1;
 	c -= corrector;
-
 	size_t ordenados = 0;
 	//Primera etapa del merge. Subdivido por la constante CANT_ARCHIVOS_SEGUIDOS a tratar,
 	//abro cada archivo, creo el arbol con un elemento de cada archivo, y voy avanzando en cada uno.
@@ -75,7 +73,7 @@ int merger_MergearArchivos(char** rutas, int cant, const char* salida_final){
 		if (cant_procesados + CANT_ARCHIVOS_SEGUIDOS <= cant){
 			a_procesar = CANT_ARCHIVOS_SEGUIDOS;
 		}else{
-			a_procesar = cant - cant_procesados - 1;
+			a_procesar = cant - cant_procesados;
 		}
 		rutas_aux[i] = merger(rutas, i,c ,cant_procesados,a_procesar, NULL, &ordenados);
 		cant_procesados += a_procesar;
@@ -83,7 +81,10 @@ int merger_MergearArchivos(char** rutas, int cant, const char* salida_final){
 	log_emitir("Finalizada primera etapa del merge", LOG_ENTRADA_PROCESO);
 
 	emitir_impresion("Mergeando Archivos temporales", 0,4);
+	getchar();
+
 	log_emitir("Se inicia segunda etapa del merge", LOG_ENTRADA_PROCESO);
+
 	merger(rutas_aux, 0, c,0,c+1, archSalida, &ordenados);
 	log_emitir("Finalizada segunda etapa del merge", LOG_ENTRADA_PROCESO);
 
@@ -92,6 +93,7 @@ int merger_MergearArchivos(char** rutas, int cant, const char* salida_final){
 		remove(rutas_aux[j]);
 		free(rutas_aux[j]);
 	}
+
 	return MERGER_OK;
 }
 
@@ -113,17 +115,18 @@ void cerrar_archivos(FILE** archivos, int cantidad){
 void verificarYAgregarElementos(heap_t* heap, unsigned int* contadores,FILE** archivos, int cant){
 	for (unsigned int i = 0; i < cant; i++){
 		if (contadores[i] == 0){
-			for (unsigned j = 0; j < CANT_REGISTROS_POR_ARCHIVO; j++){
+			for (unsigned j = 0; j < CANT_REGISTROS_POR_ARCHIVO && !feof(archivos[i]); j++){
 				dato_t* dato = malloc (sizeof(dato_t));
 				dato->numArchivo = i;
 				dato->registro = registro_leer(archivos[i]);
 				dato->freezado = false;
-				if (dato->registro != NULL)
+				if (dato->registro != NULL){
 					heap_encolar(heap, dato);
-				else
+					contadores[i] = contadores[i] + 1;
+				}else{
 					free(dato);
+				}
 			}
-			contadores[i] = CANT_REGISTROS_POR_ARCHIVO;
 		}
 	}
 }
