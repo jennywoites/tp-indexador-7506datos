@@ -189,7 +189,7 @@ void termino_imprimir(termino_t* termino){
 		return;
 	}
 
-	printf("El termino %s tiene frecuencia %u\n", termino->termino, termino->frecuencia);
+	printf("El termino %s tiene frecuencia %zu\n", termino->termino, termino->frecuencia);
 }
 
 lista_t* obtener_listado(debuffer_t* debuffer, size_t cant_documentos, const char* ruta_tams);
