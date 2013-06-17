@@ -11,6 +11,8 @@ typedef struct{
 	hash_t* hash;
 	size_t pos;
 	size_t freq;
+	size_t* posiciones;
+	size_t cant_posiciones;
 }contenedorTermino_t;
 
 struct resultado{
@@ -27,6 +29,9 @@ void destructorListas(void* a){
 	lista_t* b = (lista_t*)a;
 	lista_destruir(b, free);
 }
+
+void intersecarPalabrasIguales(lista_t** posiciones, lista_t* original, size_t num);
+void __copiarListasEze(lista_t* dst, lista_t* org);
 
 int compararFrecuencias(const void* a,const void* b){
 	contenedorTermino_t* c1 = (contenedorTermino_t*)a;
@@ -58,13 +63,40 @@ resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* 
 	resul->hashes_terminos = malloc (sizeof(contenedorTermino_t*) * cantidad);
 	resul->cantidad = cantidad;
 
+	bool * agregados = malloc(sizeof(bool)* cantidad);
+	for (size_t i = 0; i < cantidad; i++)
+		agregados[i] = false;
+	bool * primero = malloc(sizeof(bool)* cantidad);
+
 	for (size_t i = 0; i < cantidad; i++){
-		resul->hashes_terminos[i] = malloc(sizeof(contenedorTermino_t));
-		resul->hashes_terminos[i]->hash = hash_crear(destructorListas);
-		resul->hashes_terminos[i]->pos = i;
+		if(!agregados[i]){
+			resul->hashes_terminos[i] = malloc(sizeof(contenedorTermino_t));
+			resul->hashes_terminos[i]->hash = hash_crear(destructorListas);
+			resul->hashes_terminos[i]->pos = i;
+			agregados[i] = true;
+			primero[i] = true;
+			resul->hashes_terminos[i]->cant_posiciones = 1;
+			resul->hashes_terminos[i]->posiciones = malloc(sizeof(size_t) * resul->hashes_terminos[i]->cant_posiciones);
+			resul->hashes_terminos[i]->posiciones[resul->hashes_terminos[i]->cant_posiciones-1] = i;
+
+			for (size_t j = i+1; j < cantidad; j++){
+				char* ti = termino_obtenerPalabra(terminos[i]);
+				char* tj = termino_obtenerPalabra(terminos[j]);
+				if( 0 == strcmp( ti , tj ) ){
+					agregados[j] = true;
+					primero[j] = false;
+					resul->hashes_terminos[i]->cant_posiciones++;
+					resul->hashes_terminos[i]->posiciones = realloc(resul->hashes_terminos[i]->posiciones,  sizeof(size_t) * resul->hashes_terminos[i]->cant_posiciones);
+					resul->hashes_terminos[i]->posiciones[resul->hashes_terminos[i]->cant_posiciones-1] = j;
+				}
+				free(ti);
+				free(tj);
+			}
+		}
 	}
 
 	for (size_t i = 0; i < cantidad; i++){
+		if(!primero[i]) continue;
 
 		termino_t* actual = terminos[i];
 		lista_t* infoTerminos = termino_decodificarPunteros(actual, dirOffsets, ruta_tams);
@@ -76,19 +108,47 @@ resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* 
 		lista_t* documentos = lista_borrar_primero(infoTerminos);
 		resul->hashes_terminos[i]->freq = lista_largo(documentos);
 		lista_iter_t* iter = lista_iter_crear(documentos);
+
 		while (!lista_iter_al_final(iter)){
 			size_t numDoc = *((size_t*)lista_iter_ver_actual(iter));
 			char* clave = __sizeToString(numDoc);
-			hash_guardar(resul->hashes_terminos[i]->hash, clave, lista_borrar_primero(infoTerminos));
+			lista_t* aux = lista_borrar_primero(infoTerminos);
+			lista_t* original = lista_crear();
+			__copiarListasEze(original,aux);
+
+			for (size_t k = 1; k < resul->hashes_terminos[i]->cant_posiciones; k++){
+				//printf("largo: %zu\n", lista_largo(aux));
+				intersecarPalabrasIguales( & aux, original, resul->hashes_terminos[i]->posiciones[k] - resul->hashes_terminos[i]->pos );
+				//printf("postlargo: %zu\n", lista_largo(aux));
+			}
+
+			hash_guardar(resul->hashes_terminos[i]->hash, clave, aux);
 			free(clave);
 			lista_iter_avanzar(iter);
+			lista_destruir(original, free);
 		}
 		lista_iter_destruir(iter);
 		lista_destruir(documentos, free);
 		lista_destruir(infoTerminos, NULL);
 	}
 
-	heapsort((void*)resul->hashes_terminos, cantidad, compararFrecuencias);
+	size_t cont = 0;
+	for (size_t i = 0; i < cantidad; i++){
+		if(primero[i]){
+			resul->hashes_terminos[cont] = resul->hashes_terminos[i];
+			cont++;
+		}
+	}
+
+	resul->hashes_terminos = realloc (resul->hashes_terminos, sizeof(contenedorTermino_t*) * cont);
+
+	free(agregados);
+	free(primero);
+
+	heapsort((void*)resul->hashes_terminos, cont, compararFrecuencias);
+
+	resul->cantidad = cont;
+
 	return resul;
 }
 
@@ -131,6 +191,20 @@ lista_t* obtenerAparicionDocumentos (resultado_t* resul){
 	return interseccion;
 }
 
+void __copiarListasEze(lista_t* dst, lista_t* org){
+	lista_iter_t* iter = lista_iter_crear(org);
+	while (!lista_iter_al_final(iter)){
+		size_t* act = lista_iter_ver_actual(iter);
+
+		size_t* cpy = malloc (sizeof(size_t));
+		*cpy = (*act);
+		lista_insertar_ultimo(dst, cpy);
+
+		lista_iter_avanzar(iter);
+	}
+	lista_iter_destruir(iter);
+}
+
 void __copiarListas(lista_t* dst, lista_t* org, size_t pos){
 lista_iter_t* iter = lista_iter_crear(org);
 	while (!lista_iter_al_final(iter)){
@@ -143,6 +217,53 @@ lista_iter_t* iter = lista_iter_crear(org);
 		lista_iter_avanzar(iter);
 	}
 	lista_iter_destruir(iter);
+}
+
+void intersecarPalabrasIguales(lista_t** posiciones, lista_t* original, size_t num){
+	if( lista_largo(*posiciones) == 0)
+		return ;
+	lista_iter_t* iter = lista_iter_crear(*posiciones);
+	lista_iter_t* iterSec = lista_iter_crear(original);
+	size_t* pos = lista_iter_ver_actual(iter);
+	size_t* posSec = lista_iter_ver_actual(iterSec);
+	while((*posSec) < (*pos) && !lista_iter_al_final(iterSec)){
+		lista_iter_avanzar(iterSec);
+		if (!lista_iter_al_final(iterSec))
+			posSec = lista_iter_ver_actual(iterSec);
+	}
+	lista_t* aux = lista_crear();
+	while (!lista_iter_al_final(iterSec) && !lista_iter_al_final(iter)){
+		size_t* pos = lista_iter_ver_actual(iter);
+		size_t* posSec = lista_iter_ver_actual(iterSec);
+
+		if ((*posSec - *pos) == num){
+			size_t* cpy = malloc (sizeof(size_t));
+			*cpy = *pos;
+			lista_insertar_ultimo(aux, cpy);
+			lista_iter_avanzar(iter);
+			lista_iter_avanzar(iterSec);
+		}
+
+		if ((*posSec - *pos) < num){
+			lista_iter_avanzar(iterSec);
+		}
+
+		if ((*posSec - *pos) > num){
+			lista_iter_avanzar(iter);
+			if (!lista_iter_al_final(iter))
+				pos = lista_iter_ver_actual(iter);
+
+			while(!lista_iter_al_final(iterSec) && (*posSec) < (*pos) ){
+				lista_iter_avanzar(iterSec);
+				if (!lista_iter_al_final(iterSec))
+					posSec = lista_iter_ver_actual(iterSec);
+			}
+		}
+	}
+	lista_iter_destruir(iterSec);
+	lista_iter_destruir(iter);
+	lista_destruir(*posiciones, free);
+	*posiciones = aux;
 }
 
 void intersecarPosiciones(lista_t** posiciones, lista_t* posSec, size_t num){
@@ -255,6 +376,7 @@ void resultado_destruir(resultado_t* resul){
 	if (!resul) return;
 	for (size_t i = 0; i < resul->cantidad; i++){
 		hash_destruir(resul->hashes_terminos[i]->hash);
+		free(resul->hashes_terminos[i]->posiciones);
 		free(resul->hashes_terminos[i]);
 	}
 	free(resul->hashes_terminos);
