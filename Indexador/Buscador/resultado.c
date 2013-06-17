@@ -59,6 +59,15 @@ char* __sizeToString(size_t num){
 resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* dirOffsets, const char* ruta_tams){
 	if (!terminos|| cantidad <= 1 || !dirOffsets)
 		return NULL;
+
+	for (size_t i = 0; i < cantidad; i++){
+		char* ti = termino_obtenerPalabra(terminos[i]);
+		if(ti)
+			free(ti);
+		else
+			return NULL;
+	}
+
 	resultado_t* resul = malloc (sizeof(resultado_t));
 	resul->hashes_terminos = malloc (sizeof(contenedorTermino_t*) * cantidad);
 	resul->cantidad = cantidad;
@@ -83,17 +92,15 @@ resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* 
 				char* ti = termino_obtenerPalabra(terminos[i]);
 				char* tj = termino_obtenerPalabra(terminos[j]);
 
-				if(ti && tj && 0 == strcmp( ti , tj ) ){
+				if(0 == strcmp( ti , tj ) ){
 					agregados[j] = true;
 					primero[j] = false;
 					resul->hashes_terminos[i]->cant_posiciones++;
 					resul->hashes_terminos[i]->posiciones = realloc(resul->hashes_terminos[i]->posiciones,  sizeof(size_t) * resul->hashes_terminos[i]->cant_posiciones);
 					resul->hashes_terminos[i]->posiciones[resul->hashes_terminos[i]->cant_posiciones-1] = j;
 				}
-				if(ti)
-					free(ti);
-				if(tj)
-					free(tj);
+				free(ti);
+				free(tj);
 			}
 		}
 	}
