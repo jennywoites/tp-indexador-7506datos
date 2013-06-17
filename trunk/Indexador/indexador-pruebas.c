@@ -26,6 +26,7 @@
 #define OPC_BUSCAR_PALABRAS 3
 #define OPC_IMPRIMIR_AYUDA 4
 #define OPC_IMPRIMIR_VERSION 5
+#define OPC_AYUDA_USUARIO 6
 
 #define RUTA_DEFAULT "EL_REPO"
 #define REPO_DEFAULT "Repo"
@@ -281,15 +282,29 @@ void indexar(const char* directorio,const char* repositorio){
 
 void imprimir_ayuda(){
 	fprintf(stdout,"OPCIONES \n");
-	fprintf(stdout,"-h --Imprime en pantalla informacion de Ayuda. \n");
-	fprintf(stdout,"-v --Imprime la versión del programa. \n");
-	fprintf(stdout,"-i --Indexa un repositorio. Es la opcion por defecto. \n");
-	fprintf(stdout,"-b --Busca una frase en un repositorio. \n");
-	fprintf(stdout,"-t --Busca varias palabras en un repositorio. \n");
-	fprintf(stdout,"-p --Busca una frase, permite una busqueda aproximada en caso de no encontrar solucion exacta. \n");
-	fprintf(stdout,"-m --Busca una frase, permite una busqueda aproximada por metodo de Montecarlo. \n");
-	fprintf(stdout,"-d --Ruta del repositorio. \n");
-	fprintf(stdout,"-r --Nombre del repositorio. \n");
+	fprintf(stdout,"-h --help              Imprime en pantalla informacion de Ayuda. \n");
+	fprintf(stdout,"-u --user              Explicacion detallada del funcionamiento para el usuario. \n");
+	fprintf(stdout,"-v --version           Imprime la versión del programa. \n");
+	fprintf(stdout,"-i --indexar           Indexa un repositorio. Es la opcion por defecto. \n");
+	fprintf(stdout,"-b --buscar            Busca una frase en un repositorio. \n");
+	fprintf(stdout,"-t --buscar_todas      Busca varias palabras en un repositorio. \n");
+	fprintf(stdout,"-p --imperfectas       Busca una frase, permite una busqueda aproximada en caso de no encontrar solucion exacta. \n");
+	fprintf(stdout,"-m --montecarlo        Busca una frase, permite una busqueda aproximada por metodo de Montecarlo. \n");
+	fprintf(stdout,"-d --ruta_directorio   Ruta del repositorio. \n");
+	fprintf(stdout,"-r --repositorio       Nombre del repositorio. \n");
+}
+
+void imprimir_ayuda_usuario(){
+	fprintf(stdout, "\n Bienvenido al Buscador - Indexador! \n \n");
+	fprintf(stdout, "Para poder utilizar el programa, primero debe indexar su repositorio. \nPara ello, elija la ruta del repositorio a indexar y el nombre que desee utilizar.\nPor ejemplo, la ruta 'usuario/repositorio' y el nombre del repositorio 'MiRepositorio' se llamaran con los siguientes comandos: \n-i -r usuario/repositorio -d MiRepositorio \n");
+	fprintf(stdout, "El repositorio comenzara a indexarse. Esta operacion puede demorar algunos minutos, dependiendo del tamaño del repositorio a indexar. \n");
+	fprintf(stdout, "Ahora que tenemos nuestro repositorio, podemos realizar busquedas con los distintos comandos. \nLas busquedas pueden ser tanto por palabras como por frases. \n");
+	fprintf(stdout, "Si queremos realizar una busqueda por palabra o frase exacta debemos llamar al programa con los siguientes comandos: \n-b -r MiRepositorio \n");
+	fprintf(stdout, "Si nos interesa buscar palabras sueltas en un texto, principalmente para encontrar textos que sean de algun genero, debemos llamar al programa con los siguientes comandos: \n-t -r Mi repositorio \n");
+	fprintf(stdout, "Si queremos hacer busquedas por frases, pero en caso de no encontrarlas, permitir que el programa elimine algunas palabras, utilizamos el metodo de Montecarlo o el metodo que permite Imperfectas \nPara ello, activamos el -m para Montecarlo o -p para imperfectas ademas de los comandos necesarios para busqueda tradicional o para busqueda por palabras.\n");
+	fprintf(stdout, "Si en cualquier momento olvidas los comandos de inicializacion puedes escribir -h o --help y se desplegara la ayuda: \n \n");
+	imprimir_ayuda();
+	fprintf(stdout, "\n Esperamos que disfrutes el programa!! \n \n");
 }
 
 //imprime la version del programa al stdout
@@ -313,6 +328,7 @@ int obtener_parametros(int argc,char* argv[],char** ruta_directorio, char** repo
 	//struct de lineas de comando
 	struct option opciones[]={
 		{"help",no_argument,NULL,'h'},//pos0
+		{"user",no_argument,NULL,'u'},//pos1
 		{"version",no_argument,NULL,'v'},//pos1
 		{"indexar",no_argument,NULL,'i'},//pos2
 		{"buscar",no_argument,NULL,'b'},//pos3
@@ -327,10 +343,12 @@ int obtener_parametros(int argc,char* argv[],char** ruta_directorio, char** repo
 	char caracter;
 
 	//mientras haya opciones las lee y las procesa
-	while ((caracter = (getopt_long(argc,argv,"hvibtd:r:pm",opciones,NULL)))!=-1){
+	while ((caracter = (getopt_long(argc,argv,"huvibtd:r:pm",opciones,NULL)))!=-1){
 		switch(caracter){
 			case 'h'://help
 				return OPC_IMPRIMIR_AYUDA;
+			case 'u'://Ayuda para usuarios
+				return OPC_AYUDA_USUARIO;
 			case 'v'://Version
 				return OPC_IMPRIMIR_VERSION;
 			case 'i'://indexar
@@ -393,6 +411,9 @@ int main (int argc, char** argv){
 			break;
 		case OPC_IMPRIMIR_VERSION:
 			imprimir_version();
+			break;
+		case OPC_AYUDA_USUARIO:
+			imprimir_ayuda_usuario();
 			break;
 		case OPC_ERROR:
 			fprintf(stderr,"Parametros no validos. Intente nuevamente \n");
