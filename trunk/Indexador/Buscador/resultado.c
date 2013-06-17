@@ -82,15 +82,18 @@ resultado_t* resultado_crear(termino_t** terminos, size_t cantidad, const char* 
 			for (size_t j = i+1; j < cantidad; j++){
 				char* ti = termino_obtenerPalabra(terminos[i]);
 				char* tj = termino_obtenerPalabra(terminos[j]);
-				if( 0 == strcmp( ti , tj ) ){
+
+				if(ti && tj && 0 == strcmp( ti , tj ) ){
 					agregados[j] = true;
 					primero[j] = false;
 					resul->hashes_terminos[i]->cant_posiciones++;
 					resul->hashes_terminos[i]->posiciones = realloc(resul->hashes_terminos[i]->posiciones,  sizeof(size_t) * resul->hashes_terminos[i]->cant_posiciones);
 					resul->hashes_terminos[i]->posiciones[resul->hashes_terminos[i]->cant_posiciones-1] = j;
 				}
-				free(ti);
-				free(tj);
+				if(ti)
+					free(ti);
+				if(tj)
+					free(tj);
 			}
 		}
 	}
