@@ -97,7 +97,10 @@ void buscador_busquedaPuntual(buscador_t* buscador, const char* termino, const c
 
 	lista_t* documentos = lista_borrar_primero(infoTermino);
 	lista_iter_t* iter = lista_iter_crear(documentos);
-	printf("El termino se encuentra en los documentos:\n");
+	if(lista_largo(documentos)==1)
+		printf("El termino se encuentra en el siguiente documento:\n");
+	else
+		printf("El termino se encuentra en los siguientes %zu documentos:\n", lista_largo(documentos));
 	while (!lista_iter_al_final(iter)){
 		size_t doc = *((size_t*) (lista_iter_ver_actual(iter)));
 		char* nomDoc = __obtenerNombreDoc(paths, offsetPaths, doc);
