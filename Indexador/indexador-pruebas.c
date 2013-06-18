@@ -151,9 +151,11 @@ bool continuar_busqueda(){
 		valida = validar_respuesta(caract);
 		if(!valida)
 			printf("Su respuesta es invalida. Por favor ingrese 1 o 2 \n \n");
-	}
-	while (getchar() != '\n')
+
+		while (getchar() != '\n')
 			i++;
+	}
+
 
 	if (caract == '1')
 		return true;
