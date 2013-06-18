@@ -250,8 +250,21 @@ void intersecarPalabrasIguales(lista_t** posiciones, lista_t* original, size_t n
 			size_t* cpy = malloc (sizeof(size_t));
 			*cpy = *pos;
 			lista_insertar_ultimo(aux, cpy);
+			//lista_iter_avanzar(iter);
+			//lista_iter_avanzar(iterSec);
+
 			lista_iter_avanzar(iter);
-			lista_iter_avanzar(iterSec);
+			if (!lista_iter_al_final(iter))
+				pos = lista_iter_ver_actual(iter);
+
+			while(!lista_iter_al_final(iterSec) && (*posSec) < (*pos) ){
+				lista_iter_avanzar(iterSec);
+				if (!lista_iter_al_final(iterSec))
+					posSec = lista_iter_ver_actual(iterSec);
+			}
+
+			continue;
+
 		}
 
 		if ((*posSec - *pos) < num){
