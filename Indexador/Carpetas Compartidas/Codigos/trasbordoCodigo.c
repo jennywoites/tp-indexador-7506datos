@@ -15,7 +15,7 @@ arbol_huff_t* obtenerArbolito(size_t b, int *borrado){
 
 	if (!arboles) arboles = hash_crear(destructorArbol);
 	char* clave = malloc (sizeof(char)*50);
-	sprintf(clave,"%lu", b);
+	sprintf(clave,"%zu", b);
 	arbol_huff_t* arbolito;
 	*borrado = 0;
 	if (hash_pertenece(arboles, clave)){
