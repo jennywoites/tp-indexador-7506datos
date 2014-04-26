@@ -11,6 +11,8 @@
 #define LOG_ENTRADA_ERROR 3
 #define LOG_ENTRADA_PROCESO 4
 
+#include <string>
+
 /* Explicacion: Las entradas al log pueden ser de distinto tipo:
  * - Informativas (comunes)
  * - Informativas importantes (que informan sobre aspectos importantes a guardar)
@@ -29,6 +31,6 @@
 
 #define LOG_MODO LOG_COMPLETO
 
-void log_emitir(const char* mensaje, unsigned int tipo);
+void log_emitir(std::string mensaje, unsigned int tipo);
 
 #endif /* LOG_H_ */
