@@ -1,15 +1,7 @@
 #ifndef LOG_H_
 #define LOG_H_
-#define LOG_NADA 0
-#define LOG_COMPLETO 1
-#define LOG_RELEASE 2
-#define LOG_DEBUG_ERRORES 3
-#define LOG_DEBUG_ERRORES_Y_PROCESOS 4
-
-#define LOG_ENTRADA_INFORMATIVA 1
-#define LOG_ENTRADA_INFORMATIVA_IMPORTANTE 2
-#define LOG_ENTRADA_ERROR 3
-#define LOG_ENTRADA_PROCESO 4
+#define DEBUG 0
+#define RELEASE 1
 
 #include <string>
 
@@ -29,7 +21,7 @@
  * 		contexto).
  * */
 
-#define LOG_MODO LOG_COMPLETO
+#define LOG_MODO DEBUG
 
 void log_emitir(std::string mensaje, unsigned int tipo);
 
